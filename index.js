@@ -74,8 +74,8 @@ app.on("ready", () => {
     app.setAsDefaultProtocolClient("redline")
 
     // Swapper
-    protocol.handle("redline", (request) => {
-        const assetName = new URL(request.url).searchParams.get("asset")
+    protocol.handle("redline", ({ url }) => {
+        const assetName = new URL(url).searchParams.get("asset")
         const localPath = join(configDir, "swapper", assetName)
 
         if (existsSync(localPath)) return net.fetch(pathToFileURL(localPath).toString())

@@ -3,9 +3,12 @@ appId: pro.tricko.redline
 npmRebuild: false
 directories:
   output: "dist"
-artifactName: "${name}-${os}.${ext}"
+artifactName: "${name}-${os}-${arch}.${ext}"
 win:
   target: nsis
+  arch:
+    - x64
+    - ia32
   icon: "assets/icons/icon.ico"
 mac:
   target: dmg
