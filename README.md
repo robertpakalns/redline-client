@@ -7,10 +7,10 @@ This project is open-source. All Redline Client source code is publicly availabl
 ## Features
 * Adblocker
 * Custom Keybinding
+* Deeplinks (`redline:` Protocol)
 * Menu Modal (`F1`)
 * Resource Swapper
 * Userscripts & UserStyles
-* Deeplinks (`redline:` Protocol)
 
 ## Menu Modal
 To open the menu modal, press `F1`.

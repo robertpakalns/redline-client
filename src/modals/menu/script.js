@@ -1,4 +1,5 @@
-import { fromRoot } from "../../utils/functions.js"
+import packageJson from "../../../package.json" with { type: "json" }
+import { fromRoot, createEl } from "../../utils/functions.js"
 import { Config } from "../../utils/config.js"
 import { shell, ipcRenderer } from "electron"
 import Modal from "../modal.js"
@@ -17,6 +18,9 @@ class MenuModal extends Modal {
     }
 
     work() {
+        const _version = this.modal.querySelector("#clientVersion")
+        _version.textContent = `v${packageJson.version}`
+
         const sidebar = document.getElementById("menuSideBar")
         sidebar.querySelector("#redlineIcon").src = fromRoot("assets/icons/icon.png")
 
@@ -33,6 +37,23 @@ class MenuModal extends Modal {
         for (const el of this.modal.querySelectorAll(".url")) el.addEventListener("click", e => {
             e.preventDefault()
             shell.openPath(el.href)
+        })
+
+        // Update client
+        ipcRenderer.on("client-update", (_, data) => {
+            if (data === null) {
+                // popup("rgb(45, 206, 72)", "Update available!")
+            }
+            else if (data === true) {
+                const _updateButton = createEl("button", { textContent: "Update!" })
+                _updateButton.addEventListener("click", () => {
+                    ipcRenderer.send("client-update", "update")
+                    _version.innerText = "Updating..."
+                })
+                _version.innerText = ""
+                _version.appendChild(_updateButton)
+            }
+            else _version.innerText = `Downloading... ${Math.round(data.percent)}%`
         })
 
         // Settings

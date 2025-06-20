@@ -3,12 +3,14 @@ import { fromRoot, getIcon } from "./src/utils/functions.js"
 import { Config, configDir } from "./src/utils/config.js"
 import userscripts from "./src/utils/userscripts.js"
 import keybinding from "./src/utils/keybinding.js"
+import electronUpdater from "electron-updater"
 import enject from "@juice-client/node-enject"
 import swapper from "./src/utils/swapper.js"
 import { pathToFileURL } from "url"
 import { existsSync } from "fs"
 import { join } from "path"
 
+const { autoUpdater } = electronUpdater
 const config = new Config
 
 let mainWindow
@@ -90,6 +92,17 @@ app.on("ready", () => {
         const finalURL = `https://kirka.io/${cleanPath}${hash}`
         if (queryPath) mainWindow.loadURL(finalURL)
     }
+
+    const { webContents } = mainWindow
+
+    // Updater
+    autoUpdater.checkForUpdates()
+    autoUpdater.on("update-available", () => webContents.send("client-update", null))
+    autoUpdater.on("download-progress", value => webContents.send("client-update", value))
+    autoUpdater.on("update-downloaded", () => webContents.send("client-update", true))
+    ipcMain.on("client-update", (_, data) => {
+        if (data === "update") autoUpdater.quitAndInstall()
+    })
 
     ipcMain.on("relaunch", () => confirmAction("Are you sure you want to relaunch the application?", () => {
         app.relaunch()
