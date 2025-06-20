@@ -1,0 +1,27 @@
+productName: Redline Client
+appId: pro.tricko.redline
+npmRebuild: false
+directories:
+  output: "dist"
+artifactName: "${name}-${os}.${ext}"
+win:
+  target: nsis
+  icon: "assets/icon.ico"
+mac:
+  target: dmg
+  icon: "assets/icon.icns"
+linux:
+  target:
+    - AppImage
+    - tar.gz
+  category: Game
+  icon: "assets/icon.png"
+nsis:
+  oneClick: true
+  deleteAppDataOnUninstall: true
+  runAfterFinish: true
+  uninstallDisplayName: "${productName}"
+  shortcutName: "${productName}"
+  differentialPackage: false
+dmg:
+ writeUpdateInfo: false
