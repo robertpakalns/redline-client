@@ -1,0 +1,18 @@
+[
+    {
+        "version": "1.0.2",
+        "date": "June 20, 2025",
+        "description": [
+            "Added changelog in JSON format",
+            "Added Alt+F4 keybind to quit the client",
+            "Added 'Back to Kirka' button for auth pages"
+        ]
+    },
+    {
+        "version": "1.0.0",
+        "date": "June 20, 2025",
+        "description": [
+            "The client has launched with adblocker, userscripts, userstyles, and resource swapper"
+        ]
+    }
+]

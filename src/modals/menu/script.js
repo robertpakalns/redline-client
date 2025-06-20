@@ -61,12 +61,15 @@ class MenuModal extends Modal {
             fpsUncap: "client.fpsUncap",
             adblocker: "client.adblocker",
             fullscreen: "client.fullscreen",
-            swapper: "client.swapper"
+            swapper: "client.swapper",
+            modalHint: "client.modalHint"
         }
         for (const [id, conf] of Object.entries(settingsObj)) {
             document.getElementById(id).checked = config.get(conf)
             document.getElementById(id).addEventListener("change", e => config.set(conf, e.target.checked))
         }
+
+        document.getElementById("modalHint").addEventListener("change", e => ipcRenderer.send("toggle-menu-modal", e.target.checked))
 
         document.getElementById("relaunch").addEventListener("click", () => ipcRenderer.send("relaunch"))
     }

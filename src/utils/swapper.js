@@ -39,7 +39,7 @@ const swapper = webContents => {
 
         if (protocol === "file:") return callback({})
 
-        // Block ads and other scripts which are not Kirka.io related
+        // Block ads and other scripts which are not Kirka related
         if (adblocker && reject.has(host)) return callback({ cancel: true })
 
         if (domains.has(host)) {

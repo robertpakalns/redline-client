@@ -108,4 +108,7 @@ app.on("ready", () => {
         app.relaunch()
         app.exit()
     }))
+
+    // Forward messages
+    for (const e of ["toggle-menu-modal"]) ipcMain.on(e, (_, ...a) => webContents.send(e, ...a))
 })

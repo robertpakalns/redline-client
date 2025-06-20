@@ -28,12 +28,10 @@
         background: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(10px);
     }
-}
 
-
-
-.open {
-    display: block !important;
+    &.open {
+        display: block !important;
+    }
 }
 
 /* Styles */
@@ -173,6 +171,13 @@
         margin: 0;
         padding: 0 15px;
     }
+
+    .content {
+        margin: 5px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 }
 
 @keyframes hop {
@@ -192,14 +197,6 @@ label:disabled {
     opacity: 20%;
     cursor: not-allowed;
 }
-
-.content {
-    margin: 5px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
 
 /* Menu */
 #menuWrapper {

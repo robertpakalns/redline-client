@@ -8,7 +8,8 @@ export const defaultConfig = {
         adblocker: true,
         fpsUncap: true,
         fullscreen: false,
-        swapper: false
+        swapper: false,
+        modalHint: true
     },
     keybinding: {
         enable: false,
