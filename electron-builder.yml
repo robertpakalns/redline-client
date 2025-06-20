@@ -6,16 +6,16 @@ directories:
 artifactName: "${name}-${os}.${ext}"
 win:
   target: nsis
-  icon: "assets/icon.ico"
+  icon: "assets/icons/icon.ico"
 mac:
   target: dmg
-  icon: "assets/icon.icns"
+  icon: "assets/icons/icon.icns"
 linux:
   target:
     - AppImage
     - tar.gz
   category: Game
-  icon: "assets/icon.png"
+  icon: "assets/icons/icon.png"
 nsis:
   oneClick: true
   deleteAppDataOnUninstall: true

@@ -1,12 +1,20 @@
+import { app, BrowserWindow, ipcMain, dialog, protocol, net } from "electron"
 import { fromRoot, getIcon } from "./src/utils/functions.js"
-import { app, BrowserWindow, ipcMain, dialog } from "electron"
+import { Config, configDir } from "./src/utils/config.js"
 import userscripts from "./src/utils/userscripts.js"
 import keybinding from "./src/utils/keybinding.js"
 import enject from "@juice-client/node-enject"
 import swapper from "./src/utils/swapper.js"
+import { pathToFileURL } from "url"
+import { existsSync } from "fs"
+import { join } from "path"
+
+const config = new Config
+
+let mainWindow
 
 const createWindow = () => {
-    const win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         title: "Redline Client",
         icon: getIcon(),
         show: false,
@@ -17,22 +25,23 @@ const createWindow = () => {
         }
     })
 
-    win.once("ready-to-show", () => {
-        const hwnd = win.getNativeWindowHandle().readUInt32LE(0)
+    mainWindow.once("ready-to-show", () => {
+        const hwnd = mainWindow.getNativeWindowHandle().readUInt32LE(0)
         enject.startHook(hwnd)
 
-        win.show()
+        mainWindow.show()
     })
 
-    win.maximize()
-    win.setMenu(null)
-    win.loadURL("https://kirka.io")
-    win.on("page-title-updated", e => e.preventDefault())
+    mainWindow.maximize()
+    mainWindow.setMenu(null)
+    mainWindow.loadURL("https://kirka.io")
+    mainWindow.setFullScreen(config.get("client.fullscreen"))
+    mainWindow.on("page-title-updated", e => e.preventDefault())
 
-    const { webContents } = win
+    const { webContents } = mainWindow
     webContents.on("will-prevent-unload", e => e.preventDefault())
 
-    keybinding(win)
+    keybinding(mainWindow)
     swapper(webContents)
     userscripts(webContents)
 }
@@ -49,10 +58,38 @@ const confirmAction = (message, callback) => {
     if (result === 0) callback()
 }
 
-app.commandLine.appendSwitch("disable-frame-rate-limit")
+if (config.get("client.fpsUncap")) app.commandLine.appendSwitch("disable-frame-rate-limit")
+
+if (!app.requestSingleInstanceLock()) app.quit()
+
+app.on("second-instance", () => {
+    if (!mainWindow) return
+    if (mainWindow.isMinimized()) mainWindow.restore()
+    mainWindow.focus()
+})
 
 app.on("ready", () => {
+    app.setAsDefaultProtocolClient("redline")
+
+    // Swapper
+    protocol.handle("redline", (request) => {
+        const assetName = new URL(request.url).searchParams.get("asset")
+        const localPath = join(configDir, "swapper", assetName)
+
+        if (existsSync(localPath)) return net.fetch(pathToFileURL(localPath).toString())
+    })
+
     createWindow()
+
+    // Deeplink
+    const deeplink = process.argv.find(arg => arg.startsWith("redline:"))
+    if (deeplink) {
+        const { searchParams, hash } = new URL(deeplink)
+        const queryPath = searchParams.get("url")
+        const cleanPath = queryPath ? queryPath.replace(/^\/+/, "").replace(/\/+$/, "") : ""
+        const finalURL = `https://kirka.io/${cleanPath}${hash}`
+        if (queryPath) mainWindow.loadURL(finalURL)
+    }
 
     ipcMain.on("relaunch", () => confirmAction("Are you sure you want to relaunch the application?", () => {
         app.relaunch()

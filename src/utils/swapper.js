@@ -39,15 +39,15 @@ const swapper = webContents => {
 
         if (protocol === "file:") return callback({})
 
-        // Block ads and other scripts which are not voxiom related
+        // Block ads and other scripts which are not Kirka.io related
         if (adblocker && reject.has(host)) return callback({ cancel: true })
 
         if (domains.has(host)) {
 
             // Swapper
             if (swapper) {
-                const swap = swapFile(pathname.split("/").pop())
-                if (swap) return callback({ redirectURL: swap })
+                const fileName = pathname.split("/").pop()
+                if (swapFile(fileName)) return callback({ redirectURL: `redline://local?asset=${encodeURIComponent(fileName)}` })
             }
         }
 
