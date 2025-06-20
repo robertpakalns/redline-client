@@ -59,16 +59,6 @@
     transform: translate(-50%, -50%);
     animation: hop ease 0.3s;
 
-    @keyframes hop {
-        0% {
-            transform: translate(-50%, calc(-50% + 30px));
-        }
-
-        100% {
-            transform: translate(-50%, -50%);
-        }
-    }
-
     h1 {
         font-size: 0.6rem;
         color: gray;
@@ -86,24 +76,29 @@
         height: 10px;
         border: 2px solid #4CAF50;
         border-radius: 2px;
+        transition: 0.3s ease;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        &:checked {
+            background-color: #4CAF50;
+        }
     }
 
-    input[type="checkbox"]:hover {
-        box-shadow: 0 0 5px #4CAF50;
-    }
-
-    input[type="checkbox"]:checked {
-        background-color: #4CAF50;
-    }
 
     button {
         background: transparent;
         outline: none;
         border: none;
         color: white;
+        cursor: pointer;
+        transition: 0.3s ease;
     }
 
     footer {
+        padding: 10px;
         display: flex;
         flex: 1;
         justify-content: center;
@@ -112,6 +107,10 @@
 
         button {
             font-size: 1rem;
+
+            &:hover {
+                transform: scale(1.1);
+            }
         }
     }
 
@@ -170,6 +169,20 @@
         font-weight: 900;
     }
 
+    ul {
+        margin: 0;
+        padding: 0 15px;
+    }
+}
+
+@keyframes hop {
+    0% {
+        transform: translate(-50%, calc(-50% + 30px));
+    }
+
+    100% {
+        transform: translate(-50%, -50%);
+    }
 }
 
 .disabled,
@@ -265,17 +278,16 @@ label:disabled {
         height: 10px;
         border: 2px solid #4CAF50;
         border-radius: 10px;
+        transition: 0.3s ease;
+
+        &:hover {
+            box-shadow: 0 0 5px #4CAF50;
+        }
+
+        &:checked {
+            background-color: #4CAF50;
+        }
     }
-
-    input[type="radio"]:hover {
-        box-shadow: 0 0 5px #4CAF50;
-    }
-
-
-    input[type="radio"]:checked {
-        background-color: #4CAF50;
-    }
-
 }
 
 #userScriptsBlock {
@@ -303,7 +315,7 @@ label:disabled {
     padding: 2px 5px;
     color: #ffe4e1;
     background: rgba(255, 255, 255, 0.1);
-    transition: background-color 0.1s ease;
+    transition: 0.3s ease;
 
     &:hover {
         background: rgba(255, 255, 255, 0.3);

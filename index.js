@@ -1,10 +1,9 @@
-import { app, BrowserWindow } from "electron"
+import { fromRoot, getIcon } from "./src/utils/functions.js"
+import { app, BrowserWindow, ipcMain, dialog } from "electron"
+import userscripts from "./src/utils/userscripts.js"
+import keybinding from "./src/utils/keybinding.js"
 import enject from "@juice-client/node-enject"
 import swapper from "./src/utils/swapper.js"
-import keybinding from "./src/utils/keybinding.js"
-import userscripts from "./src/utils/userscripts.js"
-
-import { fromRoot, getIcon } from "./src/utils/functions.js"
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -38,6 +37,25 @@ const createWindow = () => {
     userscripts(webContents)
 }
 
+const confirmAction = (message, callback) => {
+    const result = dialog.showMessageBoxSync({
+        type: "question",
+        buttons: ["Yes", "No"],
+        defaultId: 1,
+        icon: getIcon(),
+        title: "Redline Client | Confirm",
+        message
+    })
+    if (result === 0) callback()
+}
+
 app.commandLine.appendSwitch("disable-frame-rate-limit")
 
-app.whenReady().then(createWindow)
+app.on("ready", () => {
+    createWindow()
+
+    ipcMain.on("relaunch", () => confirmAction("Are you sure you want to relaunch the application?", () => {
+        app.relaunch()
+        app.exit()
+    }))
+})
