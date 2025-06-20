@@ -253,7 +253,7 @@ label:disabled {
     }
 }
 
-#version {
+#clientVersion {
     padding: 10px;
 }
 

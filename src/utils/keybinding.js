@@ -16,6 +16,7 @@ const keybinding = win => {
     register(Reload, () => webContents.reload())
     register(Fullscreen, () => win.setFullScreen(!win.isFullScreen()))
     register(DevTools, () => webContents.toggleDevTools())
+    register("Ctrl+Shift+C", () => webContents.toggleDevTools())
 }
 
 export default keybinding

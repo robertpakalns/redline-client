@@ -3,6 +3,7 @@ import { fromRoot, createEl } from "../utils/functions.js"
 import { ipcRenderer } from "electron"
 import { readFileSync } from "fs"
 import { Config } from "../utils/config.js"
+import packageJson from "../../package.json" with { type: "json" }
 
 const config = new Config
 
@@ -44,6 +45,43 @@ window.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#app #left-icons").appendChild(_hint)
 
     ipcRenderer.on("toggle-menu-modal", (_, toggle) => _hint.style.display = toggle ? "block" : "none")
+
+    // Console
+    const versions = {
+        CHROMIUM: process.versions.chrome,
+        ELECTRON: process.versions.electron,
+        NODE: process.versions.node,
+        CLIENT: packageJson.version
+    }
+
+    const setVersions = toggle => {
+        const versionOverlay = document.getElementById("overlay")
+        if (versionOverlay) {
+            for (const [key, value] of Object.entries(versions)) {
+                const el = document.getElementById(key)
+                if (el) el.style.display = toggle ? "block" : "none"
+                else {
+                    const _span = createEl("span", { id: key }, "", [`${key} v${value}`])
+
+                    const _div = createEl("div", {}, "", [_span])
+                    versionOverlay.appendChild(_div)
+                }
+            }
+        }
+    }
+
+    const observer = new MutationObserver(() => {
+        const versionElement = document.querySelector("#overlay #version")
+        if (versionElement) {
+            const currentEmpty = versionElement.textContent === ""
+            setVersions(!currentEmpty)
+        }
+    })
+    observer.observe(document.getElementById("overlay"), {
+        childList: true,
+        subtree: true,
+        characterData: true
+    })
 })
 
 
