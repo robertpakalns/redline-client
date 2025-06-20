@@ -22,3 +22,9 @@ To use the swapper:
 * Go to `%userprofile%/Documents/RedlineClient/swapper` and place the file there
 * Reload the client to apply changes
 * [Example with Voxtulate Client (Extended Swapper)](https://github.com/robertpakalns/VoxtulateClient/wiki/Resource-Swapper)
+
+## Credits
+* xip for Kirka.io
+* Voxtulate Client (robertpakalns) for core features
+* Juice Client (irrvlo) for additional features
+* PVT and CarrySheriff for the client logo
