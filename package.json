@@ -2,14 +2,13 @@
   "type": "module",
   "name": "redline-client",
   "version": "1.0.0",
-  "description": "",
+  "description": "Unofficial Electron client for Kirka.io",
+  "author": "robertpakalns",
   "main": "index.js",
   "scripts": {
     "dev": "electron .",
     "build": "electron-builder"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
   "devDependencies": {
     "electron": "^36.5.0",
