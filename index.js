@@ -6,12 +6,14 @@ import keybinding from "./src/utils/keybinding.js"
 import electronUpdater from "electron-updater"
 import enject from "@juice-client/node-enject"
 import swapper from "./src/utils/swapper.js"
+import DRPC from "./src/utils/drpc.js"
 import { pathToFileURL } from "url"
 import { existsSync } from "fs"
 import { join } from "path"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
+new DRPC
 
 let mainWindow
 
