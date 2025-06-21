@@ -9,6 +9,7 @@ This project is open-source. All Redline Client source code is publicly availabl
 * Client and Engine Versions in-game
 * Custom Keybinding
 * Deeplinks (`redline:` Protocol)
+* Discord Rich Presence
 * Menu Modal (`F1`)
 * Resource Swapper
 * Userscripts & UserStyles

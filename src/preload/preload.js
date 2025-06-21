@@ -1,13 +1,28 @@
 import MenuModal from "../modals/menu/script.js"
 import { fromRoot, createEl } from "../utils/functions.js"
-import { ipcRenderer } from "electron"
+import { ipcRenderer, shell } from "electron"
 import { readFileSync } from "fs"
 import { Config } from "../utils/config.js"
 import packageJson from "../../package.json" with { type: "json" }
 
 const config = new Config
 
+const _console = {
+    log: console.log.bind(console),
+    warn: console.warn.bind(console),
+    error: console.error.bind(console),
+    info: console.info.bind(console),
+    trace: console.trace.bind(console)
+}
+
 window.addEventListener("DOMContentLoaded", () => {
+    // Return console methods
+    console.log = _console.log
+    console.warn = _console.warn
+    console.error = _console.error
+    console.info = _console.info
+    console.trace = _console.trace
+
     trustedTypes.createPolicy("default", { createHTML: html => html })
 
     const modalStyles = document.createElement("style")
@@ -70,18 +85,45 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Tricko links in profile
+    const setTrickoLink = () => {
+        const playerProfileCont = document.querySelector(".profile-cont")
+        if (!playerProfileCont) return
+
+        if (document.querySelector(".playerTrickoLink")) return
+
+        const playerIDCont = playerProfileCont.querySelector(".copy-cont .value")
+        if (!playerIDCont) return
+
+        const playerID = playerIDCont.innerHTML
+        const trickoLink = `https://tricko.pro/kirka/player/${decodeURIComponent(playerID.replace("#", ""))}`
+
+        const bottomCont = playerProfileCont.querySelector(".bottom")
+        if (!bottomCont) return
+
+        const copiedNode = bottomCont.childNodes[1].cloneNode(true)
+        copiedNode.classList.add("playerTrickoLink")
+        copiedNode.textContent = "TRICKO"
+        copiedNode.addEventListener("click", () => shell.openExternal(trickoLink))
+
+        bottomCont.prepend(copiedNode)
+    }
+
     const observer = new MutationObserver(() => {
+        console.log("setting tricko links...")
+        setTrickoLink()
+    })
+    observer.observe(document.getElementById("app"), { childList: true, subtree: true })
+
+    const consoleObserver = new MutationObserver(() => {
         const versionElement = document.querySelector("#overlay #version")
         if (versionElement) {
             const currentEmpty = versionElement.textContent === ""
             setVersions(!currentEmpty)
         }
+
     })
-    observer.observe(document.getElementById("overlay"), {
-        childList: true,
-        subtree: true,
-        characterData: true
-    })
+    consoleObserver.observe(document.getElementById("overlay"), { childList: true, subtree: true, characterData: true })
 })
 
 
