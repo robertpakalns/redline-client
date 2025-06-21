@@ -3,7 +3,10 @@
         "version": "1.0.3",
         "date": "June 21, 2025",
         "description": [
-           "Added client, Node, Electron, and Chromium versions into in-game console"
+            "Added client, Node, Electron, and Chromium versions into in-game console",
+            "Added access to console.log, console.error etc.",
+            "Added links to Tricko in player modals",
+            "Added Discord Rich Presence"
         ]
     },
     {

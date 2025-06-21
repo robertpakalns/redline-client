@@ -12,6 +12,7 @@ This project is open-source. All Redline Client source code is publicly availabl
 * Discord Rich Presence
 * Menu Modal (`F1`)
 * Resource Swapper
+* Tricko Links in Player Modals
 * Userscripts & UserStyles
 
 ## Menu Modal
