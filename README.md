@@ -19,8 +19,9 @@ This project is open-source. All Redline Client source code is publicly availabl
    * Resource Swapper
 * Deeplinks (`redline:` Protocol)
 * Discord Rich Presence
-* Import/Export Game/Client Settings
+<!-- * Import/Export Game/Client Settings -->
 * Menu Modal (`F1`)
+* Proxy Domain Support
 * Tricko Links in Player Modals
 
 ## Menu Modal

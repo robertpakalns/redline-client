@@ -1,5 +1,5 @@
+import { createEl, fromRoot, getHost } from "../utils/functions.js"
 import packageJson from "../../package.json" with { type: "json" }
-import { createEl, fromRoot } from "../utils/functions.js"
 import { shell } from "electron"
 
 // Go back to Kirka from Auth page
@@ -8,14 +8,14 @@ export const backToKirka = () => {
         "www.facebook.com",
         "accounts.google.com",
         "appleid.apple.com",
-        "id.twitch.tv",
+        "www.twitch.tv",
         "discord.com",
         "id.vk.com"
     ])
 
     if (authDomains.has(window.location.host)) {
         const _back = createEl("div", {}, "backToKirka", ["Back to Kirka"])
-        _back.addEventListener("click", () => window.location.href = "https://kirka.io")
+        _back.addEventListener("click", () => window.location.href = `https://${getHost()}`)
         document.body.appendChild(_back)
     }
 }

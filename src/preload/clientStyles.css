@@ -7,6 +7,7 @@
     font-size: 2rem;
     transition: 0.3s ease;
     animation: colored 3s infinite alternate;
+    z-index: 100000;
 
     &:hover {
         transform: scale(1.1);

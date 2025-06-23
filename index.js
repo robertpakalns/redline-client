@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, dialog, protocol, net } from "electron"
-import { fromRoot, getIcon, domains } from "./src/utils/functions.js"
+import { fromRoot, getIcon, getHost } from "./src/utils/functions.js"
 import { Config, configDir } from "./src/utils/config.js"
 import userscripts from "./src/utils/userscripts.js"
 import keybinding from "./src/utils/keybinding.js"
@@ -16,9 +16,6 @@ const config = new Config
 const drpc = new DRPC
 
 let mainWindow
-
-const host = config.get("client.domain")
-const hostInit = domains.has(host) ? host : "kirka.io"
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -47,7 +44,7 @@ const createWindow = () => {
 
     mainWindow.maximize()
     mainWindow.setMenu(null)
-    mainWindow.loadURL(`https://${hostInit}`)
+    mainWindow.loadURL(`https://${getHost()}`)
     mainWindow.setFullScreen(config.get("client.fullscreen"))
     mainWindow.on("page-title-updated", e => e.preventDefault())
 
@@ -104,7 +101,7 @@ app.on("ready", () => {
         const { searchParams, hash } = new URL(deeplink)
         const queryPath = searchParams.get("url")
         const cleanPath = queryPath ? queryPath.replace(/^\/+/, "").replace(/\/+$/, "") : ""
-        const finalURL = `https://${hostInit}/${cleanPath}${hash}`
+        const finalURL = `https://${getHost()}/${cleanPath}${hash}`
         if (queryPath) mainWindow.loadURL(finalURL)
     }
 

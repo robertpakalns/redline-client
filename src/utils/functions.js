@@ -1,7 +1,10 @@
 import { resolve, dirname } from "path"
 import { nativeImage } from "electron"
+import { Config } from "./config.js"
 import { fileURLToPath } from "url"
 import { join } from "path"
+
+const config = new Config
 
 const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../../")
 export const fromRoot = path => join(__root, path)
@@ -15,6 +18,11 @@ export const domains = new Set([
     "fpsiogame.com",
     "cloudconverts.com"
 ])
+
+const host = config.get("client.domain")
+export const getHost = () => {
+    return domains.has(host) ? host : "kirka.io"
+}
 
 // Redline Client icon
 const extObj = {
