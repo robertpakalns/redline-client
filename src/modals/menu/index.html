@@ -10,6 +10,7 @@
 
             <div id="menuSideBarList">
                 <button id="settingsSection" class="sideBarItem list-el">Settings</button>
+                <button id="customizationSection" class="sideBarItem list-el">Customizations</button>
                 <button id="infoSection" class="sideBarItem list-el">Info</button>
             </div>
 
@@ -59,6 +60,59 @@
 
             </div>
 
+            <div class="mainContentBlock" name="customizationSection">
+                <header>Custom Keybinding</header>
+                <div class="content">
+                    <input type="checkbox" id="enableKeybinding">
+                    <div>Enable Custom Keybinding</div>
+                </div>
+                <div class="subText">
+                    Setting multiple options to the same key might lead to unpredictable behavior
+                </div>
+                <p class="warning">Requires client restart!</p>
+                <table id="keybindingTable">
+                    <thead>
+                        <tr>
+                            <td>Name</td>
+                            <td>Key</td>
+                        </tr>
+                    </thead>
+                    <tbody id="keybindingBody"></tbody>
+                </table>
+
+                <header>Userscripts</header>
+                To use the userscripts:
+                <ol>
+                    <li>Open the <a href="#" id="userscriptsFolder">userscripts folder</a></li>
+                    <li>Put there your scripts. Make sure the files are ending with the .js extension!</li>
+                    <li>Reload the client to apply changes</li>
+                </ol>
+
+                <header>Userstyles</header>
+                To use the userstyles:
+
+                <ol>
+                    <li>Open the <a href="#" id="userstylesFolder">userstyles folder</a></li>
+                    <li>Put there your styles. Make sure the files are ending with the .css extension!</li>
+                    <li>Reload the client to apply changes</li>
+                </ol>
+
+                <header>Resource Swapper</header>
+                To use the swapper:
+                <ol>
+                    <li>Make sure you enabled it in the menu modal Settings section</li>
+                    <li>Get the file URL you want to swap and extract only the file name and extension</li>
+                    <li>Open the <a href="#" id="swapperFolder">swapper folder</a> and place the file there</li>
+                    <li>Reload the client to apply changes</li>
+                    <li>
+                        <a class="url" href="https://github.com/robertpakalns/VoxtulateClient/wiki/Resource-Swapper">
+                            Example with Voxtulate Client (Extended Swapper)
+                        </a>
+                    </li>
+                </ol>
+
+            </div>
+
             <div class="mainContentBlock" name="infoSection">
                 <header>Redline Client</header>
                 <div class="block">
@@ -66,14 +120,20 @@
                     <h4>Features</h4>
                     <ul>
                         <li>Adblocker</li>
+                        <li>Changelog</li>
                         <li>Client and Engine Versions in-game</li>
-                        <li>Custom Keybinding</li>
+                        <li>Customizations</li>
+                        <ul>
+                            <li>Custom Keybinding</li>
+                            <li>Userscripts</li>
+                            <li>Userstyles</li>
+                            <li>Resource Swapper</li>
+                        </ul>
                         <li>Deeplinks (redline: Protocol)</li>
                         <li>Discord Rich Presence</li>
+                        <li>Import/Export Game/Client Settings</li>
                         <li>Menu Modal (F1)</li>
-                        <li>Resource Swapper</li>
                         <li>Tricko Links in Player Modals</li>
-                        <li>Userscripts & UserStyles</li>
                     </ul>
                     <p>This project is still raw; more features will be added soon!</p>
                 </div>

@@ -178,6 +178,15 @@
         align-items: center;
         gap: 8px;
     }
+
+    input[type="text"] {
+        cursor: pointer;
+        color: white;
+        background: transparent;
+        outline: none;
+        border: none;
+        border-bottom: 1px solid rgb(50, 50, 50);
+    }
 }
 
 @keyframes hop {

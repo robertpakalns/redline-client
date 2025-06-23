@@ -1,8 +1,9 @@
 import packageJson from "../../../package.json" with { type: "json" }
 import { fromRoot, createEl } from "../../utils/functions.js"
-import { Config } from "../../utils/config.js"
+import { Config, configDir } from "../../utils/config.js"
 import { shell, ipcRenderer } from "electron"
 import Modal from "../modal.js"
+import { join } from "path"
 
 const config = new Config
 
@@ -62,7 +63,9 @@ class MenuModal extends Modal {
             adblocker: "client.adblocker",
             fullscreen: "client.fullscreen",
             swapper: "client.swapper",
-            modalHint: "client.modalHint"
+            modalHint: "client.modalHint",
+
+            enableKeybinding: "keybinding.enable"
         }
         for (const [id, conf] of Object.entries(settingsObj)) {
             document.getElementById(id).checked = config.get(conf)
@@ -72,6 +75,43 @@ class MenuModal extends Modal {
         document.getElementById("modalHint").addEventListener("change", e => ipcRenderer.send("toggle-menu-modal", e.target.checked))
 
         document.getElementById("relaunch").addEventListener("click", () => ipcRenderer.send("relaunch"))
+
+        this.modal.querySelector("#userscriptsFolder").addEventListener("click", () => shell.openPath(join(configDir, "scripts")))
+        this.modal.querySelector("#userstylesFolder").addEventListener("click", () => shell.openPath(join(configDir, "styles")))
+        this.modal.querySelector("#swapperFolder").addEventListener("click", () => shell.openPath(join(configDir, "swapper")))
+
+        // Keybinding
+        const keybindingCont = this.modal.querySelector("#keybindingBody")
+        const keybindingRow = (name, key) => {
+            const _inputChild = createEl("input", { type: "text", value: key })
+            _inputChild.addEventListener("keydown", e => {
+                e.preventDefault()
+                _inputChild.value = e.code
+                config.set(`keybinding.content.${name}`, e.code)
+            })
+
+            const _name = createEl("td", { textContent: name })
+            const _input = createEl("td", {}, "", [_inputChild])
+            const tr = createEl("tr", {}, "", [_name, _input])
+
+            keybindingCont.appendChild(tr)
+        }
+
+        const { content: c2 } = config.get("keybinding")
+        for (const key in c2) keybindingRow(key, c2[key])
+
+        const _enableKeybinding = document.getElementById("enableKeybinding")
+        const _keybindingTable = document.getElementById("keybindingTable")
+
+        const toggleKeybinding = () => {
+            const checked = _enableKeybinding.checked
+            _keybindingTable.classList.toggle("disabled", !checked)
+            for (const item of _keybindingTable.querySelectorAll("input")) item.disabled = !checked
+        }
+
+        toggleKeybinding()
+        // _enableKeybinding.checked = config.get("keybinding.enable")
+        _enableKeybinding.addEventListener("change", toggleKeybinding)
     }
 }
 

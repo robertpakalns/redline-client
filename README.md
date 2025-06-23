@@ -9,14 +9,18 @@ This project is open-source. All Redline Client source code is publicly availabl
 
 ## Features
 * Adblocker
+* Changelog
 * Client and Engine Versions in-game
-* Custom Keybinding
+* Customizations
+   * Custom Keybinding
+   * Userscripts
+   * Userstyles
+   * Resource Swapper
 * Deeplinks (`redline:` Protocol)
 * Discord Rich Presence
+* Import/Export Game/Client Settings
 * Menu Modal (`F1`)
-* Resource Swapper
 * Tricko Links in Player Modals
-* Userscripts & UserStyles
 
 ## Menu Modal
 To open the menu modal, press `F1`.
