@@ -13,7 +13,7 @@ import { join } from "path"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
-new DRPC
+const drpc = new DRPC
 
 let mainWindow
 
@@ -50,7 +50,10 @@ const createWindow = () => {
 
     const { webContents } = mainWindow
     webContents.on("will-prevent-unload", e => e.preventDefault())
-    webContents.on("did-navigate-in-page", () => webContents.send("url-change"))
+    webContents.on("did-navigate-in-page", (_, url) => {
+        webContents.send("url-change")
+        drpc.setState(url)
+    })
 
     keybinding(mainWindow)
     swapper(webContents)

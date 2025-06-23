@@ -13,6 +13,7 @@ This project is open-source. All Redline Client source code is publicly availabl
 * Client and Engine Versions in-game
 * Customizations
    * Custom Keybinding
+   * Fast CSS
    * Userscripts
    * Userstyles
    * Resource Swapper
@@ -38,5 +39,7 @@ To use the swapper:
 * Voxtulate Client (robertpakalns) for core features
 * Juice Client (irrvlo) for additional features
 * PVT and CarrySheriff for the client logo
+
+In partnership with Kirka clan [`ImOn_Smoko`](https://discord.gg/BBchaJvZVU)
 
 [by robertpakalns](https://github.com/robertpakalns) | [Community Server](https://discord.gg/cTE6CVuGen) | [Powered by Tricko](https://discord.gg/yPjrUrvSzv)

@@ -1,4 +1,26 @@
 import { Client } from "discord-rpc"
+import { URL } from "url"
+
+const staticLinks = {
+    "/": "Viewing main lobby",
+    "/hub/leaderboard": "Viewing player leaderboard",
+    "/hub/clans/champions-league": "Viewing clan leaderboard",
+    "/hub/ranked/leaderboard-point3v3": "Viewing ranked leaderboard: Point 3v3",
+    "/hub/ranked/leaderboard-sad": "Viewing ranked leaderboard: Search And Destroy",
+    "/hub/ranked/leaderboard-1v1": "Viewing ranked leaderboard: 1v1",
+    "/hub/clans/my-clan": "Viewing their clan",
+    "/hub/market": "Viewing market",
+    "/hub/live": "Viewing videos",
+    "/hub/news": "Viewing news",
+    "/hub/terms": "Viewing terms of service",
+    "/store": "Viewing store",
+    "/servers/main": "Viewing servers",
+    "/servers/parkour": "Viewing parkour servers",
+    "/servers/custom": "Viewing custom servers",
+    "/quests/hourly": "Viewing hourly quests",
+    "/friends": "Viewing their friends",
+    "/inventory": "Viewing their inventory"
+}
 
 class DRPC {
     constructor() {
@@ -33,6 +55,21 @@ class DRPC {
             ]
 
         })
+    }
+
+    setState(url) {
+        console.log(url)
+        const { pathname } = new URL(url)
+        if (!this.connected) return
+
+        let result = "Playing Kirka.io"
+
+        if (pathname.startsWith("/games")) {
+            result = `Playing a match in ${pathname.split("/").pop().split("~")[0]} server`
+        }
+        else if (staticLinks[pathname]) result = staticLinks[pathname]
+
+        this.state = result
     }
 }
 
