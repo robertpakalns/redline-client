@@ -22,16 +22,32 @@ const appendStyles = () => {
     const clientStyles = document.createElement("style")
     clientStyles.innerHTML = readFileSync(fromRoot("src/preload/clientStyles.css"), "utf8") + `
         .clientModalHint { display: ${config.get("client.modalHint") ? "block" : "none"} }`
-    document.head.append(modalStyles, clientStyles)
+
+    const fastCSSStyles = document.createElement("style")
+    fastCSSStyles.id = "fastCSSStyles"
+
+    const fastCSSLink = document.createElement("link")
+    fastCSSLink.id = "fastCSSLink"
+    fastCSSLink.rel = "stylesheet"
+
+    const { enable, url, value } = config.get("fastCSS")
+
+    if (enable) {
+        fastCSSStyles.innerHTML = value
+        fastCSSLink.href = url
+        document.head.appendChild(fastCSSLink)
+    }
+
+    document.head.append(modalStyles, clientStyles, fastCSSStyles)
 }
 
 window.addEventListener("DOMContentLoaded", () => {
     // Return console methods
-    console.log = _console.log;
-    console.warn = _console.warn;
-    console.error = _console.error;
-    console.info = _console.info;
-    console.trace = _console.trace;
+    console.log = _console.log
+    console.warn = _console.warn
+    console.error = _console.error
+    console.info = _console.info
+    console.trace = _console.trace
 
     ipcRenderer.on("url-change", () => {
         console.log = _console.log
@@ -57,6 +73,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     ipcRenderer.on("toggle-menu-modal", (_, toggle) => _hint.style.display = toggle ? "block" : "none")
 
+    // Observers
     const observer = new MutationObserver(() => {
         setTrickoLink()
         changeLogo()
@@ -71,6 +88,35 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     })
     consoleObserver.observe(document.getElementById("overlay"), { childList: true, subtree: true, characterData: true })
+
+    // Fast CSS
+    const fastCSSStyles = document.getElementById("fastCSSStyles")
+    let fastCSSLink = document.getElementById("fastCSSLink")
+
+    ipcRenderer.on("change-fast-css", (_, enable, url, value) => {
+        if (!enable) {
+            fastCSSStyles.innerHTML = ""
+            if (fastCSSLink) {
+                fastCSSLink.remove()
+                fastCSSLink = null
+            }
+            return
+        }
+
+        fastCSSStyles.innerHTML = value
+
+        if (url) {
+            if (!fastCSSLink) {
+                fastCSSLink = createEl("link", { id: "fastCSSLink", rel: "stylesheet" })
+                document.head.appendChild(fastCSSLink)
+            }
+            fastCSSLink.href = url
+        }
+        else if (fastCSSLink) {
+            fastCSSLink.remove()
+            fastCSSLink = null
+        }
+    })
 })
 
 ipcRenderer.on("toggle-window", (_, modal) => { // Toggles modals on keybinds

@@ -11,6 +11,11 @@ export const defaultConfig = {
         swapper: false,
         modalHint: true
     },
+    fastCSS: {
+        enable: false,
+        url: "",
+        value: ""
+    },
     keybinding: {
         enable: false,
         content: {

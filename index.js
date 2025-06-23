@@ -119,5 +119,6 @@ app.on("ready", () => {
     }))
 
     // Forward messages
-    for (const e of ["toggle-menu-modal"]) ipcMain.on(e, (_, ...a) => webContents.send(e, ...a))
+    for (const e of ["toggle-menu-modal", "change-fast-css"])
+        ipcMain.on(e, (_, ...a) => webContents.send(e, ...a))
 })

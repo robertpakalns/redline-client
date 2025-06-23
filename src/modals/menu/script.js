@@ -66,7 +66,9 @@ class MenuModal extends Modal {
             swapper: "client.swapper",
             modalHint: "client.modalHint",
 
-            enableKeybinding: "keybinding.enable"
+            enableKeybinding: "keybinding.enable",
+
+            enableFastCSS: "fastCSS.enable"
         }
         for (const [id, conf] of Object.entries(settingsObj)) {
             document.getElementById(id).checked = config.get(conf)
@@ -121,6 +123,24 @@ class MenuModal extends Modal {
 
         // Changelog
         createChangelogSection()
+
+        // Fast CSS
+        const fastCSSURL = this.modal.querySelector("#fastCSSURL")
+        fastCSSURL.addEventListener("change", e => config.set("fastCSS.url", e.target.value))
+        fastCSSURL.value = config.get("fastCSS.url")
+
+        const fastCSSValue = this.modal.querySelector("#fastCSSValue")
+        fastCSSValue.addEventListener("input", e => config.set("fastCSS.value", e.target.value))
+        fastCSSValue.value = config.get("fastCSS.value")
+
+        const enableFastCSS = this.modal.querySelector("#enableFastCSS")
+
+        for (const id of ["enableFastCSS", "fastCSSURL", "fastCSSValue"]) {
+            const eventType = id === "enableFastCSS" ? "change" : "input"
+            this.modal.querySelector(`#${id}`).addEventListener(eventType, () => {
+                ipcRenderer.send("change-fast-css", enableFastCSS.checked, fastCSSURL.value, fastCSSValue.value)
+            })
+        }
     }
 }
 
