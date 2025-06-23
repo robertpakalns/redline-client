@@ -27,11 +27,19 @@ const appendStyles = () => {
 
 window.addEventListener("DOMContentLoaded", () => {
     // Return console methods
-    console.log = _console.log
-    console.warn = _console.warn
-    console.error = _console.error
-    console.info = _console.info
-    console.trace = _console.trace
+    console.log = _console.log;
+    console.warn = _console.warn;
+    console.error = _console.error;
+    console.info = _console.info;
+    console.trace = _console.trace;
+
+    ipcRenderer.on("url-change", () => {
+        console.log = _console.log
+        console.warn = _console.warn
+        console.error = _console.error
+        console.info = _console.info
+        console.trace = _console.trace
+    })
 
     trustedTypes.createPolicy("default", { createHTML: html => html })
 
@@ -64,7 +72,6 @@ window.addEventListener("DOMContentLoaded", () => {
     })
     consoleObserver.observe(document.getElementById("overlay"), { childList: true, subtree: true, characterData: true })
 })
-
 
 ipcRenderer.on("toggle-window", (_, modal) => { // Toggles modals on keybinds
     const openedModal = document.querySelector(".modalWrapper.open")

@@ -25,12 +25,18 @@ const createWindow = () => {
         webPreferences: {
             preload: fromRoot("src/preload/preload.js"),
             nodeIntegration: true,
-            webSecurity: false
+            webSecurity: false,
+            contextIsolation: false
         }
     })
 
     mainWindow.once("ready-to-show", () => {
-        const hwnd = mainWindow.getNativeWindowHandle().readUInt32LE(0)
+        const handleBuffer = mainWindow.getNativeWindowHandle()
+        let hwnd
+
+        if (process.arch === "x64" || process.arch === "arm64") hwnd = Number(handleBuffer.readBigUInt64LE(0))
+        else hwnd = handleBuffer.readUInt32LE(0)
+
         enject.startHook(hwnd)
 
         mainWindow.show()
@@ -44,6 +50,7 @@ const createWindow = () => {
 
     const { webContents } = mainWindow
     webContents.on("will-prevent-unload", e => e.preventDefault())
+    webContents.on("did-navigate-in-page", () => webContents.send("url-change"))
 
     keybinding(mainWindow)
     swapper(webContents)
