@@ -1,5 +1,5 @@
 import packageJson from "../../../package.json" with { type: "json" }
-import { fromRoot, createEl } from "../../utils/functions.js"
+import { fromRoot, createEl, domains } from "../../utils/functions.js"
 import { Config, configDir } from "../../utils/config.js"
 import createChangelogSection from "./changelog.js"
 import { shell, ipcRenderer } from "electron"
@@ -140,6 +140,13 @@ class MenuModal extends Modal {
             this.modal.querySelector(`#${id}`).addEventListener(eventType, () => {
                 ipcRenderer.send("change-fast-css", enableFastCSS.checked, fastCSSURL.value, fastCSSValue.value)
             })
+        }
+
+        // Domains
+        const domainSelect = this.modal.querySelector("#gameDomain")
+        for (const el of domains) {
+            const option = createEl("option", { value: el }, "", [el])
+            domainSelect.appendChild(option)
         }
     }
 }

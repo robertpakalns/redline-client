@@ -6,6 +6,17 @@ import { join } from "path"
 const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../../")
 export const fromRoot = path => join(__root, path)
 
+// Kirka.io Domains
+export const domains = new Set([
+    "kirka.io",
+    "cloudyfrogs.com",
+    "snipers.io",
+    "ask101math.com",
+    "fpsiogame.com",
+    "cloudconverts.com"
+])
+
+// Redline Client icon
 const extObj = {
     win32: "ico",
     darwin: "icns",

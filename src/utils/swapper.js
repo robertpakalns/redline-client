@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync } from "fs"
+import { existsSync, mkdirSync, readdirSync } from "fs"
 import { Config, configDir } from "./config.js"
+import { domains } from "./functions.js"
 import { join } from "path"
 const config = new Config
 
@@ -8,15 +9,6 @@ const swapper = webContents => {
         "api.adinplay.com",
         "www.google-analytics.com",
         "www.googletagmanager.com"
-    ])
-
-    const domains = new Set([
-        "kirka.io",
-        "cloudyfrogs.com",
-        "snipers.io",
-        "ask101math.com",
-        "fpsiogame.com",
-        "cloudconverts.com"
     ])
 
     const { adblocker, swapper } = config.get("client")

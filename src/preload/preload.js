@@ -1,5 +1,5 @@
 import { backToKirka, setVersions, setTrickoLink, changeLogo } from "./preloadUtils.js"
-import { fromRoot, createEl } from "../utils/functions.js"
+import { fromRoot, createEl, domains } from "../utils/functions.js"
 import MenuModal from "../modals/menu/script.js"
 import { Config } from "../utils/config.js"
 import { ipcRenderer } from "electron"
@@ -42,6 +42,12 @@ const appendStyles = () => {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+    trustedTypes.createPolicy("default", { createHTML: html => html })
+    backToKirka()
+    appendStyles()
+
+    if (!domains.has(window.location.host)) return
+
     // Return console methods
     console.log = _console.log
     console.warn = _console.warn
@@ -57,15 +63,11 @@ window.addEventListener("DOMContentLoaded", () => {
         console.trace = _console.trace
     })
 
-    trustedTypes.createPolicy("default", { createHTML: html => html })
 
-    appendStyles()
 
     const menuModal = new MenuModal
     menuModal.init()
     menuModal.work()
-
-    backToKirka()
 
     // Modal Hint
     const _hint = createEl("div", {}, "clientModalHint", [`Press ${config.get("keybinding.content.MenuModal")} to open menu`])

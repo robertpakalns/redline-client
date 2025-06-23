@@ -205,6 +205,25 @@
         color: white;
         border-radius: 20px;
     }
+
+    select {
+        padding: 5px;
+        background: transparent;
+        outline: none;
+        border: none;
+        color: white;
+        border-bottom: 1px solid rgb(50, 50, 50);
+
+        option {
+            &:nth-child(odd) {
+                background: rgb(50, 50, 50);
+            }
+
+            &:nth-child(even) {
+                background: rgb(40, 40, 40);
+            }
+        }
+    }
 }
 
 @keyframes hop {
