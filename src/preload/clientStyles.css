@@ -43,3 +43,12 @@
     color: #fff;
     width: max-content;
 }
+
+/* Fixing xip's bugs in styling */
+.profile-cont .bottom {
+    gap: 10px;
+
+    * {
+        margin: 0 !important;
+    }
+}
