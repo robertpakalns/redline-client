@@ -1,6 +1,7 @@
 import packageJson from "../../../package.json" with { type: "json" }
 import { fromRoot, createEl } from "../../utils/functions.js"
 import { Config, configDir } from "../../utils/config.js"
+import createChangelogSection from "./changelog.js"
 import { shell, ipcRenderer } from "electron"
 import Modal from "../modal.js"
 import { join } from "path"
@@ -76,9 +77,15 @@ class MenuModal extends Modal {
 
         document.getElementById("relaunch").addEventListener("click", () => ipcRenderer.send("relaunch"))
 
-        this.modal.querySelector("#userscriptsFolder").addEventListener("click", () => shell.openPath(join(configDir, "scripts")))
-        this.modal.querySelector("#userstylesFolder").addEventListener("click", () => shell.openPath(join(configDir, "styles")))
-        this.modal.querySelector("#swapperFolder").addEventListener("click", () => shell.openPath(join(configDir, "swapper")))
+        const openFromShell = {
+            configFolder: "config.json",
+            userscriptsFolder: "scripts",
+            userstylesFolder: "styles",
+            swapperFolder: "swapper"
+        }
+
+        for (const [key, value] of Object.entries(openFromShell))
+            this.modal.querySelector(`#${key}`).addEventListener("click", () => shell.openPath(join(configDir, value)))
 
         // Keybinding
         const keybindingCont = this.modal.querySelector("#keybindingBody")
@@ -110,8 +117,10 @@ class MenuModal extends Modal {
         }
 
         toggleKeybinding()
-        // _enableKeybinding.checked = config.get("keybinding.enable")
         _enableKeybinding.addEventListener("change", toggleKeybinding)
+
+        // Changelog
+        createChangelogSection()
     }
 }
 

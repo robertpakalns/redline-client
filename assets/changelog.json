@@ -1,5 +1,15 @@
 [
     {
+        "version": "1.0.4",
+        "date": "June 23, 2025",
+        "description": [
+          "Added logo to the main menu",
+          "Added 'Customizations' section in the menu modal with Custom Keybinding, Userscripts, Userstyles, and Resource Swapper",
+          "Added 'Userscripts' section which you can use for your loaded userscripts",
+          "Added 'Changelog' section"
+        ]
+    },
+    {
         "version": "1.0.3",
         "date": "June 21, 2025",
         "description": [

@@ -11,7 +11,9 @@
             <div id="menuSideBarList">
                 <button id="settingsSection" class="sideBarItem list-el">Settings</button>
                 <button id="customizationSection" class="sideBarItem list-el">Customizations</button>
+                <button id="changelogSection" class="sideBarItem list-el">Changelog</button>
                 <button id="infoSection" class="sideBarItem list-el">Info</button>
+                <button id="userscriptsSection" class="sideBarItem list-el">Userscripts</button>
             </div>
 
             <div class="sideBarFooter">
@@ -51,6 +53,13 @@
                     <div class="content">
                         <input type="checkbox" id="modalHint">
                         <div>Toggle Modal Hint</div>
+                    </div>
+                </div>
+
+                <div class="block">
+                    <h1>Configs</h1>
+                    <div class="content">
+                        <a id="configFolder" href="#">Open Configs</a>
                     </div>
                 </div>
 
@@ -113,6 +122,14 @@
 
             </div>
 
+            <div class="mainContentBlock" name="changelogSection">
+                <header>Changelog</header>
+                <div id="clientUpdates">
+                    <div id="clientUpdatesText"></div>
+                    <div id="clientUpdatesNavigator"></div>
+                </div>
+            </div>
+
             <div class="mainContentBlock" name="infoSection">
                 <header>Redline Client</header>
                 <div class="block">
@@ -168,6 +185,10 @@
                         <a href="https://discord.gg/yPjrUrvSzv" class="url">Powered by Tricko</a>
                     </button>
                 </footer>
+            </div>
+
+            <div class="mainContentBlock" name="userscriptsSection">
+                <p class="userscriptsInfo">Here, you will be able to interact with your loaded userscripts!</p>
             </div>
 
         </div>
