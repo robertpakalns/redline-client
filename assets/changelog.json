@@ -1,12 +1,22 @@
 [
     {
+        "version": "1.0.5",
+        "date": "June 24, 2025",
+        "description": [
+            "The client will show user activity in the Discord profile based on the game URL",
+            "Added Kirka proxy domain support",
+            "The banner of the Redline Client repository has been changed",
+            "Added an option to import and export client settings"
+        ]
+    },
+    {
         "version": "1.0.4",
         "date": "June 23, 2025",
         "description": [
-          "Added logo to the main menu",
-          "Added 'Customizations' section in the menu modal with Custom Keybinding, Userscripts, Userstyles, and Resource Swapper",
-          "Added 'Userscripts' section which you can use for your loaded userscripts",
-          "Added 'Changelog' section"
+            "Added logo to the main menu",
+            "Added 'Customizations' section in the menu modal with Custom Keybinding, Userscripts, Userstyles, and Resource Swapper",
+            "Added 'Userscripts' section which you can use for your loaded userscripts",
+            "Added 'Changelog' section"
         ]
     },
     {
