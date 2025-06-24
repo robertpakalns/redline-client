@@ -36,7 +36,7 @@ export const setVersions = toggle => {
         const el = document.getElementById(key)
         if (el) {
             el.style.display = toggle ? "block" : "none"
-            return
+            continue
         }
 
         const _span = createEl("span", { id: key }, "", [`${key} v${value}`])

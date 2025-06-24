@@ -58,14 +58,16 @@ class DRPC {
     }
 
     setState(url) {
-        console.log(url)
         const { pathname } = new URL(url)
         if (!this.connected) return
 
         let result = "Playing Kirka.io"
 
         if (pathname.startsWith("/games")) {
-            result = `Playing a match in ${pathname.split("/").pop().split("~")[0]} server`
+            result = `Playing a match on the ${pathname.split("/").pop().split("~")[0]} server`
+        }
+        else if (pathname.startsWith("/profile")) {
+            result = `Viewing player profile with ID ${pathname.split("/").pop()}`
         }
         else if (staticLinks[pathname]) result = staticLinks[pathname]
 

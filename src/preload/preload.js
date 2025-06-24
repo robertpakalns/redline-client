@@ -63,8 +63,6 @@ window.addEventListener("DOMContentLoaded", () => {
         console.trace = _console.trace
     })
 
-
-
     const menuModal = new MenuModal
     menuModal.init()
     menuModal.work()
