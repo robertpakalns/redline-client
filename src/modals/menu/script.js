@@ -1,5 +1,5 @@
 import packageJson from "../../../package.json" with { type: "json" }
-import { fromRoot, createEl, domains } from "../../utils/functions.js"
+import { fromRoot, createEl, domains, getHost } from "../../utils/functions.js"
 import { Config, configDir } from "../../utils/config.js"
 import createChangelogSection from "./changelog.js"
 import { shell, ipcRenderer } from "electron"
@@ -144,10 +144,20 @@ class MenuModal extends Modal {
 
         // Domains
         const domainSelect = this.modal.querySelector("#gameDomain")
+        domainSelect.addEventListener("change", e => config.set("client.domain", e.target.value))
         for (const el of domains) {
             const option = createEl("option", { value: el }, "", [el])
             domainSelect.appendChild(option)
         }
+        domainSelect.value = getHost()
+
+        // Import/export settings
+        const settingsObject = {
+            importClientSettings: "import-client-settings",
+            exportClientSettings: "export-client-settings"
+        }
+        for (const [id, event] of Object.entries(settingsObject))
+            this.modal.querySelector(`#${id}`).addEventListener("click", () => ipcRenderer.send(event))
     }
 }
 

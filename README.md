@@ -2,7 +2,7 @@
 Unofficial Electron client for Kirka.io
 
 ## Engine
-Redline Client uses Electron version `36.5.0`, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the `@juice-client/node-enject` package, which resolves the problem on Windows. More information in [`package.json`](https://github.com/robertpakalns/redline-client/blob/main/package.json).
+Redline Client uses Electron version `36.5.0`, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the [`@juice-client/node-enject`](https://www.npmjs.com/package/@juice-client/node-enject) package, which resolves the problem on Windows. More information in [`package.json`](https://github.com/robertpakalns/redline-client/blob/main/package.json).
 
 ## Client Safety
 This project is open-source. All Redline Client source code is publicly available in the [GitHub repository](https://github.com/robertpakalns/redline-client). All builds are executed via GitHub Actions. If you have concerns about the safety of your private information while using Redline Client, feel free to inspect the source code. Trust in the client is based on trust in the developer.
@@ -19,7 +19,7 @@ This project is open-source. All Redline Client source code is publicly availabl
    * Resource Swapper
 * Deeplinks (`redline:` Protocol)
 * Discord Rich Presence
-<!-- * Import/Export Game/Client Settings -->
+* Import/Export Client Settings
 * Menu Modal (`F1`)
 * Proxy Domain Support
 * Tricko Links in Player Modals
@@ -39,7 +39,7 @@ To use the swapper:
 * xip for Kirka.io
 * Voxtulate Client (robertpakalns) for core features
 * Juice Client (irrvlo) for additional features
-* PVT and CarrySheriff for the client logo
+* PVT and CarrySheriff for the client assets
 
 In partnership with Kirka clan [`ImOn_Smoko`](https://discord.gg/BBchaJvZVU)
 

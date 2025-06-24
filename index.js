@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog, protocol, net } from "electron"
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js"
-import { Config, configDir } from "./src/utils/config.js"
+import { Config, configDir, configPath } from "./src/utils/config.js"
+import { existsSync, writeFileSync, readFileSync } from "fs"
 import userscripts from "./src/utils/userscripts.js"
 import keybinding from "./src/utils/keybinding.js"
 import electronUpdater from "electron-updater"
@@ -8,7 +9,6 @@ import enject from "@juice-client/node-enject"
 import swapper from "./src/utils/swapper.js"
 import DRPC from "./src/utils/drpc.js"
 import { pathToFileURL } from "url"
-import { existsSync } from "fs"
 import { join } from "path"
 
 const { autoUpdater } = electronUpdater
@@ -124,4 +124,13 @@ app.on("ready", () => {
     // Forward messages
     for (const e of ["toggle-menu-modal", "change-fast-css"])
         ipcMain.on(e, (_, ...a) => webContents.send(e, ...a))
+
+    // Import/export settings
+    const f = { filters: [{ name: "JSON Files", extensions: ["json"] }] }
+    ipcMain.on("import-client-settings", () => dialog.showOpenDialog(f).then(({ canceled, filePaths }) => {
+        if (!canceled && filePaths.length > 0) writeFileSync(Config.file, readFileSync(filePaths[0], "utf8"))
+    }))
+    ipcMain.on("export-client-settings", () => dialog.showSaveDialog(f).then(({ canceled, filePath }) => {
+        if (!canceled && filePath) writeFileSync(filePath, readFileSync(configPath))
+    }))
 })
