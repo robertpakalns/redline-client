@@ -61,7 +61,6 @@ const createWindow = () => {
 
     keybinding(mainWindow)
     swapper(webContents)
-    setUserscripts(webContents)
     userscripts(webContents)
 }
 

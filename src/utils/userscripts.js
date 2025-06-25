@@ -10,17 +10,24 @@ const userstylesFolder = join(configDir, "styles")
 if (!existsSync(userstylesFolder)) mkdirSync(userstylesFolder, { recursive: true })
 const userstylesFiles = new Set(readdirSync(userstylesFolder))
 
-export const setUserscripts = webContents => {
+const setUserscripts = webContents => {
     // User scripts
     // .js files only
     for (const el of userscriptsFiles) {
         const script = join(userscriptsFolder, el)
-        if (existsSync(script)) webContents.executeJavaScript(readFileSync(script, "utf8"))
+        if (!existsSync(script)) continue
+
+        const content = new Function(readFileSync(script, "utf8"))
+        webContents.executeJavaScript(`(${content.toString()})()`)
     }
 }
 
 export const userscripts = webContents => {
-    webContents.on("did-start-loading", () => setUserscripts(webContents))
+    setUserscripts(webContents)
+
+    webContents.on("did-start-navigation", (_, __, isInPlace, isMainFrame) => {
+        if (isMainFrame && !isInPlace) setUserscripts(webContents)
+    })
 
     webContents.on("did-finish-load", () => {
         // User styles
