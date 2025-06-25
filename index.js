@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog, protocol, net } from "electron"
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js"
 import { Config, configDir, configPath } from "./src/utils/config.js"
 import { existsSync, writeFileSync, readFileSync } from "fs"
-import userscripts from "./src/utils/userscripts.js"
+import { userscripts, setUserscripts } from "./src/utils/userscripts.js"
 import keybinding from "./src/utils/keybinding.js"
 import electronUpdater from "electron-updater"
 import enject from "@juice-client/node-enject"
@@ -57,6 +57,7 @@ const createWindow = () => {
 
     keybinding(mainWindow)
     swapper(webContents)
+    setUserscripts(webContents)
     userscripts(webContents)
 }
 

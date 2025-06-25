@@ -67,7 +67,7 @@ window.addEventListener("DOMContentLoaded", () => {
     menuModal.init()
     menuModal.work()
 
-    // Modal Hint
+    // Modal hint
     const _hint = createEl("div", {}, "clientModalHint", [`Press ${config.get("keybinding.content.MenuModal")} to open menu`])
     document.querySelector("#app #left-icons").appendChild(_hint)
 
