@@ -4,11 +4,11 @@ import { join } from "path"
 
 const userscriptsFolder = join(configDir, "scripts")
 if (!existsSync(userscriptsFolder)) mkdirSync(userscriptsFolder, { recursive: true })
-const userscriptsFiles = new Set(readdirSync(userscriptsFolder))
+const userscriptsFiles = readdirSync(userscriptsFolder)
 
 const userstylesFolder = join(configDir, "styles")
 if (!existsSync(userstylesFolder)) mkdirSync(userstylesFolder, { recursive: true })
-const userstylesFiles = new Set(readdirSync(userstylesFolder))
+const userstylesFiles = readdirSync(userstylesFolder)
 
 const setUserscripts = webContents => {
     // User scripts
@@ -22,7 +22,7 @@ const setUserscripts = webContents => {
     }
 }
 
-export const userscripts = webContents => {
+const userscripts = webContents => {
     setUserscripts(webContents)
 
     webContents.on("did-start-navigation", (_, __, isInPlace, isMainFrame) => {
@@ -38,3 +38,5 @@ export const userscripts = webContents => {
         }
     })
 }
+
+export default userscripts

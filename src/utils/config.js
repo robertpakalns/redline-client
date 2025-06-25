@@ -41,10 +41,16 @@ export class Config {
     constructor() {
         if (Config.configInstance) this.config = Config.configInstance
         else {
-            this.config = JSON.parse(readFileSync(Config.file, "utf8"))
-            this.fillConfig()
-            this.cleanConfig()
-            Config.configInstance = this.config
+            try {
+                this.config = JSON.parse(readFileSync(Config.file, "utf8"))
+                this.fillConfig()
+                this.cleanConfig()
+                Config.configInstance = this.config
+            }
+            catch {
+                this.config = defaultConfig
+                Config.configInstance = defaultConfig
+            }
         }
     }
 

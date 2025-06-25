@@ -10,7 +10,7 @@ This project is open-source. All Redline Client source code is publicly availabl
 ## Features
 * Adblocker
 * Changelog
-* Client and Engine Versions in-game
+* Client, OS, and Engine Stats in-game
 * Customizations
    * Custom Keybinding
    * Fast CSS
@@ -19,6 +19,7 @@ This project is open-source. All Redline Client source code is publicly availabl
    * Resource Swapper
 * Deeplinks (`redline:` Protocol)
 * Discord Rich Presence
+* FPS Uncap (Windows Only)
 * Import/Export Client Settings
 * Menu Modal (`F1`)
 * Proxy Domain Support
