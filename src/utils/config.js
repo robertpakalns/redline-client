@@ -50,6 +50,7 @@ export class Config {
             catch {
                 this.config = defaultConfig
                 Config.configInstance = defaultConfig
+                this.writeConfig()
             }
         }
     }

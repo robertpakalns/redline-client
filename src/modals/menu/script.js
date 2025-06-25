@@ -34,6 +34,9 @@ class MenuModal extends Modal {
 
             const targetDiv = this.modal.querySelector(`#menuMainContent > div[name="${e.target.id}"]`)
             if (targetDiv) targetDiv.classList.add("active")
+
+            // Load changelog data only when needed
+            if (targetDiv.getAttribute("name") === "changelogSection") createChangelogSection()
         })
 
         for (const el of this.modal.querySelectorAll(".url")) el.addEventListener("click", e => {
@@ -123,9 +126,6 @@ class MenuModal extends Modal {
 
         toggleKeybinding()
         _enableKeybinding.addEventListener("change", toggleKeybinding)
-
-        // Changelog
-        createChangelogSection()
 
         // Fast CSS
         const fastCSSURL = this.modal.querySelector("#fastCSSURL")

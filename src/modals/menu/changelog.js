@@ -1,12 +1,19 @@
-import { fromRoot, createEl } from "../../utils/functions.js"
-import { readFileSync } from "fs"
+import { createEl, sessionFetch, getAsset } from "../../utils/functions.js"
 
+let data
 const createChangelogSection = async () => {
+    if (data) return
 
     const _section = document.getElementById("clientUpdates")
     const _text = _section.querySelector("#clientUpdatesText")
 
-    const data = JSON.parse(readFileSync(fromRoot("assets/changelog.json"), "utf8"))
+    // Load data
+    const _spin = createEl("div", {}, "spin")
+    const _loading = createEl("div", {}, "loader", [_spin])
+
+    _text.appendChild(_loading)
+    data = await sessionFetch(getAsset("redline/redlineUpdates.json"))
+    _text.removeChild(_loading)
 
     // Render page
     for (const update of data) {

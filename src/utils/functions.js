@@ -44,3 +44,13 @@ export const createEl = (tag, attrs = {}, className = "", append = []) => {
     element.append(...append)
     return element
 }
+
+// Assets
+export const getAsset = path => `https://raw.githubusercontent.com/robertpakalns/tricko-assets/main/${path}`
+
+export const sessionFetch = url => JSON.parse(sessionStorage.getItem(url)) || fetch(url)
+    .then(r => r.json())
+    .then(data => {
+        sessionStorage.setItem(url, JSON.stringify(data))
+        return data
+    })
