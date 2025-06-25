@@ -5,12 +5,11 @@ import { existsSync, writeFileSync, readFileSync } from "fs"
 import { userscripts, setUserscripts } from "./src/utils/userscripts.js"
 import keybinding from "./src/utils/keybinding.js"
 import electronUpdater from "electron-updater"
-import enject from "@juice-client/node-enject"
+// import enject from "@juice-client/node-enject"
 import swapper from "./src/utils/swapper.js"
 import DRPC from "./src/utils/drpc.js"
 import { pathToFileURL } from "url"
 import { join } from "path"
-import { type } from "os"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
@@ -31,14 +30,18 @@ const createWindow = () => {
         }
     })
 
-    mainWindow.once("ready-to-show", () => {
-        const handleBuffer = mainWindow.getNativeWindowHandle()
-        let hwnd
+    mainWindow.once("ready-to-show", async () => {
+        if (process.platform === "win32") {
+            const { default: enject } = await import("@juice-client/node-enject")
 
-        if (process.arch === "x64" || process.arch === "arm64") hwnd = Number(handleBuffer.readBigUInt64LE(0))
-        else hwnd = handleBuffer.readUInt32LE(0)
+            const handleBuffer = mainWindow.getNativeWindowHandle()
+            let hwnd
 
-        enject.startHook(hwnd)
+            if (process.arch === "x64" || process.arch === "arm64") hwnd = Number(handleBuffer.readBigUInt64LE(0))
+            else hwnd = handleBuffer.readUInt32LE(0)
+
+            enject.startHook(hwnd)
+        }
 
         mainWindow.show()
     })
