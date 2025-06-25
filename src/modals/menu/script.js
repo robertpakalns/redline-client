@@ -75,6 +75,9 @@ class MenuModal extends Modal {
             document.getElementById(id).addEventListener("change", e => config.set(conf, e.target.checked))
         }
 
+        // FPS uncap works only on Windows
+        if (process.platform === "win32") document.getElementById("fpsUncapWarning").style.display = "none"
+
         document.getElementById("modalHint").addEventListener("change", e => ipcRenderer.send("toggle-menu-modal", e.target.checked))
 
         document.getElementById("relaunch").addEventListener("click", () => ipcRenderer.send("relaunch"))

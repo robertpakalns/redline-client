@@ -10,6 +10,7 @@ import swapper from "./src/utils/swapper.js"
 import DRPC from "./src/utils/drpc.js"
 import { pathToFileURL } from "url"
 import { join } from "path"
+import { type } from "os"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
@@ -73,7 +74,7 @@ const confirmAction = (message, callback) => {
     if (result === 0) callback()
 }
 
-if (config.get("client.fpsUncap")) app.commandLine.appendSwitch("disable-frame-rate-limit")
+if (config.get("client.fpsUncap") && process.platform === "win32") app.commandLine.appendSwitch("disable-frame-rate-limit")
 
 if (!app.requestSingleInstanceLock()) app.quit()
 
