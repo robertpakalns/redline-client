@@ -1,6 +1,7 @@
 import { createEl, fromRoot, getHost } from "../utils/functions.js"
 import packageJson from "../../package.json" with { type: "json" }
 import { shell } from "electron"
+import { type, release, arch } from "os"
 
 // Go back to Kirka from Auth page
 export const backToKirka = () => {
@@ -22,10 +23,11 @@ export const backToKirka = () => {
 
 // In-game console versions
 const versions = {
-    CHROMIUM: process.versions.chrome,
-    ELECTRON: process.versions.electron,
-    NODE: process.versions.node,
-    CLIENT: packageJson.version
+    CHROMIUM: `v${process.versions.chrome}`,
+    ELECTRON: `v${process.versions.electron}`,
+    NODE: `v${process.versions.node}`,
+    CLIENT: `v${packageJson.version}`,
+    OS: `${type()} ${release()} (${arch()})`
 }
 
 export const setVersions = toggle => {
@@ -39,7 +41,7 @@ export const setVersions = toggle => {
             continue
         }
 
-        const _span = createEl("span", { id: key }, "", [`${key} v${value}`])
+        const _span = createEl("span", { id: key }, "", [`${key}: ${value}`])
         const _div = createEl("div", {}, "", [_span])
         versionOverlay.appendChild(_div)
     }
