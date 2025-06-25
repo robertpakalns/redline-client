@@ -1,5 +1,15 @@
 [
     {
+        "version": "1.0.6",
+        "date": "June 25, 2025",
+        "description": [
+            "Fixed a bug when extra values were not hiding properly in the in-game console",
+            "Added OS, version, and architecture into the in-game console",
+            "The userscripts are loaded before DOM",
+            "GitHub will release bundles also for macOS and Linux without the FPS uncap feature"
+        ]
+    },
+    {
         "version": "1.0.5",
         "date": "June 24, 2025",
         "description": [
