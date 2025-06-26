@@ -45,6 +45,19 @@
     width: max-content;
 }
 
+.kd-ratio {
+    display: none !important;
+    gap: 5px;
+
+    .kd-text {
+        font-size: 0.8rem;
+    }
+}
+
+.kd-ratio.open {
+    display: flex !important;
+}
+
 /* Fixing xip's bugs in styling */
 .profile-cont .bottom {
     gap: 10px;

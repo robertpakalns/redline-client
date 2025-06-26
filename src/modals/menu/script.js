@@ -67,7 +67,9 @@ class MenuModal extends Modal {
             adblocker: "client.adblocker",
             fullscreen: "client.fullscreen",
             swapper: "client.swapper",
-            modalHint: "client.modalHint",
+
+            modalHint: "interface.modalHint",
+            kdRatio: "interface.kdRatio",
 
             enableKeybinding: "keybinding.enable",
 
@@ -82,6 +84,7 @@ class MenuModal extends Modal {
         if (process.platform === "win32") document.getElementById("fpsUncapWarning").style.display = "none"
 
         document.getElementById("modalHint").addEventListener("change", e => ipcRenderer.send("toggle-menu-modal", e.target.checked))
+        document.getElementById("kdRatio").addEventListener("change", e => ipcRenderer.send("toggle-kd-ratio", e.target.checked))
 
         document.getElementById("relaunch").addEventListener("click", () => ipcRenderer.send("relaunch"))
 

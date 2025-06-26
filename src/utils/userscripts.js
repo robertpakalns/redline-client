@@ -4,11 +4,11 @@ import { join } from "path"
 
 const userscriptsFolder = join(configDir, "scripts")
 if (!existsSync(userscriptsFolder)) mkdirSync(userscriptsFolder, { recursive: true })
-const userscriptsFiles = readdirSync(userscriptsFolder)
+const userscriptsFiles = readdirSync(userscriptsFolder).filter(script => script.endsWith(".js"))
 
 const userstylesFolder = join(configDir, "styles")
 if (!existsSync(userstylesFolder)) mkdirSync(userstylesFolder, { recursive: true })
-const userstylesFiles = readdirSync(userstylesFolder)
+const userstylesFiles = readdirSync(userstylesFolder).filter(style => style.endsWith(".css"))
 
 const setUserscripts = webContents => {
     // User scripts

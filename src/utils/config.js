@@ -9,8 +9,11 @@ export const defaultConfig = {
         fpsUncap: true,
         fullscreen: false,
         swapper: false,
-        modalHint: true,
         domain: "kirka.io"
+    },
+    interface: {
+        modalHint: true,
+        kdRatio: true
     },
     fastCSS: {
         enable: false,

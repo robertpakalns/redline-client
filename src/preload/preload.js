@@ -1,4 +1,4 @@
-import { backToKirka, setVersions, setTrickoLink, changeLogo } from "./preloadUtils.js"
+import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils.js"
 import { fromRoot, createEl, domains } from "../utils/functions.js"
 import MenuModal from "../modals/menu/script.js"
 import { Config } from "../utils/config.js"
@@ -21,7 +21,7 @@ const appendStyles = () => {
 
     const clientStyles = document.createElement("style")
     clientStyles.innerHTML = readFileSync(fromRoot("src/preload/clientStyles.css"), "utf8") + `
-        .clientModalHint { display: ${config.get("client.modalHint") ? "block" : "none"} }`
+        .clientModalHint { display: ${config.get("interface.modalHint") ? "block" : "none"} }`
 
     const fastCSSStyles = document.createElement("style")
     fastCSSStyles.id = "fastCSSStyles"
@@ -73,12 +73,26 @@ window.addEventListener("DOMContentLoaded", () => {
 
     ipcRenderer.on("toggle-menu-modal", (_, toggle) => _hint.style.display = toggle ? "block" : "none")
 
+    // K/D ratio
+    ipcRenderer.on("toggle-kd-ratio", (_, toggle) => {
+        const cont = document.querySelector(".kd-ratio")
+        cont.classList.toggle("open")
+        console.log(toggle)
+    })
+
     // Observers
-    const observer = new MutationObserver(() => {
+    const app = document.getElementById("app")
+    const appObserver = new MutationObserver(() => {
+        appObserver.disconnect()
+
         setTrickoLink()
         changeLogo()
+        createKDRatio()
+
+        appObserver.observe(app, { childList: true, subtree: true })
+
     })
-    observer.observe(document.getElementById("app"), { childList: true, subtree: true })
+    appObserver.observe(app, { childList: true, subtree: true })
 
     const consoleObserver = new MutationObserver(() => {
         const versionElement = document.querySelector("#overlay #version")

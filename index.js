@@ -125,7 +125,7 @@ app.on("ready", () => {
     }))
 
     // Forward messages
-    for (const e of ["toggle-menu-modal", "change-fast-css"])
+    for (const e of ["toggle-menu-modal", "change-fast-css", "toggle-kd-ratio"])
         ipcMain.on(e, (_, ...a) => webContents.send(e, ...a))
 
     // Import/export settings

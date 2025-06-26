@@ -1,7 +1,10 @@
 import { createEl, fromRoot, getHost } from "../utils/functions.js"
 import packageJson from "../../package.json" with { type: "json" }
-import { shell } from "electron"
+import { Config } from "../utils/config.js"
 import { type, release, arch } from "os"
+import { shell } from "electron"
+
+const config = new Config
 
 // Go back to Kirka from Auth page
 export const backToKirka = () => {
@@ -80,4 +83,40 @@ export const changeLogo = () => {
     const oldLogo = document.querySelector("img.logo#logo")
     if (!oldLogo) return
     oldLogo.src = fromRoot("assets/logo.png")
+}
+
+const isNum = (aVal, bVal) => {
+    const a = parseInt(aVal)
+    const b = parseInt(bVal)
+
+    if (isNaN(a) || isNaN(b) || b === 0) return a
+
+    return (a / b).toFixed(2).replace(/\.?0+$/, "")
+}
+
+export const createKDRatio = () => {
+    const cont = document.querySelector(".desktop-game-interface .state-cont")
+    if (!cont) return
+
+    const killDeath = cont.querySelector(".kill-death")
+    if (!killDeath) return
+
+    const [kills, deaths] = killDeath.children
+
+    const val = isNum(kills.textContent, deaths.textContent)
+
+    if (!cont.querySelector(".kd-ratio")) {
+        const _kdText = createEl("div", {}, "kd-text", ["K/D"])
+        const _kdValue = createEl("div", {}, "kd-value", [val])
+
+        const _kd = kills.cloneNode(true)
+        _kd.textContent = ""
+        _kd.append(_kdValue, _kdText)
+        _kd.classList.add("kd-ratio")
+        if (config.get("interface.kdRatio")) _kd.classList.add("open")
+        killDeath.appendChild(_kd)
+        return
+    }
+
+    cont.querySelector(".kd-value").textContent = val
 }
