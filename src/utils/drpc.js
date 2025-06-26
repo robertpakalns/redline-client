@@ -1,5 +1,9 @@
 import { Client } from "discord-rpc"
+import { Config } from "./config.js"
 import { URL } from "url"
+
+const config = new Config
+const { joinButton } = config.get("discord")
 
 const staticLinks = {
     "/": "Viewing main lobby",
@@ -25,6 +29,7 @@ const staticLinks = {
 class DRPC {
     constructor() {
         this.protocol = "redline://"
+        this.joinURL = "redline://" // Default join URL
         this.clientId = "1385893715519864933"
         this.client = new Client({ transport: "ipc" })
         this.state = "Playing Kirka.io"
@@ -45,15 +50,15 @@ class DRPC {
     setActivity() {
         if (!this.connected) return
 
+        const buttons = [{ label: "Download Client", url: "https://github.com/robertpakalns/redline-client/releases/latest" }]
+        if (joinButton) buttons.unshift({ label: "Join Game", url: this.joinURL })
+        else buttons.push({ label: "Community Server", url: "https://discord.gg/cTE6CVuGen" })
+
         this.client.setActivity({
             state: this.state,
             startTimestamp: this.time,
             largeImageKey: "redline",
-            buttons: [
-                { label: "Download Client", url: "https://github.com/robertpakalns/redline-client/releases/latest" },
-                { label: "Community Server", url: "https://discord.gg/cTE6CVuGen" }
-            ]
-
+            buttons
         })
     }
 
@@ -72,6 +77,7 @@ class DRPC {
         else if (staticLinks[pathname]) result = staticLinks[pathname]
 
         this.state = result
+        this.joinURL = pathname === "/" ? this.protocol : `${this.protocol}?url=${pathname}`
     }
 }
 

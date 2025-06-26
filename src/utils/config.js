@@ -15,6 +15,9 @@ export const defaultConfig = {
         modalHint: true,
         kdRatio: true
     },
+    discord: {
+        joinButton: true
+    },
     fastCSS: {
         enable: false,
         url: "",

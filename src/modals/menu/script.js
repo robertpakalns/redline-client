@@ -71,6 +71,8 @@ class MenuModal extends Modal {
             modalHint: "interface.modalHint",
             kdRatio: "interface.kdRatio",
 
+            drpcJoinButton: "discord.joinButton",
+
             enableKeybinding: "keybinding.enable",
 
             enableFastCSS: "fastCSS.enable"
