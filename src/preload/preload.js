@@ -77,7 +77,6 @@ window.addEventListener("DOMContentLoaded", () => {
     ipcRenderer.on("toggle-kd-ratio", (_, toggle) => {
         const cont = document.querySelector(".kd-ratio")
         cont.classList.toggle("open")
-        console.log(toggle)
     })
 
     // Observers
