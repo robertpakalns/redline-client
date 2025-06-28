@@ -24,8 +24,7 @@ const createWindow = () => {
         webPreferences: {
             preload: fromRoot("src/preload/preload.js"),
             nodeIntegration: true,
-            webSecurity: false,
-            contextIsolation: false
+            webSecurity: false
         }
     })
 

@@ -2,18 +2,13 @@ import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } fr
 import { fromRoot, createEl, domains } from "../utils/functions.js"
 import MenuModal from "../modals/menu/script.js"
 import { Config } from "../utils/config.js"
-import { ipcRenderer } from "electron"
+import { ipcRenderer, contextBridge } from "electron"
 import { readFileSync } from "fs"
 
 const config = new Config
 
-const _console = {
-    log: console.log.bind(console),
-    warn: console.warn.bind(console),
-    error: console.error.bind(console),
-    info: console.info.bind(console),
-    trace: console.trace.bind(console)
-}
+// With contextIsolation: true, window.appconsole is an alternative for window.console
+contextBridge.exposeInMainWorld("appconsole", window.console)
 
 const appendStyles = () => {
     const modalStyles = document.createElement("style")
@@ -47,21 +42,6 @@ window.addEventListener("DOMContentLoaded", () => {
     appendStyles()
 
     if (!domains.has(window.location.host)) return
-
-    // Return console methods
-    console.log = _console.log
-    console.warn = _console.warn
-    console.error = _console.error
-    console.info = _console.info
-    console.trace = _console.trace
-
-    ipcRenderer.on("url-change", () => {
-        console.log = _console.log
-        console.warn = _console.warn
-        console.error = _console.error
-        console.info = _console.info
-        console.trace = _console.trace
-    })
 
     const menuModal = new MenuModal
     menuModal.init()
