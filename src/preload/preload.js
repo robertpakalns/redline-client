@@ -1,8 +1,8 @@
 import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils.js"
 import { fromRoot, createEl, domains } from "../utils/functions.js"
+import { ipcRenderer, contextBridge } from "electron"
 import MenuModal from "../modals/menu/script.js"
 import { Config } from "../utils/config.js"
-import { ipcRenderer, contextBridge } from "electron"
 import { readFileSync } from "fs"
 
 const config = new Config
@@ -54,7 +54,7 @@ window.addEventListener("DOMContentLoaded", () => {
     ipcRenderer.on("toggle-menu-modal", (_, toggle) => _hint.style.display = toggle ? "block" : "none")
 
     // K/D ratio
-    ipcRenderer.on("toggle-kd-ratio", (_, toggle) => {
+    ipcRenderer.on("toggle-kd-ratio", () => {
         const cont = document.querySelector(".kd-ratio")
         cont.classList.toggle("open")
     })

@@ -1,5 +1,5 @@
+import { fromRoot, createEl, domains, getHost, popup, restartMessage } from "../../utils/functions.js"
 import packageJson from "../../../package.json" with { type: "json" }
-import { fromRoot, createEl, domains, getHost } from "../../utils/functions.js"
 import { Config, configDir } from "../../utils/config.js"
 import createChangelogSection from "./changelog.js"
 import { shell, ipcRenderer } from "electron"
@@ -46,9 +46,7 @@ class MenuModal extends Modal {
 
         // Update client
         ipcRenderer.on("client-update", (_, data) => {
-            if (data === null) {
-                // popup("rgb(45, 206, 72)", "Update available!")
-            }
+            if (data === null) popup("rgb(45, 206, 72)", "Update available!")
             else if (data === true) {
                 const _updateButton = createEl("button", { textContent: "Update!" })
                 _updateButton.addEventListener("click", () => {
@@ -108,6 +106,7 @@ class MenuModal extends Modal {
                 e.preventDefault()
                 _inputChild.value = e.code
                 config.set(`keybinding.content.${name}`, e.code)
+                restartMessage()
             })
 
             const _name = createEl("td", { textContent: name })
@@ -152,7 +151,10 @@ class MenuModal extends Modal {
 
         // Domains
         const domainSelect = this.modal.querySelector("#gameDomain")
-        domainSelect.addEventListener("change", e => config.set("client.domain", e.target.value))
+        domainSelect.addEventListener("change", e => {
+            config.set("client.domain", e.target.value)
+            restartMessage()
+        })
         for (const el of domains) {
             const option = createEl("option", { value: el }, "", [el])
             domainSelect.appendChild(option)
@@ -166,6 +168,10 @@ class MenuModal extends Modal {
         }
         for (const [id, event] of Object.entries(settingsObject))
             this.modal.querySelector(`#${id}`).addEventListener("click", () => ipcRenderer.send(event))
+
+        const restartNotifications = ["fpsUncap", "adblocker", "fullscreen", "swapper", "drpcJoinButton", "enableKeybinding"]
+        for (const id of restartNotifications)
+            this.modal.querySelector(`#${id}`).addEventListener("click", restartMessage)
     }
 }
 
