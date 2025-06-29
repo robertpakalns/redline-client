@@ -1,4 +1,7 @@
-# Redline Client
+<h1 style="font-size: 2em; display: flex; align-items: center">
+    <img src="https://raw.githubusercontent.com/robertpakalns/redline-client/main/assets/icons/icon.png" style="height: 1em; margin-right: 5px">
+    <span>Redline Client</span>
+</h1>
 Unofficial Electron client for Kirka.io
 
 ## Engine
@@ -22,6 +25,7 @@ This project is open-source. All Redline Client source code is publicly availabl
 * FPS Uncap (Windows Only)
 * Import/Export Client Settings
 * Menu Modal (`F1`)
+* Popup Messages
 * Proxy Domain Support
 * Tricko Links in Player Modals
 
