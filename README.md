@@ -1,3 +1,10 @@
+![Downloads](https://img.shields.io/github/downloads/robertpakalns/redline-client/total)
+![License](https://img.shields.io/github/license/robertpakalns/redline-client)
+![GitHub stars](https://img.shields.io/github/stars/robertpakalns/redline-client)
+![GitHub forks](https://img.shields.io/github/forks/robertpakalns/redline-client)
+![GitHub last commit](https://img.shields.io/github/last-commit/robertpakalns/redline-client)
+![Languages](https://img.shields.io/github/languages/top/robertpakalns/redline-client)
+
 <h1 style="font-size: 2em; display: flex; align-items: center">
     <img src="https://raw.githubusercontent.com/robertpakalns/redline-client/main/assets/icons/icon.png" style="height: 1em; margin-right: 5px">
     <span>Redline Client</span>

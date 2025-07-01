@@ -74,7 +74,10 @@ const confirmAction = (message, callback) => {
     if (result === 0) callback()
 }
 
-if (config.get("client.fpsUncap") && process.platform === "win32") app.commandLine.appendSwitch("disable-frame-rate-limit")
+if (config.get("client.fpsUncap") && process.platform === "win32") {
+    app.commandLine.appendSwitch("disable-frame-rate-limit")
+    app.commandLine.appendSwitch("disable-gpu-vsync")
+}
 
 if (!app.requestSingleInstanceLock()) app.quit()
 
