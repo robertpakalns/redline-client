@@ -2,7 +2,7 @@
   "type": "module",
   "name": "redline-client",
   "version": "1.0.8",
-  "description": "Unofficial Electron client for Kirka.io",
+  "description": "Redline Client",
   "author": "robertpakalns",
   "main": "index.js",
   "scripts": {

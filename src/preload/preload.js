@@ -56,31 +56,56 @@ window.addEventListener("DOMContentLoaded", () => {
     // K/D ratio
     ipcRenderer.on("toggle-kd-ratio", () => {
         const cont = document.querySelector(".kd-ratio")
-        cont.classList.toggle("open")
+        if (cont) cont.classList.toggle("open")
     })
 
     // Observers
     const app = document.getElementById("app")
+
     const appObserver = new MutationObserver(() => {
-        appObserver.disconnect()
+        const logoCont = app.querySelector("img.logo#logo")
+        if (logoCont) changeLogo(logoCont)
 
-        setTrickoLink()
-        changeLogo()
-        createKDRatio()
+        const profileCont = app.querySelector(".profile-cont")
+        if (profileCont) setTrickoLink(profileCont)
 
-        appObserver.observe(app, { childList: true, subtree: true })
+        const kdrCont = app.querySelector(".kill-death")
+        if (kdrCont && !kdrCont.dataset.kdrObserved) {
+            kdrCont.dataset.kdrObserved = "true"
+            createKDRatio(kdrCont)
+
+            kdrObserver.observe(kdrCont, { childList: true, subtree: true, characterData: true })
+        }
 
     })
     appObserver.observe(app, { childList: true, subtree: true })
 
-    const consoleObserver = new MutationObserver(() => {
-        const versionElement = document.querySelector("#overlay #version")
-        if (versionElement) {
-            const currentEmpty = versionElement.textContent === ""
-            setVersions(!currentEmpty)
-        }
+    const kdrObserver = new MutationObserver(() => {
+        kdrObserver.disconnect()
+
+        const kdrCont = app.querySelector(".kill-death")
+        if (!kdrCont) return
+
+        createKDRatio(kdrCont)
+
+        kdrObserver.observe(kdrCont, { childList: true, subtree: true, characterData: true })
     })
-    consoleObserver.observe(document.getElementById("overlay"), { childList: true, subtree: true, characterData: true })
+
+    const overlay = document.getElementById("overlay")
+    let lastVersionState = null
+    const consoleObserver = new MutationObserver(() => {
+        // Unoptimized part because of characterData: true
+        const versionElement = overlay.querySelector("#version")
+        if (!versionElement) return
+
+        let isNonEmpty = versionElement.textContent !== ""
+
+        if (isNonEmpty === lastVersionState) return
+
+        lastVersionState = isNonEmpty
+        setVersions(overlay, isNonEmpty)
+    })
+    consoleObserver.observe(overlay, { childList: true, subtree: true, characterData: true })
 
     // Fast CSS
     const fastCSSStyles = document.getElementById("fastCSSStyles")

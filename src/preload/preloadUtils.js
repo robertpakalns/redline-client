@@ -33,12 +33,12 @@ const versions = {
     OS: `${type()} ${release()} (${arch()})`
 }
 
-export const setVersions = toggle => {
-    const versionOverlay = document.getElementById("overlay")
-    if (!versionOverlay) return
+export const setVersions = (cont, toggle) => {
+    console.log("setVersions called")
+    if (!cont) return
 
     for (const [key, value] of Object.entries(versions)) {
-        const el = document.getElementById(key)
+        const el = cont.querySelector(`#${key}`)
         if (el) {
             el.style.display = toggle ? "block" : "none"
             continue
@@ -46,21 +46,20 @@ export const setVersions = toggle => {
 
         const _span = createEl("span", { id: key }, "", [`${key}: ${value}`])
         const _div = createEl("div", {}, "", [_span])
-        versionOverlay.appendChild(_div)
+        cont.appendChild(_div)
     }
 }
 
 // Tricko links in profile
-export const setTrickoLink = () => {
-    const profileCont = document.querySelector(".profile-cont")
-    if (!profileCont) return
+export const setTrickoLink = cont => {
+    if (!cont) return
 
-    if (profileCont.querySelector(".playerTrickoLink")) return
+    if (cont.querySelector(".playerTrickoLink")) return
 
-    const idCont = profileCont.querySelector(".copy-cont .value")
+    const idCont = cont.querySelector(".copy-cont .value")
     if (!idCont) return
 
-    const bottomCont = profileCont.querySelector(".bottom")
+    const bottomCont = cont.querySelector(".bottom")
     if (!bottomCont) return
 
     const copiedNode = bottomCont.childNodes[0].cloneNode(true)
@@ -79,10 +78,9 @@ export const setTrickoLink = () => {
 
 // Change logo on the main menu
 // Credits: PVT
-export const changeLogo = () => {
-    const oldLogo = document.querySelector("img.logo#logo")
-    if (!oldLogo) return
-    oldLogo.src = fromRoot("assets/logo.png")
+export const changeLogo = cont => {
+    if (!cont) return
+    cont.src = fromRoot("assets/logo.png")
 }
 
 const isNum = (aVal, bVal) => {
@@ -94,14 +92,10 @@ const isNum = (aVal, bVal) => {
     return (a / b).toFixed(2).replace(/\.?0+$/, "")
 }
 
-export const createKDRatio = () => {
-    const cont = document.querySelector(".desktop-game-interface .state-cont")
+export const createKDRatio = cont => {
     if (!cont) return
 
-    const killDeath = cont.querySelector(".kill-death")
-    if (!killDeath) return
-
-    const [kills, deaths] = killDeath.children
+    const [kills, deaths] = cont.children
 
     const val = isNum(kills.textContent, deaths.textContent)
 
@@ -114,7 +108,7 @@ export const createKDRatio = () => {
         _kd.append(_kdValue, _kdText)
         _kd.classList.add("kd-ratio")
         if (config.get("interface.kdRatio")) _kd.classList.add("open")
-        killDeath.appendChild(_kd)
+        cont.appendChild(_kd)
         return
     }
 
