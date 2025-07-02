@@ -88,7 +88,7 @@ const isNum = (aVal, bVal) => {
 
     if (isNaN(a) || isNaN(b) || b === 0) return a
 
-    return (a / b).toFixed(2).replace(/\.?0+$/, "")
+    return Math.round(a / b * 100) / 100
 }
 
 export const createKDRatio = cont => {

@@ -11,19 +11,15 @@ const config = new Config
 contextBridge.exposeInMainWorld("appconsole", window.console)
 
 const appendStyles = () => {
-    const modalStyles = document.createElement("style")
+    const modalStyles = createEl("style")
     modalStyles.innerHTML = readFileSync(fromRoot("src/modals/style.css"), "utf8")
 
-    const clientStyles = document.createElement("style")
+    const clientStyles = createEl("style")
     clientStyles.innerHTML = readFileSync(fromRoot("src/preload/clientStyles.css"), "utf8") + `
         .clientModalHint { display: ${config.get("interface.modalHint") ? "block" : "none"} }`
 
-    const fastCSSStyles = document.createElement("style")
-    fastCSSStyles.id = "fastCSSStyles"
-
-    const fastCSSLink = document.createElement("link")
-    fastCSSLink.id = "fastCSSLink"
-    fastCSSLink.rel = "stylesheet"
+    const fastCSSStyles = createEl("style", { id: "fastCSSStyles" })
+    const fastCSSLink = createEl("link", { id: "fastCSSLink", rel: "stylesheet" })
 
     const { enable, url, value } = config.get("fastCSS")
 
@@ -136,13 +132,21 @@ window.addEventListener("DOMContentLoaded", () => {
 ipcRenderer.on("toggle-window", (_, modal) => { // Toggles modals on keybinds
     const openedModal = document.querySelector(".modalWrapper.open")
 
-    if (openedModal) {
-        if (modal === "null") openedModal.classList.toggle("open")
-        document.getElementById(modal).classList.toggle("open")
+    // Not in-game
+    if (document.querySelector("img.logo#logo")) {
+        openedModal?.classList.toggle("open")
+        if (openedModal?.id !== modal) document.getElementById(modal)?.classList.toggle("open")
+        return
     }
 
-    else {
-        if (modal === "null") return
+    if (modal === "null") document.querySelector(".enmYtp") ? document.querySelector("canvas").requestPointerLock() : document.exitPointerLock()
+    if (openedModal) {
+        openedModal.classList.toggle("open")
+        if (modal === "null" || openedModal.id === modal) document.querySelector("canvas").requestPointerLock()
         else document.getElementById(modal).classList.toggle("open")
+    }
+    else if (modal !== "null") {
+        document.getElementById(modal).classList.toggle("open")
+        document.exitPointerLock()
     }
 })
