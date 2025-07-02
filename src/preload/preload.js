@@ -43,9 +43,11 @@ window.addEventListener("DOMContentLoaded", () => {
     menuModal.init()
     menuModal.work()
 
+    const app = document.getElementById("app")
+
     // Modal hint
     const _hint = createEl("div", {}, "clientModalHint", [`Press ${config.get("keybinding.content.MenuModal")} to open menu`])
-    document.querySelector("#app #left-icons").appendChild(_hint)
+    app.querySelector("#left-icons").appendChild(_hint)
 
     ipcRenderer.on("toggle-menu-modal", (_, toggle) => _hint.style.display = toggle ? "block" : "none")
 
@@ -56,8 +58,6 @@ window.addEventListener("DOMContentLoaded", () => {
     })
 
     // Observers
-    const app = document.getElementById("app")
-
     const appObserver = new MutationObserver(() => {
         const logoCont = app.querySelector("img.logo#logo")
         if (logoCont) changeLogo(logoCont)

@@ -31,9 +31,15 @@ const extObj = {
     linux: "png"
 }
 
+let cachedIcon
 export const getIcon = () => {
-    const ext = extObj[process.platform] || null
-    return ext ? nativeImage.createFromPath(fromRoot(`assets/icons/icon.${ext}`)) : undefined
+    if (cachedIcon) return cachedIcon
+
+    const ext = extObj[process.platform]
+    if (!ext) return undefined
+
+    cachedIcon = nativeImage.createFromPath(fromRoot(`assets/icons/icon.${ext}`))
+    return cachedIcon
 }
 
 // DOM
@@ -72,9 +78,12 @@ export const restartMessage = () => popup("#e74c3c", "Restart the client to appl
 // Assets
 export const getAsset = path => `https://raw.githubusercontent.com/robertpakalns/tricko-assets/main/${path}`
 
-export const sessionFetch = url => JSON.parse(sessionStorage.getItem(url)) || fetch(url)
-    .then(r => r.json())
-    .then(data => {
-        sessionStorage.setItem(url, JSON.stringify(data))
-        return data
-    })
+export const sessionFetch = async url => {
+    const cached = sessionStorage.getItem(url)
+    if (cached) return JSON.parse(cached)
+
+    const response = await fetch(url)
+    const data = await response.json()
+    sessionStorage.setItem(url, JSON.stringify(data))
+    return data
+}
