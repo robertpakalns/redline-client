@@ -34,7 +34,6 @@ const versions = {
 }
 
 export const setVersions = (cont, toggle) => {
-    console.log("setVersions called")
     if (!cont) return
 
     for (const [key, value] of Object.entries(versions)) {

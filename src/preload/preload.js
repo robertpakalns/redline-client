@@ -93,19 +93,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const overlay = document.getElementById("overlay")
     let lastVersionState = null
-    const consoleObserver = new MutationObserver(() => {
-        // Unoptimized part because of characterData: true
-        const versionElement = overlay.querySelector("#version")
-        if (!versionElement) return
-
-        let isNonEmpty = versionElement.textContent !== ""
-
+    const consoleObserver = new MutationObserver(mut => {
+        // Ping always has textContent
+        let isNonEmpty = mut[3].target.textContent !== ""
         if (isNonEmpty === lastVersionState) return
 
         lastVersionState = isNonEmpty
         setVersions(overlay, isNonEmpty)
     })
-    consoleObserver.observe(overlay, { childList: true, subtree: true, characterData: true })
+    consoleObserver.observe(overlay, { childList: true, subtree: true })
 
     // Fast CSS
     const fastCSSStyles = document.getElementById("fastCSSStyles")
