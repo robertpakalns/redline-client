@@ -50,10 +50,14 @@ const createWindow = () => {
     mainWindow.setFullScreen(config.get("client.fullscreen"))
     mainWindow.on("page-title-updated", e => e.preventDefault())
 
+    ipcMain.on("join-game", (_, url) => mainWindow.loadURL(url))
+
     const { webContents } = mainWindow
+    ipcMain.on("update-url", e => e.reply("update-url", webContents.getURL()))
     webContents.on("will-prevent-unload", e => e.preventDefault())
     webContents.on("did-navigate-in-page", (_, url) => {
         webContents.send("url-change")
+        webContents.send("update-url", url)
         drpc.setState(url)
     })
 

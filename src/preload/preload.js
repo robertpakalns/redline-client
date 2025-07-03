@@ -2,10 +2,13 @@ import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } fr
 import { fromRoot, createEl, domains } from "../utils/functions.js"
 import { ipcRenderer, contextBridge } from "electron"
 import MenuModal from "../modals/menu/script.js"
-import { Config } from "../utils/config.js"
+import { Config, defaultConfig } from "../utils/config.js"
 import { readFileSync } from "fs"
 
 const config = new Config
+
+const { enable = enableKeybinding, content } = config.get("keybinding")
+const keybinding = enable ? content : defaultConfig.keybinding.content
 
 // With contextIsolation: true, window.appconsole is an alternative for window.console
 contextBridge.exposeInMainWorld("appconsole", window.console)
@@ -46,7 +49,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const app = document.getElementById("app")
 
     // Modal hint
-    const _hint = createEl("div", {}, "clientModalHint", [`Press ${config.get("keybinding.content.MenuModal")} to open menu`])
+    const _hint = createEl("div", {}, "clientModalHint", [`Press ${keybinding.MenuModal} to open menu`])
     app.querySelector("#left-icons").appendChild(_hint)
 
     ipcRenderer.on("toggle-menu-modal", (_, toggle) => _hint.style.display = toggle ? "block" : "none")

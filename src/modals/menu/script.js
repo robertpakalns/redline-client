@@ -44,6 +44,11 @@ class MenuModal extends Modal {
             shell.openPath(el.href)
         })
 
+        for (const el of this.modal.querySelectorAll(".copy")) el.addEventListener("click", e => {
+            navigator.clipboard.writeText(e.target.innerText)
+            popup("rgb(206, 185, 45)", "Copied!")
+        })
+
         // Update client
         ipcRenderer.on("client-update", (_, data) => {
             if (data === null) popup("rgb(45, 206, 72)", "Update available!")
@@ -169,9 +174,24 @@ class MenuModal extends Modal {
         for (const [id, event] of Object.entries(settingsObject))
             this.modal.querySelector(`#${id}`).addEventListener("click", () => ipcRenderer.send(event))
 
+        // Restart notifications
         const restartNotifications = ["fpsUncap", "adblocker", "fullscreen", "swapper", "drpcJoinButton", "enableKeybinding"]
         for (const id of restartNotifications)
             this.modal.querySelector(`#${id}`).addEventListener("click", restartMessage)
+
+        // Join game URL
+        const _currentURL = this.modal.querySelector("#currentURL")
+        ipcRenderer.on("update-url", (_, url) => _currentURL.innerText = url || "Unknown URL")
+        ipcRenderer.send("update-url")
+
+        const joinLinkURL = this.modal.querySelector("#joinLinkURL")
+        const joinByURL = () => ipcRenderer.send("join-game", joinLinkURL.value)
+        this.modal.querySelector("#joinLink").addEventListener("click", joinByURL)
+        joinLinkURL.addEventListener("keydown", e => {
+            if (e.key !== "Enter") return
+            e.preventDefault()
+            joinByURL()
+        })
     }
 }
 
