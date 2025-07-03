@@ -12,7 +12,7 @@
 Unofficial Electron client for Kirka.io
 
 ## Engine
-Redline Client uses Electron version `36.5.0`, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the [`@juice-client/node-enject`](https://www.npmjs.com/package/@juice-client/node-enject) package, which resolves the problem on Windows. More information in [`package.json`](https://github.com/robertpakalns/redline-client/blob/main/package.json).
+Redline Client uses Electron version `37.2.0`, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the [`@juice-client/node-enject`](https://www.npmjs.com/package/@juice-client/node-enject) package, which resolves the problem on Windows. More information in [`package.json`](https://github.com/robertpakalns/redline-client/blob/main/package.json).
 
 ## Client Safety
 This project is open-source. All Redline Client source code is publicly available in the [GitHub repository](https://github.com/robertpakalns/redline-client). All builds are executed via GitHub Actions. If you have concerns about the safety of your private information while using Redline Client, feel free to inspect the source code. Trust in the client is based on trust in the developer.
@@ -37,7 +37,7 @@ This project is open-source. All Redline Client source code is publicly availabl
 * Tricko Links in Player Modals
 
 ## Menu Modal
-To open the menu modal, press `F1`.
+To open the menu modal, press `F1`. You can change the key in the Menu Modal.
 
 ## Resource Swapper
 To use the swapper:

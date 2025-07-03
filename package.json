@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "redline-client",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Redline Client",
   "author": "robertpakalns",
   "main": "index.js",
@@ -11,7 +11,7 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "electron": "^36.5.0",
+    "electron": "^37.2.0",
     "electron-builder": "^25.1.8"
   },
   "dependencies": {
