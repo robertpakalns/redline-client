@@ -11,13 +11,35 @@
 </h1>
 Unofficial Electron client for Kirka.io
 
-## Engine
+<p align="center" style="margin: 30px">
+  <a href="https://github.com/robertpakalns/redline-client/releases/latest">
+    <img src="https://img.shields.io/badge/Download-GitHub_Releases-blue?style=for-the-badge&logo=github&logoColor=white" />
+  </a>
+
+  <a href="https://discord.gg/cTE6CVuGen">
+    <img src="https://img.shields.io/badge/Join-Discord-5661F5?style=for-the-badge&logo=discord&logoColor=white" />
+  </a>
+
+  <a href="https://tricko.pro/redline">
+    <img src="https://img.shields.io/badge/Visit-Tricko.pro-black?style=for-the-badge&logo=Google-Chrome&logoColor=white" />
+  </a>
+</p>
+
+## 📥 Download Client
+1. Visit the [GitHub releases](https://github.com/robertpakalns/redline-client/releases/latest)
+2. Download the installer for your operating system:
+   - Windows: `.exe`
+   - macOS: `.dmg`
+   - Linux: `.AppImage` or `.tar.gz`
+3. Run the installer
+
+## ⚙️ Engine
 Redline Client uses Electron version `37.2.0`, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the [`@juice-client/node-enject`](https://www.npmjs.com/package/@juice-client/node-enject) package, which resolves the problem on Windows. More information in [`package.json`](https://github.com/robertpakalns/redline-client/blob/main/package.json).
 
-## Client Safety
+## 🛡️ Client Safety
 This project is open-source. All Redline Client source code is publicly available in the [GitHub repository](https://github.com/robertpakalns/redline-client). All builds are executed via GitHub Actions. If you have concerns about the safety of your private information while using Redline Client, feel free to inspect the source code. Trust in the client is based on trust in the developer.
 
-## Features
+## 🚀 Features
 * Adblocker
 * Changelog
 * Client, OS, and Engine Stats in-game
@@ -33,13 +55,13 @@ This project is open-source. All Redline Client source code is publicly availabl
 * Import/Export Client Settings
 * Menu Modal (`F1`)
 * Popup Messages
-* Proxy Domain Support
+* Proxy Domains Support
 * Tricko Links in Player Modals
 
-## Menu Modal
+## 🖼️ Menu Modal
 To open the menu modal, press `F1`. You can change the key in the Menu Modal.
 
-## Resource Swapper
+## 🔄 Resource Swapper
 To use the swapper:
 1. Make sure you enabled it in the menu modal settings section
 2. Get the file URL you want to swap and extract only the file name and extension
@@ -47,12 +69,13 @@ To use the swapper:
 4. Reload the client to apply changes
 5. [Example with Voxtulate Client (Extended Swapper)](https://github.com/robertpakalns/VoxtulateClient/wiki/Resource-Swapper)
 
-## Credits
+## 🧑‍💻 Credits
 * xip for Kirka.io
 * Voxtulate Client (robertpakalns) for core features
 * Juice Client (irrvlo) for additional features
 * PVT and CarrySheriff for the client assets
+* slavcp for enject
 
-In partnership with Kirka clan [`ImOn_Smoko`](https://discord.gg/BBchaJvZVU)
+In partnership with Kirka.io clan [`ImOn_Smoko`](https://discord.gg/BBchaJvZVU)
 
-[by robertpakalns](https://github.com/robertpakalns) | [Community Server](https://discord.gg/cTE6CVuGen) | [Powered by Tricko](https://discord.gg/yPjrUrvSzv)
+by robertpakalns
