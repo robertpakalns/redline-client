@@ -40,6 +40,18 @@ Redline Client uses Electron version `37.2.0`, which supports the latest web sta
 ## 🛡️ Client Safety
 This project is open-source. All Redline Client source code is publicly available in the [GitHub repository](https://github.com/robertpakalns/redline-client). All builds are executed via GitHub Actions. If you have concerns about the safety of your private information while using Redline Client, feel free to inspect the source code. Trust in the client is based on trust in the developer.
 
+## 🔗 Deeplink
+Voxtulate Client uses `voxtulate:` protocol to open the client. For example, `voxtulate://?url=path/to/page` opens the client with the page `https://voxiom.io/path/to/page`. [More information](https://github.com/robertpakalns/VoxtulateClient/wiki/Deeplinks).
+
+## 🔧 Default Keybinding
+| Key        | Action                 |
+|------------|------------------------|
+| `Escape`   | Close Modal Window     |
+| `F1`       | Open Menu Window       |
+| `F5`       | Reload Page            |
+| `F11`      | Toggle Fullscreen Mode |
+| `F12`      | Toggle Developer Tools |
+
 ## 🚀 Features
 * Adblocker
 * Changelog
