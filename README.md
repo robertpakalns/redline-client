@@ -10,8 +10,9 @@
     <span>Redline Client</span>
 </h1>
 Unofficial Electron client for Kirka.io
+<br><br>
 
-<p align="center" style="margin: 30px">
+<p align="center">
   <a href="https://github.com/robertpakalns/redline-client/releases/latest">
     <img src="https://img.shields.io/badge/Download-GitHub_Releases-blue?style=for-the-badge&logo=github&logoColor=white" />
   </a>
