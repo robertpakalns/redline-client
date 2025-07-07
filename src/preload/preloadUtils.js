@@ -29,7 +29,7 @@ const versions = {
     CHROMIUM: `v${process.versions.chrome}`,
     ELECTRON: `v${process.versions.electron}`,
     NODE: `v${process.versions.node}`,
-    CLIENT: `v${packageJson.version}`,
+    "REDLINE CLIENT": `v${packageJson.version}`,
     OS: `${type()} ${release()} (${arch()})`
 }
 

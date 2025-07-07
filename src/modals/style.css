@@ -251,7 +251,7 @@ input:disabled,
 input:disabled,
 label:disabled {
     opacity: 20%;
-    cursor: not-allowed;
+    cursor: not-allowed !important;
 }
 
 /* Menu */

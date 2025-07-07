@@ -154,6 +154,17 @@ class MenuModal extends Modal {
             })
         }
 
+        const toggleFastCSS = () => {
+            const checked = enableFastCSS.checked
+            fastCSSURL.disabled = !checked
+            fastCSSValue.disabled = !checked
+            fastCSSURL.classList.toggle("disabled", !checked)
+            fastCSSValue.classList.toggle("disabled", !checked)
+        }
+
+        toggleFastCSS()
+        enableFastCSS.addEventListener("change", toggleFastCSS)
+
         // Domains
         const domainSelect = this.modal.querySelector("#gameDomain")
         domainSelect.addEventListener("change", e => {
