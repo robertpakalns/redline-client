@@ -11,7 +11,7 @@ const keySet = new Set([MenuModal, Reload, Fullscreen, DevTools])
 const keybinding = win => {
     const { webContents } = win
 
-    webContents.on("before-input-event", (e, { code, type }) => {
+    webContents.on("before-input-event", (e, { code }) => {
         if (keySet.has(code)) e.preventDefault()
 
         switch (code) {

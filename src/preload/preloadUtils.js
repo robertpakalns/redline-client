@@ -61,7 +61,8 @@ export const setTrickoLink = cont => {
     const bottomCont = cont.querySelector(".bottom")
     if (!bottomCont) return
 
-    const copiedNode = bottomCont.childNodes[0].cloneNode(true)
+    const children = Array.from(bottomCont.childNodes).filter(node => node instanceof HTMLElement)
+    const copiedNode = children[0]?.cloneNode(true)
     if (!copiedNode) return
 
     copiedNode.classList.add("playerTrickoLink")
