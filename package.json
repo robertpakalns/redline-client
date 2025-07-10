@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "redline-client",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Redline Client",
   "author": "robertpakalns",
   "main": "index.js",

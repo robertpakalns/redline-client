@@ -17,8 +17,12 @@ const appendStyles = () => {
     const modalStyles = createEl("style")
     modalStyles.innerHTML = readFileSync(fromRoot("src/modals/style.css"), "utf8")
 
+    const fontURL = fromRoot("assets/fonts/Roboto.ttf").replace(/\\/g, "/")
+
+
     const clientStyles = createEl("style")
     clientStyles.innerHTML = readFileSync(fromRoot("src/preload/clientStyles.css"), "utf8") + `
+        @font-face { font-family: "Roboto"; src: url(${fontURL}) format("truetype") }
         .clientModalHint { display: ${config.get("interface.modalHint") ? "block" : "none"} }`
 
     const fastCSSStyles = createEl("style", { id: "fastCSSStyles" })
