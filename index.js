@@ -61,6 +61,9 @@ const createWindow = () => {
         drpc.setState(url)
     })
 
+    webContents.on("did-navigate", (_, url) => drpc.setState(url))
+    webContents.on("did-finish-load", () => drpc.setState(webContents.getURL()))
+
     keybinding(mainWindow)
     swapper(webContents)
     userscripts(webContents)

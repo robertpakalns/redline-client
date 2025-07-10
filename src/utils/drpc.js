@@ -33,12 +33,13 @@ class DRPC {
         this.clientId = "1385893715519864933"
         this.client = new Client({ transport: "ipc" })
         this.state = "Playing Kirka.io"
+        this.details = ""
         this.time = Date.now()
         this.connected = false
+        this.hasState = false
 
         this.client.on("ready", () => {
             this.connected = true
-            this.setActivity()
         })
         setInterval(() => this.connected && this.setActivity(), 15000) // Updates every 15 seconds
 
@@ -56,6 +57,7 @@ class DRPC {
 
         this.client.setActivity({
             state: this.state,
+            ...(this.details ? { details: this.details } : {}),
             startTimestamp: this.time,
             largeImageKey: "redline",
             buttons
@@ -63,7 +65,7 @@ class DRPC {
     }
 
     setState(url) {
-        const { pathname } = new URL(url)
+        const { hostname, pathname } = new URL(url)
         if (!this.connected) return
 
         let result = "Playing Kirka.io"
@@ -74,10 +76,19 @@ class DRPC {
         else if (pathname.startsWith("/profile")) {
             result = `Viewing player profile with ID ${pathname.split("/").pop()}`
         }
-        else if (staticLinks[pathname]) result = staticLinks[pathname]
+        else if (pathname.startsWith("/___lobby___")) {
+            result = `In the ${pathname.split("/").pop().split("~")[0]} lobby`
+        }
+        else if (staticLinks[pathname]) {
+            result = staticLinks[pathname]
+        }
 
         this.state = result
+        this.details = hostname
         this.joinURL = pathname === "/" ? this.protocol : `${this.protocol}?url=${pathname}`
+        this.hasState = true
+
+        this.setActivity()
     }
 }
 

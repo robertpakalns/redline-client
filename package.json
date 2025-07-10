@@ -20,6 +20,6 @@
     "electron-updater": "^6.6.2"
   },
   "optionalDependencies": {
-    "@juice-client/node-enject": "^1.0.3"
+    "@juice-client/node-enject": "^1.0.4"
   }
 }
