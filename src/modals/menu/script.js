@@ -2,6 +2,7 @@ import { fromRoot, createEl, domains, getHost, popup, restartMessage } from "../
 import packageJson from "../../../package.json" with { type: "json" }
 import { Config, configDir } from "../../utils/config.js"
 import createChangelogSection from "./changelog.js"
+import createUserscriptsBlock from "./userscripts.js"
 import { shell, ipcRenderer } from "electron"
 import Modal from "../modal.js"
 import { join } from "path"
@@ -203,6 +204,8 @@ class MenuModal extends Modal {
             e.preventDefault()
             joinByURL()
         })
+
+        createUserscriptsBlock()
     }
 }
 
