@@ -7,6 +7,25 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            node_abi: win32-x64-msvc
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            node_abi: win32-ia32-msvc
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            node_abi: linux-x64-gnu
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            node_abi: linux-arm64-gnu
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            node_abi: darwin-x64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            node_abi: darwin-arm64
 
     permissions:
       contents: write
@@ -37,11 +56,16 @@ jobs:
       - run: npm ci
 
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rs/toolchain@v1
+        with:
+          target: ${{ matrix.target }}
+          profile: minimal
+          override: true
 
       - working-directory: ./src-rust
         run: |
-          cd analytics && npx napi build --release
-          cd ../drpc && npx napi build --release
+          cd analytics && npx napi build --target ${{ matrix.node_abi }} --release
+          cd ../drpc && npx napi build --target ${{ matrix.node_abi }} --release
 
       - uses: softprops/action-gh-release@v2.0.6
         with:
