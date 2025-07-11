@@ -5,18 +5,26 @@ import { app, BrowserWindow, ipcMain } from "electron"
 import { writeFileSync, readFileSync } from "fs"
 import electronUpdater from "electron-updater"
 
+// JavaScript modules
 import { userscripts } from "./src/utils/userscripts.js"
-import analytics from "./src-rust/analytics/index.js"
 import keybinding from "./src/utils/keybinding.js"
 import swapper from "./src/utils/swapper.js"
-import DRPC from "./src/utils/drpc.js"
+
+// Rust modules
+import analytics from "./src-rust/analytics/index.js"
+import drpc from "./src-rust/drpc/index.js"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
-const drpc = new DRPC
 
 let mainWindow = null
 let lastURL = null
+
+const handleURL = url => {
+    lastURL = url
+    drpc.setStatus(lastURL)
+    analytics.setEntry(lastURL)
+}
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -58,30 +66,18 @@ const createWindow = () => {
     ipcMain.on("update-url", e => e.reply("update-url", webContents.getURL()))
     webContents.on("will-prevent-unload", e => e.preventDefault())
     webContents.on("did-navigate-in-page", (_, url) => {
-        webContents.send("url-change")
         webContents.send("update-url", url)
-
-        lastURL = url
-        drpc.setState(lastURL)
-        analytics.setEntry(lastURL)
+        handleURL(url)
     })
-
-    webContents.on("did-navigate", (_, url) => {
-        lastURL = url
-        drpc.setState(lastURL)
-        analytics.setEntry(lastURL)
-    })
-    webContents.on("did-finish-load", () => {
-        lastURL = webContents.getURL()
-        drpc.setState(lastURL)
-        analytics.setEntry(lastURL)
-    })
+    webContents.on("did-navigate", (_, url) => handleURL(url))
+    webContents.on("did-finish-load", () => handleURL(webContents.getURL()))
 
     keybinding(mainWindow)
     swapper(webContents)
     userscripts(webContents)
 }
 
+// FPS uncap for Windows only
 if (config.get("client.fpsUncap") && process.platform === "win32") {
     app.commandLine.appendSwitch("disable-frame-rate-limit")
     app.commandLine.appendSwitch("disable-gpu-vsync")
@@ -97,6 +93,8 @@ app.on("second-instance", () => {
 
 app.on("ready", () => {
     app.setAsDefaultProtocolClient("redline")
+
+    drpc.init(config.get("discord.joinButton"), `https://${getHost()}`)
 
     createWindow()
 
