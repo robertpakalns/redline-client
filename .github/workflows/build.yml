@@ -60,6 +60,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           profile: minimal
+          toolchain: stable
           override: true
 
       - working-directory: ./src-rust
