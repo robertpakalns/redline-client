@@ -6,7 +6,8 @@ use std::{
     collections::HashSet,
     io::ErrorKind::NotFound,
     path::PathBuf,
-    sync::Mutex,
+    sync::{mpsc, Arc, Mutex},
+    thread,
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 use url::Url;
@@ -19,8 +20,8 @@ struct LastEntry {
     instant: Instant,
 }
 
-static LAST_ENTRY: Lazy<Mutex<Option<LastEntry>>> = Lazy::new(|| Mutex::new(None));
-static UNREGISTERED_DOMAIN_DURATION: Lazy<Mutex<i64>> = Lazy::new(|| Mutex::new(0));
+static LAST_ENTRY: Lazy<Arc<Mutex<Option<LastEntry>>>> = Lazy::new(|| Arc::new(Mutex::new(None)));
+static UNREGISTERED_DOMAIN_DURATION: Lazy<Arc<Mutex<i64>>> = Lazy::new(|| Arc::new(Mutex::new(0)));
 
 static ALLOWED_DOMAINS: Lazy<HashSet<&'static str>> = Lazy::new(|| {
     let mut set = HashSet::new();
@@ -32,6 +33,10 @@ static ALLOWED_DOMAINS: Lazy<HashSet<&'static str>> = Lazy::new(|| {
     set.insert("cloudconverts.com");
     set
 });
+
+fn napi_err<E: std::fmt::Display>(e: E) -> Error {
+    Error::from_reason(e.to_string())
+}
 
 fn get_timestamp() -> i64 {
     SystemTime::now()
@@ -49,11 +54,7 @@ fn get_db_path() -> std::io::Result<PathBuf> {
     Ok(path)
 }
 
-fn napi_err<E: std::fmt::Display>(e: E) -> Error {
-    Error::from_reason(e.to_string())
-}
-
-fn establish() -> Result<Connection> {
+fn establish_connection() -> Result<Connection> {
     let path = get_db_path().map_err(napi_err)?;
     let conn = Connection::open(path).map_err(napi_err)?;
     conn.execute_batch(
@@ -61,7 +62,7 @@ fn establish() -> Result<Connection> {
             id INTEGER PRIMARY KEY,
             host TEXT NOT NULL,
             path TEXT NOT NULL,
-            duration INTEGER,
+            duration INTEGER DEFAULT 0,
             timestamp INTEGER NOT NULL
         );",
     )
@@ -71,112 +72,170 @@ fn establish() -> Result<Connection> {
 
 #[napi]
 pub fn set_entry(url: String) -> Result<()> {
-    let conn = establish()?;
+    let url = url.clone();
+    let last_entry = LAST_ENTRY.clone();
+    let unregistered_duration = UNREGISTERED_DOMAIN_DURATION.clone();
 
-    let parsed_url = Url::parse(&url).map_err(napi_err)?;
-    let host = parsed_url
-        .host_str()
-        .ok_or_else(|| napi_err("Invalid host"))?
-        .to_string();
-    let path = parsed_url.path().to_string();
-    let instant_now = Instant::now();
+    thread::spawn(move || {
+        if let Err(e) = (|| -> Result<()> {
+            let conn = establish_connection()?;
+            let parsed_url = Url::parse(&url).map_err(napi_err)?;
+            let host = parsed_url
+                .host_str()
+                .ok_or_else(|| napi_err("Invalid host"))?
+                .to_string();
+            let path = parsed_url.path().to_string();
+            let instant_now = Instant::now();
 
-    let mut last_entry_lock = LAST_ENTRY.lock().unwrap();
-    let mut unregistered_cache_lock = UNREGISTERED_DOMAIN_DURATION.lock().unwrap();
+            let mut last_entry_lock = last_entry.lock().unwrap();
+            let mut unregistered_lock = unregistered_duration.lock().unwrap();
 
-    if let Some(ref last) = *last_entry_lock {
-        let duration = instant_now.duration_since(last.instant).as_millis() as i64;
+            if let Some(ref last) = *last_entry_lock {
+                let duration = instant_now.duration_since(last.instant).as_millis() as i64;
 
-        if ALLOWED_DOMAINS.contains(host.as_str()) {
-            if last.host == host && last.path == path {
+                if ALLOWED_DOMAINS.contains(host.as_str()) {
+                    if last.host == host && last.path == path {
+                        *last_entry_lock = Some(LastEntry {
+                            id: last.id,
+                            host: last.host.clone(),
+                            path: last.path.clone(),
+                            instant: instant_now,
+                        });
+                        return Ok(());
+                    }
+
+                    let total_duration = duration + *unregistered_lock;
+
+                    conn.execute(
+                        "UPDATE entries SET duration = ?1 WHERE id = ?2",
+                        params![total_duration, last.id],
+                    )
+                    .map_err(napi_err)?;
+
+                    *unregistered_lock = 0;
+
+                    conn.execute(
+                        "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, 0, ?3)",
+                        params![host, path, get_timestamp()],
+                    )
+                    .map_err(napi_err)?;
+
+                    let id = conn.last_insert_rowid();
+
+                    *last_entry_lock = Some(LastEntry {
+                        id,
+                        host,
+                        path,
+                        instant: instant_now,
+                    });
+                } else {
+                    *unregistered_lock += duration;
+                    *last_entry_lock = Some(LastEntry {
+                        id: last.id,
+                        host: last.host.clone(),
+                        path: last.path.clone(),
+                        instant: instant_now,
+                    });
+                }
+            } else if ALLOWED_DOMAINS.contains(host.as_str()) {
+                conn.execute(
+                    "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, 0, ?3)",
+                    params![host, path, get_timestamp()],
+                )
+                .map_err(napi_err)?;
+
+                let id = conn.last_insert_rowid();
+
                 *last_entry_lock = Some(LastEntry {
-                    id: last.id,
-                    host: last.host.clone(),
-                    path: last.path.clone(),
+                    id,
+                    host,
+                    path,
                     instant: instant_now,
                 });
-                return Ok(());
+            } else {
+                *unregistered_lock = 0;
             }
 
-            let total_duration = duration + *unregistered_cache_lock;
-
-            conn.execute(
-                "UPDATE entries SET duration = ?1 WHERE id = ?2",
-                params![total_duration, last.id],
-            )
-            .map_err(napi_err)?;
-
-            *unregistered_cache_lock = 0;
-
-            conn.execute(
-                "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, NULL, ?3)",
-                params![host, path, get_timestamp()],
-            )
-            .map_err(napi_err)?;
-
-            let id = conn.last_insert_rowid();
-
-            *last_entry_lock = Some(LastEntry {
-                id,
-                host,
-                path,
-                instant: instant_now,
-            });
-
             Ok(())
-        } else {
-            *unregistered_cache_lock += duration;
-
-            *last_entry_lock = Some(LastEntry {
-                id: last.id,
-                host: last.host.clone(),
-                path: last.path.clone(),
-                instant: instant_now,
-            });
-
-            Ok(())
+        })() {
+            eprintln!("Error in set_entry thread: {}", e);
         }
-    } else {
-        if ALLOWED_DOMAINS.contains(host.as_str()) {
-            conn.execute(
-                "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, NULL, ?3)",
-                params![host, path, get_timestamp()],
-            )
-            .map_err(napi_err)?;
+    });
 
-            let id = conn.last_insert_rowid();
-
-            *last_entry_lock = Some(LastEntry {
-                id,
-                host,
-                path,
-                instant: instant_now,
-            });
-
-            Ok(())
-        } else {
-            *unregistered_cache_lock = 0;
-            Ok(())
-        }
-    }
+    Ok(())
 }
 
 #[napi]
 pub fn set_last_entry() -> Result<()> {
-    let conn = establish()?;
-    let now = Instant::now();
+    let last_entry = LAST_ENTRY.clone();
 
-    let mut last_entry_lock = LAST_ENTRY.lock().unwrap();
-    if let Some(ref last) = *last_entry_lock {
-        let duration = now.duration_since(last.instant).as_millis() as i64;
+    thread::spawn(move || {
+        if let Err(e) = (|| -> Result<()> {
+            let conn = establish_connection()?;
+            let now = Instant::now();
 
-        conn.execute(
-            "UPDATE entries SET duration = COALESCE(duration, 0) + ?1 WHERE id = ?2",
-            params![duration, last.id],
-        )
-        .map_err(napi_err)?;
-    }
+            let mut last_entry_lock = last_entry.lock().unwrap();
+            if let Some(ref last) = *last_entry_lock {
+                let duration = now.duration_since(last.instant).as_millis() as i64;
 
-    *last_entry_lock = None;
+                conn.execute(
+                    "UPDATE entries SET duration = COALESCE(duration, 0) + ?1 WHERE id = ?2",
+                    params![duration, last.id],
+                )
+                .map_err(napi_err)?;
+            }
+
+            *last_entry_lock = None;
+            Ok(())
+        })() {
+            eprintln!("Error in set_last_entry thread: {}", e);
+        }
+    });
+
     Ok(())
+}
+
+#[napi(object)]
+pub struct Entry {
+    pub host: String,
+    pub path: String,
+    pub duration: i64,
+    pub timestamp: i64,
+}
+
+#[napi]
+pub fn get_all_data() -> Result<Vec<Entry>> {
+    let (tx, rx) = mpsc::channel();
+
+    thread::spawn(move || {
+        let result = (|| -> Result<Vec<Entry>> {
+            let conn = establish_connection()?;
+
+            let mut stmt = conn
+                .prepare("SELECT host, path, duration, timestamp FROM entries")
+                .map_err(napi_err)?;
+
+            let entry_iter = stmt
+                .query_map([], |row| {
+                    Ok(Entry {
+                        host: row.get(0)?,
+                        path: row.get(1)?,
+                        duration: row.get(2)?,
+                        timestamp: row.get(3)?,
+                    })
+                })
+                .map_err(napi_err)?;
+
+            let mut entries = Vec::new();
+            for entry in entry_iter {
+                entries.push(entry.map_err(napi_err)?);
+            }
+
+            Ok(entries)
+        })();
+
+        tx.send(result).unwrap();
+    });
+
+    rx.recv().unwrap()
 }

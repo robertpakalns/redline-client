@@ -1,4 +1,4 @@
-import { createEl, fromRoot, getHost } from "../utils/functions.js"
+import { createEl, fromRoot, getHost, isNum } from "../utils/functions.js"
 import packageJson from "../../package.json" with { type: "json" }
 import { Config } from "../utils/config.js"
 import { type, release, arch } from "os"
@@ -81,15 +81,6 @@ export const setTrickoLink = cont => {
 export const changeLogo = cont => {
     if (!cont) return
     cont.src = fromRoot("assets/logo.png")
-}
-
-const isNum = (aVal, bVal) => {
-    const a = parseInt(aVal)
-    const b = parseInt(bVal)
-
-    if (isNaN(a) || isNaN(b) || b === 0) return a
-
-    return Math.round(a / b * 100) / 100
 }
 
 export const createKDRatio = cont => {

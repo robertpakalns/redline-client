@@ -5,3 +5,10 @@
 
 export declare function setEntry(url: string): void
 export declare function setLastEntry(): void
+export interface Entry {
+  host: string
+  path: string
+  duration: number
+  timestamp: number
+}
+export declare function getAllData(): Array<Entry>

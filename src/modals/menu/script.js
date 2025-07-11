@@ -3,6 +3,7 @@ import packageJson from "../../../package.json" with { type: "json" }
 import { Config, configDir } from "../../utils/config.js"
 import createChangelogSection from "./changelog.js"
 import createUserscriptsBlock from "./userscripts.js"
+import createAnalyticsSection from "./analytics.js"
 import { shell, ipcRenderer } from "electron"
 import Modal from "../modal.js"
 import { join } from "path"
@@ -36,8 +37,9 @@ class MenuModal extends Modal {
             const targetDiv = this.modal.querySelector(`#menuMainContent > div[name="${e.target.id}"]`)
             if (targetDiv) targetDiv.classList.add("active")
 
-            // Load changelog data only when needed
+            // Load sections only when needed
             if (targetDiv.getAttribute("name") === "changelogSection") createChangelogSection()
+            if (targetDiv.getAttribute("name") === "analyticsSection") createAnalyticsSection()
         })
 
         for (const el of this.modal.querySelectorAll(".url")) el.addEventListener("click", e => {

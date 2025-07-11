@@ -88,3 +88,13 @@ export const sessionFetch = async url => {
     sessionStorage.setItem(url, JSON.stringify(data))
     return data
 }
+
+// Output
+export const isNum = (aVal, bVal) => {
+    const a = parseInt(aVal)
+    const b = parseInt(bVal)
+
+    if (isNaN(a) || isNaN(b) || b === 0) return a
+
+    return Math.round(a / b * 100) / 100
+}

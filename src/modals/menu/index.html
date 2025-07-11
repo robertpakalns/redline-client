@@ -14,6 +14,7 @@
                 <button id="changelogSection" class="sideBarItem list-el">Changelog</button>
                 <button id="infoSection" class="sideBarItem list-el">Info</button>
                 <button id="userscriptsSection" class="sideBarItem list-el">Userscripts</button>
+                <button id="analyticsSection" class="sideBarItem list-el">Analytics</button>
             </div>
 
             <div class="sideBarFooter">
@@ -267,6 +268,26 @@
 
             <div class="mainContentBlock" name="userscriptsSection">
                 <p class="userscriptsInfo">Here, you will be able to interact with your loaded userscripts!</p>
+            </div>
+
+            <div class="mainContentBlock" name="analyticsSection">
+                <header>Analytics</header>
+
+                <div class="main">
+                    <div>
+                        <h1>Time Spent in client, h</h1>
+                        <div id="totalTimeSpentInClient"></div>
+                    </div>
+                    <div>
+                        <h1>Time Spent in-game, h</h1>
+                        <div id="totalTimeSpentInGame"></div>
+                    </div>
+                </div>
+
+                <div class="chartBlock">
+                    <h1>Time Spent on Proxies, h</h1>
+                    <canvas id="durationByHostChart"></canvas>
+                </div>
             </div>
 
         </div>

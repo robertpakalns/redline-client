@@ -470,3 +470,16 @@ label:disabled {
         transform: scale(1.05);
     }
 }
+
+/* Charts */
+.chartBlock {
+    max-width: 50%;
+    margin: auto;
+    text-align: center;
+}
+
+.main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
