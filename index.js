@@ -1,14 +1,17 @@
-import { app, BrowserWindow, ipcMain, dialog, protocol, net } from "electron"
+import { confirmAction, openDialogModal, saveDialogModal } from "./src/utils/dialogs.js"
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js"
+import { app, BrowserWindow, ipcMain, protocol, net } from "electron"
 import { Config, configDir, configPath } from "./src/utils/config.js"
 import { existsSync, writeFileSync, readFileSync } from "fs"
-import { userscripts } from "./src/utils/userscripts.js"
-import keybinding from "./src/utils/keybinding.js"
 import electronUpdater from "electron-updater"
-import swapper from "./src/utils/swapper.js"
-import DRPC from "./src/utils/drpc.js"
 import { pathToFileURL } from "url"
 import { join } from "path"
+
+import { userscripts } from "./src/utils/userscripts.js"
+import analytics from "./src-rust/analytics/index.js"
+import keybinding from "./src/utils/keybinding.js"
+import swapper from "./src/utils/swapper.js"
+import DRPC from "./src/utils/drpc.js"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
@@ -58,27 +61,24 @@ const createWindow = () => {
     webContents.on("did-navigate-in-page", (_, url) => {
         webContents.send("url-change")
         webContents.send("update-url", url)
+
         drpc.setState(url)
+        analytics.setEntry(url)
     })
 
-    webContents.on("did-navigate", (_, url) => drpc.setState(url))
-    webContents.on("did-finish-load", () => drpc.setState(webContents.getURL()))
+    webContents.on("did-navigate", (_, url) => {
+        drpc.setState(url)
+        analytics.setEntry(url)
+    })
+    webContents.on("did-finish-load", () => {
+        drpc.setState(webContents.getURL())
+        analytics.setEntry(webContents.getURL())
+    })
+    mainWindow.on("close", () => analytics.setEntry(webContents.getURL()))
 
     keybinding(mainWindow)
     swapper(webContents)
     userscripts(webContents)
-}
-
-const confirmAction = (message, callback) => {
-    const result = dialog.showMessageBoxSync({
-        type: "question",
-        buttons: ["Yes", "No"],
-        defaultId: 1,
-        icon: getIcon(),
-        title: "Redline Client | Confirm",
-        message
-    })
-    if (result === 0) callback()
 }
 
 if (config.get("client.fpsUncap") && process.platform === "win32") {
@@ -138,11 +138,13 @@ app.on("ready", () => {
         ipcMain.on(e, (_, ...a) => webContents.send(e, ...a))
 
     // Import/export settings
-    const f = { filters: [{ name: "JSON Files", extensions: ["json"] }] }
-    ipcMain.on("import-client-settings", () => dialog.showOpenDialog(f).then(({ canceled, filePaths }) => {
-        if (!canceled && filePaths.length > 0) writeFileSync(Config.file, readFileSync(filePaths[0], "utf8"))
-    }))
-    ipcMain.on("export-client-settings", () => dialog.showSaveDialog(f).then(({ canceled, filePath }) => {
-        if (!canceled && filePath) writeFileSync(filePath, readFileSync(configPath))
-    }))
+    // const f = { filters: [{ name: "JSON Files", extensions: ["json"] }] }
+    // ipcMain.on("import-client-settings", () => dialog.showOpenDialog(f).then(({ canceled, filePaths }) => {
+    //     if (!canceled && filePaths.length > 0) writeFileSync(Config.file, readFileSync(filePaths[0], "utf8"))
+    // }))
+    ipcMain.on("import-client-settings", () => openDialogModal(filePath => writeFileSync(Config.file, readFileSync(filePath, "utf8"))))
+    // ipcMain.on("export-client-settings", () => dialog.showSaveDialog(f).then(({ canceled, filePath }) => {
+    //     if (!canceled && filePath) writeFileSync(filePath, readFileSync(configPath))
+    // }))
+    ipcMain.on("export-client-settings", () => saveDialogModal(filePath => writeFileSync(filePath, readFileSync(configPath))))
 })

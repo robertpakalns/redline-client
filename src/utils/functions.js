@@ -6,6 +6,7 @@ import { join } from "path"
 
 const config = new Config
 
+// Project root path
 const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../../")
 export const fromRoot = path => join(__root, path)
 
