@@ -6,7 +6,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest, ubuntu-22.04, macos-latest]
         include:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
@@ -14,10 +14,10 @@ jobs:
           - os: windows-latest
             target: i686-pc-windows-msvc
             node_abi: win32-ia32-msvc
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             node_abi: linux-x64-gnu
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             node_abi: aarch64-unknown-linux-gnu
           - os: macos-latest
@@ -80,12 +80,11 @@ jobs:
               exit 1
           esac
 
-      - if: matrix.os == 'ubuntu-latest' && matrix.target == 'aarch64-unknown-linux-gnu'
+      - if: matrix.os == 'ubuntu-22.04' && matrix.target == 'aarch64-unknown-linux-gnu'
         run: |
-          sudo apt-get update
           sudo dpkg --add-architecture arm64
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libsqlite3-dev:arm64
+          sudo apt-get install -y libsqlite3-dev:arm64
 
       - working-directory: ./src-rust
         run: |
