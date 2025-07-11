@@ -29,7 +29,7 @@ const versions = {
     CHROMIUM: `v${process.versions.chrome}`,
     ELECTRON: `v${process.versions.electron}`,
     NODE: `v${process.versions.node}`,
-    "REDLINE CLIENT": `v${packageJson.version}`,
+    REDLINE_CLIENT: `v${packageJson.version}`,
     OS: `${type()} ${release()} (${arch()})`
 }
 
@@ -43,7 +43,7 @@ export const setVersions = (cont, toggle) => {
             continue
         }
 
-        const _span = createEl("span", { id: key }, "", [`${key}: ${value}`])
+        const _span = createEl("span", { id: key }, "", [`${key.replace("_", " ")}: ${value}`])
         const _div = createEl("div", {}, "", [_span])
         cont.appendChild(_div)
     }
