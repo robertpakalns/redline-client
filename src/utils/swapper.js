@@ -1,7 +1,10 @@
 import { existsSync, mkdirSync, readdirSync } from "fs"
 import { Config, configDir } from "./config.js"
+import { protocol, net } from "electron"
 import { domains } from "./functions.js"
+import { pathToFileURL } from "url"
 import { join } from "path"
+
 const config = new Config
 
 const swapper = webContents => {
@@ -16,6 +19,14 @@ const swapper = webContents => {
     const swapperFolder = join(configDir, "swapper")
     if (!existsSync(swapperFolder)) mkdirSync(swapperFolder, { recursive: true })
     const swapperFiles = new Set(readdirSync(swapperFolder))
+
+    // Handle protocol
+    protocol.handle("redline", ({ url }) => {
+        const assetName = new URL(url).searchParams.get("asset")
+        const localPath = join(configDir, "swapper", assetName)
+
+        if (existsSync(localPath)) return net.fetch(pathToFileURL(localPath).toString())
+    })
 
     const swapFile = name => {
 

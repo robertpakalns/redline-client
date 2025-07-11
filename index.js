@@ -1,11 +1,9 @@
 import { confirmAction, openDialogModal, saveDialogModal } from "./src/utils/dialogs.js"
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js"
-import { app, BrowserWindow, ipcMain, protocol, net } from "electron"
-import { Config, configDir, configPath } from "./src/utils/config.js"
-import { existsSync, writeFileSync, readFileSync } from "fs"
+import { Config, configPath } from "./src/utils/config.js"
+import { app, BrowserWindow, ipcMain } from "electron"
+import { writeFileSync, readFileSync } from "fs"
 import electronUpdater from "electron-updater"
-import { pathToFileURL } from "url"
-import { join } from "path"
 
 import { userscripts } from "./src/utils/userscripts.js"
 import analytics from "./src-rust/analytics/index.js"
@@ -99,14 +97,6 @@ app.on("second-instance", () => {
 
 app.on("ready", () => {
     app.setAsDefaultProtocolClient("redline")
-
-    // Swapper
-    protocol.handle("redline", ({ url }) => {
-        const assetName = new URL(url).searchParams.get("asset")
-        const localPath = join(configDir, "swapper", assetName)
-
-        if (existsSync(localPath)) return net.fetch(pathToFileURL(localPath).toString())
-    })
 
     createWindow()
 
