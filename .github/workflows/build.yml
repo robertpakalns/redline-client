@@ -21,7 +21,7 @@ jobs:
           node-version: 20
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
-  
+
       - id: get_version
         shell: bash
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
@@ -35,6 +35,13 @@ jobs:
           fi
 
       - run: npm ci
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - working-directory: ./src-rust
+        run: |
+          cd analytics && npx napi build --release
+          cd ../drpc && npx napi build --release
 
       - uses: softprops/action-gh-release@v2.0.6
         with:
