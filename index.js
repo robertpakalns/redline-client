@@ -17,7 +17,8 @@ const { autoUpdater } = electronUpdater
 const config = new Config
 const drpc = new DRPC
 
-let mainWindow
+let mainWindow = null
+let lastURL = null
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -62,19 +63,21 @@ const createWindow = () => {
         webContents.send("url-change")
         webContents.send("update-url", url)
 
-        drpc.setState(url)
-        analytics.setEntry(url)
+        lastURL = url
+        drpc.setState(lastURL)
+        analytics.setEntry(lastURL)
     })
 
     webContents.on("did-navigate", (_, url) => {
-        drpc.setState(url)
-        analytics.setEntry(url)
+        lastURL = url
+        drpc.setState(lastURL)
+        analytics.setEntry(lastURL)
     })
     webContents.on("did-finish-load", () => {
-        drpc.setState(webContents.getURL())
-        analytics.setEntry(webContents.getURL())
+        lastURL = webContents.getURL()
+        drpc.setState(lastURL)
+        analytics.setEntry(lastURL)
     })
-    mainWindow.on("close", () => analytics.setEntry(webContents.getURL()))
 
     keybinding(mainWindow)
     swapper(webContents)
@@ -138,13 +141,13 @@ app.on("ready", () => {
         ipcMain.on(e, (_, ...a) => webContents.send(e, ...a))
 
     // Import/export settings
-    // const f = { filters: [{ name: "JSON Files", extensions: ["json"] }] }
-    // ipcMain.on("import-client-settings", () => dialog.showOpenDialog(f).then(({ canceled, filePaths }) => {
-    //     if (!canceled && filePaths.length > 0) writeFileSync(Config.file, readFileSync(filePaths[0], "utf8"))
-    // }))
-    ipcMain.on("import-client-settings", () => openDialogModal(filePath => writeFileSync(Config.file, readFileSync(filePath, "utf8"))))
-    // ipcMain.on("export-client-settings", () => dialog.showSaveDialog(f).then(({ canceled, filePath }) => {
-    //     if (!canceled && filePath) writeFileSync(filePath, readFileSync(configPath))
-    // }))
-    ipcMain.on("export-client-settings", () => saveDialogModal(filePath => writeFileSync(filePath, readFileSync(configPath))))
+    ipcMain.on("import-client-settings", () => openDialogModal(file => writeFileSync(Config.file, readFileSync(file, "utf8"))))
+    ipcMain.on("export-client-settings", () => saveDialogModal(file => writeFileSync(file, readFileSync(configPath))))
+
+    // Save last URL
+    mainWindow.on("close", () => {
+        if (mainWindow && mainWindow.webContents) lastURL = mainWindow.webContents.getURL()
+    })
 })
+
+app.on("before-quit", analytics.setLastEntry)

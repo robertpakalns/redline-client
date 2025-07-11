@@ -7,6 +7,8 @@ const { joinButton } = config.get("discord")
 
 const staticLinks = {
     "/": "Viewing main lobby",
+    "/auth": "Viewing authentication page",
+    "/levels": "Viewing level tracker",
     "/hub/leaderboard": "Viewing player leaderboard",
     "/hub/clans/champions-league": "Viewing clan leaderboard",
     "/hub/ranked/leaderboard-point3v3": "Viewing ranked leaderboard: Point 3v3",
