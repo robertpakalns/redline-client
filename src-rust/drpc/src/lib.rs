@@ -169,9 +169,14 @@ pub fn set_status(url: String) -> Result<()> {
     let drpc = instance
         .as_ref()
         .ok_or_else(|| napi_err("DRPC not initialized."))?;
-    let mut drpc = drpc.lock().unwrap();
+    let drpc_clone = drpc.clone();
 
-    set_status_internal(&mut drpc, &url)?;
+    spawn(move || {
+        if let Err(e) = set_status_internal(&mut drpc_clone.lock().unwrap(), &url) {
+            eprintln!("Failed to update status: {}", e);
+        }
+    });
+
     Ok(())
 }
 

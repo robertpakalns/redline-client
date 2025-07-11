@@ -26,6 +26,9 @@ const proxyChart = data => {
 
     const ctx = document.getElementById("durationByHostChart").getContext("2d")
 
+    const existingChart = Chart.getChart(ctx)
+    if (existingChart) existingChart.destroy()
+
     new Chart(ctx, {
         type: "pie",
         data: {
@@ -66,8 +69,6 @@ const setValues = data => {
 
 const createAnalyticsSection = async () => {
     const entries = getAllData()
-
-    console.log(entries)
 
     proxyChart(entries)
     setValues(entries)
