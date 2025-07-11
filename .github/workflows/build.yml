@@ -39,9 +39,14 @@ jobs:
         with:
           node-version: 20
           cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
 
       - id: get_version
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
       - shell: bash
+        run: |
           tag="v${{ steps.get_version.outputs.version }}"
           if git show-ref --tags --verify --quiet "refs/tags/${tag}"; then
             echo "Tag ${tag} already exists."
@@ -76,14 +81,12 @@ jobs:
           esac
 
       - if: matrix.os == 'ubuntu-22.04' && matrix.target == 'aarch64-unknown-linux-gnu'
+        shell: bash
         run: |
           sudo dpkg --add-architecture arm64
-          
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/arm64.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/arm64.list
-          
           sudo apt-get update
-          
           sudo apt-get install -y libsqlite3-dev:arm64
 
       - working-directory: ./src-rust
