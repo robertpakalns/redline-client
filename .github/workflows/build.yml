@@ -5,120 +5,88 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform: [win32, darwin, linux]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
-          - platform: win32
-            rust_target: x86_64-pc-windows-msvc
-            node_abi: win32-x64-msvc
-            electron_arch: x64
-            artifacts: "*.exe *.blockmap *.zip"
-          - platform: win32
-            rust_target: i686-pc-windows-msvc
-            node_abi: win32-ia32-msvc
-            electron_arch: ia32
-            artifacts: "*.exe *.blockmap *.zip"
-          - platform: darwin
-            rust_target: x86_64-apple-darwin
-            node_abi: darwin-x64
-            electron_arch: x64
-            artifacts: "*.dmg *.zip"
-          - platform: darwin
-            rust_target: aarch64-apple-darwin
-            node_abi: darwin-arm64
-            electron_arch: arm64
-            artifacts: "*.dmg *.zip"
-          - platform: linux
+          # Linux targets (using cross)
+          - os: ubuntu-latest
             rust_target: x86_64-unknown-linux-gnu
             node_abi: linux-x64-gnu
             electron_arch: x64
             artifacts: "*.AppImage *.tar.gz *.zip"
-          - platform: linux
+            use_cross: true
+          - os: ubuntu-latest
             rust_target: aarch64-unknown-linux-gnu
             node_abi: linux-arm64
             electron_arch: arm64
             artifacts: "*.AppImage *.tar.gz *.zip"
-
-    permissions:
-      contents: write
+            use_cross: true
+            
+          # Windows targets (native)
+          - os: windows-latest
+            rust_target: x86_64-pc-windows-msvc
+            node_abi: win32-x64-msvc
+            electron_arch: x64
+            artifacts: "*.exe *.blockmap *.zip"
+            use_cross: false
+          - os: windows-latest
+            rust_target: i686-pc-windows-msvc
+            node_abi: win32-ia32-msvc
+            electron_arch: ia32
+            artifacts: "*.exe *.blockmap *.zip"
+            use_cross: false
+            
+          # macOS targets (native)
+          - os: macos-latest
+            rust_target: x86_64-apple-darwin
+            node_abi: darwin-x64
+            electron_arch: x64
+            artifacts: "*.dmg *.zip"
+            use_cross: false
+          - os: macos-latest
+            rust_target: aarch64-apple-darwin
+            node_abi: darwin-arm64
+            electron_arch: arm64
+            artifacts: "*.dmg *.zip"
+            use_cross: false
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
-
+      
       - id: get_version
-        shell: bash
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      - shell: bash
-        run: |
-          tag="v${{ steps.get_version.outputs.version }}"
-          if git show-ref --tags --verify --quiet "refs/tags/${tag}"; then
-            echo "Tag ${tag} already exists."
-            exit 1
-          fi
 
       - run: npm ci
 
-      # Install Windows toolchain for cross-compilation
-      - name: Install Windows toolchain
-        if: matrix.platform == 'win32'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-x86-64 gcc-mingw-w64-i686
-          rustup target add x86_64-pc-windows-gnu i686-pc-windows-gnu
-
-      # Rust toolchain setup
+      # Setup Rust
       - uses: dtolnay/rust-toolchain@stable
-      - uses: actions-rs/toolchain@v1
-        with:
-          target: ${{ matrix.rust_target }}
-          profile: minimal
-          toolchain: stable
-          override: true
+      - run: rustup target add ${{ matrix.rust_target }}
 
-      # Install cross and setup Docker (for non-Windows targets)
-      - name: Setup cross
-        if: matrix.platform != 'win32'
+      # Setup cross only for Linux targets
+      - name: Install cross
+        if: matrix.use_cross
         uses: taiki-e/install-action@v2
         with:
           tool: cross
       - name: Setup Docker
-        if: matrix.platform != 'win32'
+        if: matrix.use_cross
         uses: docker/setup-buildx-action@v3
 
       # Build Rust modules
       - working-directory: ./src-rust
         run: |
           npm install
-          if [[ "${{ matrix.platform }}" == "win32" ]]; then
-            # For Windows targets, use GNU toolchain instead of MSVC
-            export CARGO_TARGET_I686_PC_WINDOWS_GNU_LINKER=i686-w64-mingw32-gcc
-            export CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=x86_64-w64-mingw32-gcc
-            cd analytics && \
-            cargo build --target ${{ matrix.rust_target }}gnu --release && \
-            napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
-            cd ../drpc && \
-            cargo build --target ${{ matrix.rust_target }}gnu --release && \
-            napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
+          if [[ "${{ matrix.use_cross }}" == "true" ]]; then
+            cross build --target ${{ matrix.rust_target }} --release
           else
-            # For non-Windows targets, use cross
-            cd analytics && \
-            cross build --target ${{ matrix.rust_target }} --release && \
-            napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
-            cd ../drpc && \
-            cross build --target ${{ matrix.rust_target }} --release && \
-            napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
+            cargo build --target ${{ matrix.rust_target }} --release
           fi
+          napi build --platform --target ${{ matrix.node_abi }} --release
 
       # Collect artifacts
       - shell: bash
@@ -126,29 +94,28 @@ jobs:
           mkdir -p "rust-plugins/${{ matrix.rust_target }}"
           find src-rust -name "*.node" -exec cp {} "rust-plugins/${{ matrix.rust_target }}" \;
 
-      # Install electron-builder
+      # Build Electron
       - run: npm install electron-builder --save-dev
-
-      # Build Electron app
       - run: npm run build
-      - run: npx electron-builder --${{ matrix.platform }} --${{ matrix.electron_arch }} --config.extraMetadata.version=${{ steps.get_version.outputs.version }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: npx electron-builder --${{ matrix.os == 'macos-latest' && 'mac' || matrix.os == 'windows-latest' && 'win' || 'linux' }} --${{ matrix.electron_arch }}
 
-      # Create release (only once)
-      - uses: softprops/action-gh-release@v2.0.6
-        if: matrix.platform == 'win32' && matrix.electron_arch == 'x64' # Only run once
+      # Upload artifacts
+      - uses: actions/upload-artifact@v4
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: Redline Client ${{ steps.get_version.outputs.version }}
-          draft: true
-          prerelease: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ matrix.os }}-${{ matrix.rust_target }}
+          path: |
+            dist/${{ matrix.artifacts }}
+            rust-plugins/${{ matrix.rust_target }}/*.node
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.build.outputs.version }}
           files: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.AppImage
-            dist/*.zip
-            dist/*.blockmap
-            dist/*.tar.gz
-            rust-plugins/**/*.node
+            artifacts/**/*
