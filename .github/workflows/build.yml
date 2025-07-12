@@ -32,7 +32,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       - run: |
-          for target in "${{ join(matrix.targets, ' ') }}"; do
+          for target in ${{ join(matrix.targets, ' ') }}; do
             rustup target add "$target"
           done
 
@@ -62,7 +62,7 @@ jobs:
         shell: bash
         run: |
           npm install
-          for target in "${{ join(matrix.targets, ' ') }}"; do
+          for target in ${{ join(matrix.targets, ' ') }}; do
             if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
               cd analytics && cross build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
               cd drpc && cross build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
