@@ -77,6 +77,14 @@ jobs:
         if: matrix.use_cross
         uses: docker/setup-buildx-action@v3
 
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.os == 'ubuntu-latest' && matrix.rust_target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          # Also install the linker
+          sudo apt-get install -y binutils-aarch64-linux-gnu
+
       - name: Setup macOS ARM64 build
         if: matrix.rust_target == 'aarch64-apple-darwin'
         run: |
