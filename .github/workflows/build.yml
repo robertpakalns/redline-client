@@ -10,7 +10,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
-          # Linux targets (using cross)
           - os: ubuntu-latest
             rust_target: x86_64-unknown-linux-gnu
             node_abi: linux-x64-gnu
@@ -23,8 +22,6 @@ jobs:
             electron_arch: arm64
             artifacts: "*.AppImage *.tar.gz *.zip"
             use_cross: true
-            
-          # Windows targets (native)
           - os: windows-latest
             rust_target: x86_64-pc-windows-msvc
             node_abi: win32-x64-msvc
@@ -37,8 +34,6 @@ jobs:
             electron_arch: ia32
             artifacts: "*.exe *.blockmap *.zip"
             use_cross: false
-            
-          # macOS targets (native)
           - os: macos-latest
             rust_target: x86_64-apple-darwin
             node_abi: darwin-x64
@@ -63,13 +58,10 @@ jobs:
 
       - run: npm ci
 
-      # Setup Rust
       - uses: dtolnay/rust-toolchain@stable
       - run: rustup target add ${{ matrix.rust_target }}
 
-      # Setup cross only for Linux targets
-      - name: Install cross
-        if: matrix.use_cross
+      - if: matrix.use_cross
         uses: taiki-e/install-action@v2
         with:
           tool: cross
@@ -77,8 +69,7 @@ jobs:
         if: matrix.use_cross
         uses: docker/setup-buildx-action@v3
 
-      - name: Install cross-compilation toolchain
-        if: matrix.os == 'ubuntu-latest' && matrix.rust_target == 'aarch64-unknown-linux-gnu'
+      - if: matrix.os == 'ubuntu-latest' && matrix.rust_target == 'aarch64-unknown-linux-gnu'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -87,11 +78,9 @@ jobs:
             binutils-aarch64-linux-gnu \
             libc6-dev-arm64-cross
 
-          # Set correct linker
           echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
 
-      - name: Setup macOS ARM64 build
-        if: matrix.rust_target == 'aarch64-apple-darwin'
+      - if: matrix.rust_target == 'aarch64-apple-darwin'
         run: |
           rustup target add aarch64-apple-darwin
           echo "RUSTFLAGS=-C link-arg=-undefined -C link-arg=dynamic_lookup" >> $GITHUB_ENV
@@ -101,16 +90,13 @@ jobs:
         run: |
           npm install
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            # Using cross for all steps
             cd analytics && cross build --target ${{ matrix.rust_target }} --release
             cd ../drpc && cross build --target ${{ matrix.rust_target }} --release
             cd ..
             
-            # Build Node-API bindings using cross
             cd analytics && npx napi build --target ${{ matrix.rust_target }} --release
             cd ../drpc && npx napi build --target ${{ matrix.rust_target }} --release
           else
-            # Native builds for Windows/macOS
             cd analytics && cargo build --target ${{ matrix.rust_target }} --release
             cd ../drpc && cargo build --target ${{ matrix.rust_target }} --release
             cd ..
@@ -119,18 +105,15 @@ jobs:
             cd ../drpc && npx napi build --target ${{ matrix.rust_target }} --release
           fi
 
-      # Collect artifacts
       - shell: bash
         run: |
           mkdir -p "rust-plugins/${{ matrix.rust_target }}"
           find src-rust -name "*.node" -exec cp {} "rust-plugins/${{ matrix.rust_target }}" \;
 
-      # Build Electron
-      - run: npm install electron-builder --save-dev
       - run: npm run build
-      - run: npx electron-builder --${{ matrix.os == 'macos-latest' && 'mac' || matrix.os == 'windows-latest' && 'win' || 'linux' }} --${{ matrix.electron_arch }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Upload artifacts
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ matrix.rust_target }}
