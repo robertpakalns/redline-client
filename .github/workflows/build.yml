@@ -82,11 +82,20 @@ jobs:
         run: |
           npm install
           if [[ "${{ matrix.use_cross }}" == "true" ]]; then
-            cross build --target ${{ matrix.rust_target }} --release
+            # Using cross for Linux targets
+            cd analytics && cross build --target ${{ matrix.rust_target }} --release
+            cd ../drpc && cross build --target ${{ matrix.rust_target }} --release
+            cd ..
           else
-            cargo build --target ${{ matrix.rust_target }} --release
+            # Using cargo directly for Windows/macOS
+            cd analytics && cargo build --target ${{ matrix.rust_target }} --release
+            cd ../drpc && cargo build --target ${{ matrix.rust_target }} --release
+            cd ..
           fi
-          napi build --platform --target ${{ matrix.node_abi }} --release
+          
+          # Build Node-API bindings for both projects
+          cd analytics && napi build --platform --target ${{ matrix.node_abi }} --release
+          cd ../drpc && napi build --platform --target ${{ matrix.node_abi }} --release
 
       # Collect artifacts
       - shell: bash
