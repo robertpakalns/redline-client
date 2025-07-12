@@ -107,8 +107,8 @@ jobs:
             cd ..
             
             # Build Node-API bindings using cross
-            cd analytics && cross run --target ${{ matrix.rust_target }} -- napi build --target ${{ matrix.rust_target }} --release
-            cd ../drpc && cross run --target ${{ matrix.rust_target }} -- napi build --target ${{ matrix.rust_target }} --release
+            cd analytics && napi build --target ${{ matrix.rust_target }} --release
+            cd ../drpc && napi build --target ${{ matrix.rust_target }} --releas
           else
             # Native builds for Windows/macOS
             cd analytics && cargo build --target ${{ matrix.rust_target }} --release
