@@ -24,9 +24,8 @@ jobs:
           node-version: 20
 
       - id: get_version
-        run: |
-          version=$(node -p "require('./package.json').version")
-          echo "version=$version" >> $GITHUB_OUTPUT
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       - run: npm ci
 
