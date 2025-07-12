@@ -13,7 +13,7 @@ files:
   - "!**/*.pak"
   - "!**/ffmpeg.dll"
   - "!**/d3dcompiler_47.dll"
-  - "dist/**/*.node"
+  - "!src-rust"
 
 win:
   target:
