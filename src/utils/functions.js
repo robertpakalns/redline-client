@@ -1,8 +1,7 @@
-import { resolve, dirname } from "path"
+import { resolve, dirname, join } from "path"
 import { nativeImage } from "electron"
 import { Config } from "./config.js"
 import { fileURLToPath } from "url"
-import { join } from "path"
 
 const config = new Config
 
@@ -55,11 +54,11 @@ export const createEl = (tag, attrs = {}, className = "", append = []) => {
 export const popup = (color, text) => {
     document.getElementById("clientPopup")?.remove()
 
-    const _bell = createEl("img", { src: fromRoot("assets/icons/bell.svg") })
+    const _bell = createEl("img", { src: "redline://?path=assets/icons/bell.svg" })
     const _popup = createEl("div", { id: "clientPopup" }, "", [_bell, text])
     _popup.style.background = color
 
-    const audio = new Audio(fromRoot("assets/sounds/pop.mp3"))
+    const audio = new Audio("redline://?path=assets/sounds/pop.mp3")
     audio.volume = 0.3
     audio.play()
 

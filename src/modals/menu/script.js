@@ -26,7 +26,7 @@ class MenuModal extends Modal {
         _version.textContent = `v${packageJson.version}`
 
         const sidebar = document.getElementById("menuSideBar")
-        sidebar.querySelector("#redlineIcon").src = fromRoot("assets/icons/icon.png")
+        sidebar.querySelector("#redlineIcon").src = "redline://?path=assets/icons/icon.png"
 
         this.modal.querySelector("#menuMainContent > div[name='settingsSection']").classList.add("active") // Open by default
 

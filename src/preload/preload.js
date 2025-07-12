@@ -17,7 +17,7 @@ const appendStyles = () => {
     const modalStyles = createEl("style")
     modalStyles.innerHTML = readFileSync(fromRoot("src/modals/style.css"), "utf8")
 
-    const fontURL = fromRoot("assets/fonts/Roboto.ttf").replace(/\\/g, "/")
+    const fontURL = "redline://?path=assets/fonts/Roboto.ttf"
 
     const clientStyles = createEl("style")
     clientStyles.innerHTML = readFileSync(fromRoot("src/preload/clientStyles.css"), "utf8") + `
