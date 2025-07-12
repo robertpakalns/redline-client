@@ -87,8 +87,8 @@ jobs:
       - working-directory: ./src-rust
         run: |
           npm install
-          if [[ "${{ matrix.use_cross }}" == "true" ]]; then
-            # Using cross for Linux targets
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            # Using cross for all Linux targets
             cd analytics && cross build --target ${{ matrix.rust_target }} --release
             cd ../drpc && cross build --target ${{ matrix.rust_target }} --release
             cd ..
