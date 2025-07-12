@@ -6,20 +6,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
+            targets: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
           - os: windows-latest
-            target: x86_64-pc-windows-msvc
-          - os: windows-latest
-            target: i686-pc-windows-msvc
+            targets: [x86_64-pc-windows-msvc, i686-pc-windows-msvc]
           - os: macos-latest
-            target: x86_64-apple-darwin
-          - os: macos-latest
-            target: aarch64-apple-darwin
+            targets: [x86_64-apple-darwin, aarch64-apple-darwin]
 
     permissions:
       contents: write
@@ -29,24 +22,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      
+
       - id: get_version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
 
       - run: npm ci
 
       - uses: dtolnay/rust-toolchain@stable
-      - run: rustup target add ${{ matrix.target }}
+
+      - run: |
+          for target in "${{ join(matrix.targets, ' ') }}"; do
+            rustup target add "$target"
+          done
 
       - if: matrix.os == 'ubuntu-latest'
         uses: taiki-e/install-action@v2
         with:
           tool: cross
-      - name: Setup Docker
-        if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-latest'
         uses: docker/setup-buildx-action@v3
 
-      - if: matrix.os == 'ubuntu-latest' && matrix.target == 'aarch64-unknown-linux-gnu'
+      - if: contains(matrix.targets, 'aarch64-unknown-linux-gnu') && matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -57,35 +53,23 @@ jobs:
 
           echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
 
-      - if: matrix.target == 'aarch64-apple-darwin'
+      - if: contains(matrix.targets, 'aarch64-apple-darwin') && matrix.os == 'macos-latest'
         run: |
-          rustup target add aarch64-apple-darwin
           echo "RUSTFLAGS=-C link-arg=-undefined -C link-arg=dynamic_lookup" >> $GITHUB_ENV
 
       - working-directory: ./src-rust
         shell: bash
         run: |
           npm install
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            cd analytics && cross build --target ${{ matrix.target }} --release
-            cd ../drpc && cross build --target ${{ matrix.target }} --release
-            cd ..
-            
-            cd analytics && npx napi build --target ${{ matrix.target }} --release
-            cd ../drpc && npx napi build --target ${{ matrix.target }} --release
-          else
-            cd analytics && cargo build --target ${{ matrix.target }} --release
-            cd ../drpc && cargo build --target ${{ matrix.target }} --release
-            cd ..
-            
-            cd analytics && npx napi build --target ${{ matrix.target }} --release
-            cd ../drpc && npx napi build --target ${{ matrix.target }} --release
-          fi
-
-      - shell: bash
-        run: |
-          mkdir -p "rust-plugins/${{ matrix.target }}"
-          find src-rust -name "*.node" -exec cp {} "rust-plugins/${{ matrix.target }}" \;
+          for target in "${{ join(matrix.targets, ' ') }}"; do
+            if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+              cd analytics && cross build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
+              cd drpc && cross build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
+            else
+              cd analytics && cargo build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
+              cd drpc && cargo build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
+            fi
+          done
 
       - uses: softprops/action-gh-release@v2.0.6
         with:
