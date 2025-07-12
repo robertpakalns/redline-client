@@ -31,7 +31,8 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - run: |
+      - shell: bash 
+        run: |
           for target in ${{ join(matrix.targets, ' ') }}; do
             rustup target add "$target"
           done
