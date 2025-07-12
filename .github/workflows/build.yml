@@ -77,6 +77,12 @@ jobs:
         if: matrix.use_cross
         uses: docker/setup-buildx-action@v3
 
+      - name: Setup macOS ARM64 build
+        if: matrix.rust_target == 'aarch64-apple-darwin'
+        run: |
+          rustup target add aarch64-apple-darwin
+          echo "RUSTFLAGS=-C link-arg=-undefined -C link-arg=dynamic_lookup" >> $GITHUB_ENV
+
       # Build Rust modules
       - working-directory: ./src-rust
         run: |
