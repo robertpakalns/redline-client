@@ -54,6 +54,7 @@ Voxtulate Client uses `voxtulate:` protocol to open the client. For example, `vo
 
 ## 🚀 Features
 * Adblocker
+* Analytics
 * Changelog
 * Client, OS, and Engine Stats in-game
 * Customizations
