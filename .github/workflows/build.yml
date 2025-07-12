@@ -100,8 +100,8 @@ jobs:
           fi
           
           # Build Node-API bindings for both projects
-          cd analytics && napi build --platform --target ${{ matrix.node_abi }} --release
-          cd ../drpc && napi build --platform --target ${{ matrix.node_abi }} --release
+          cd analytics && npx napi build --platform --target ${{ matrix.node_abi }} --release
+          cd ../drpc && npx napi build --platform --target ${{ matrix.node_abi }} --release
 
       # Collect artifacts
       - shell: bash
