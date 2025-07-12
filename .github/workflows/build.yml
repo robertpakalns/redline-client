@@ -110,30 +110,6 @@ jobs:
           mkdir -p "rust-plugins/${{ matrix.rust_target }}"
           find src-rust -name "*.node" -exec cp {} "rust-plugins/${{ matrix.rust_target }}" \;
 
-      - run: npm run build
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.os }}-${{ matrix.rust_target }}
-          path: |
-            dist/${{ matrix.artifacts }}
-            rust-plugins/${{ matrix.rust_target }}/*.node
-
-  create-release:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - id: get_version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
       - uses: softprops/action-gh-release@v2.0.6
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
@@ -141,3 +117,7 @@ jobs:
           draft: true
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: npm run build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
