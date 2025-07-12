@@ -85,6 +85,7 @@ jobs:
 
       # Build Rust modules
       - working-directory: ./src-rust
+        shell: bash
         run: |
           npm install
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
