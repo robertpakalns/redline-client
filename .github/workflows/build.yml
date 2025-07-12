@@ -69,6 +69,14 @@ jobs:
 
       - run: npm ci
 
+      # Install Windows toolchain for cross-compilation
+      - name: Install Windows toolchain
+        if: matrix.platform == 'win32'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-x86-64 gcc-mingw-w64-i686
+          rustup target add x86_64-pc-windows-gnu i686-pc-windows-gnu
+
       # Rust toolchain setup
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions-rs/toolchain@v1
@@ -78,22 +86,39 @@ jobs:
           toolchain: stable
           override: true
 
-      # Install cross and setup Docker
-      - uses: taiki-e/install-action@v2
+      # Install cross and setup Docker (for non-Windows targets)
+      - name: Setup cross
+        if: matrix.platform != 'win32'
+        uses: taiki-e/install-action@v2
         with:
           tool: cross
-      - uses: docker/setup-buildx-action@v3
+      - name: Setup Docker
+        if: matrix.platform != 'win32'
+        uses: docker/setup-buildx-action@v3
 
       # Build Rust modules
       - working-directory: ./src-rust
         run: |
           npm install
-          cd analytics && \
-          cross build --target ${{ matrix.rust_target }} --release && \
-          napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
-          cd ../drpc && \
-          cross build --target ${{ matrix.rust_target }} --release && \
-          napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
+          if [[ "${{ matrix.platform }}" == "win32" ]]; then
+            # For Windows targets, use GNU toolchain instead of MSVC
+            export CARGO_TARGET_I686_PC_WINDOWS_GNU_LINKER=i686-w64-mingw32-gcc
+            export CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=x86_64-w64-mingw32-gcc
+            cd analytics && \
+            cargo build --target ${{ matrix.rust_target }}gnu --release && \
+            napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
+            cd ../drpc && \
+            cargo build --target ${{ matrix.rust_target }}gnu --release && \
+            napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
+          else
+            # For non-Windows targets, use cross
+            cd analytics && \
+            cross build --target ${{ matrix.rust_target }} --release && \
+            napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
+            cd ../drpc && \
+            cross build --target ${{ matrix.rust_target }} --release && \
+            napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
+          fi
 
       # Collect artifacts
       - shell: bash
