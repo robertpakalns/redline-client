@@ -1,31 +1,45 @@
+name: Build and Release
+
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-22.04, macos-latest]
+        platform: [win32, darwin, linux]
         include:
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
+          - platform: win32
+            rust_target: x86_64-pc-windows-msvc
             node_abi: win32-x64-msvc
-          - os: windows-latest
-            target: i686-pc-windows-msvc
+            electron_arch: x64
+            artifacts: "*.exe *.blockmap *.zip"
+          - platform: win32
+            rust_target: i686-pc-windows-msvc
             node_abi: win32-ia32-msvc
-          - os: ubuntu-22.04
-            target: x86_64-unknown-linux-gnu
-            node_abi: linux-x64-gnu
-          - os: ubuntu-22.04
-            target: aarch64-unknown-linux-gnu
-            node_abi: aarch64-unknown-linux-gnu
-          - os: macos-latest
-            target: x86_64-apple-darwin
+            electron_arch: ia32
+            artifacts: "*.exe *.blockmap *.zip"
+          - platform: darwin
+            rust_target: x86_64-apple-darwin
             node_abi: darwin-x64
-          - os: macos-latest
-            target: aarch64-apple-darwin
+            electron_arch: x64
+            artifacts: "*.dmg *.zip"
+          - platform: darwin
+            rust_target: aarch64-apple-darwin
             node_abi: darwin-arm64
+            electron_arch: arm64
+            artifacts: "*.dmg *.zip"
+          - platform: linux
+            rust_target: x86_64-unknown-linux-gnu
+            node_abi: linux-x64-gnu
+            electron_arch: x64
+            artifacts: "*.AppImage *.tar.gz *.zip"
+          - platform: linux
+            rust_target: aarch64-unknown-linux-gnu
+            node_abi: linux-arm64
+            electron_arch: arm64
+            artifacts: "*.AppImage *.tar.gz *.zip"
 
     permissions:
       contents: write
@@ -55,53 +69,61 @@ jobs:
 
       - run: npm ci
 
+      # Rust toolchain setup
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions-rs/toolchain@v1
         with:
-          target: ${{ matrix.target }}
+          target: ${{ matrix.rust_target }}
           profile: minimal
           toolchain: stable
           override: true
 
-      - shell: bash # Install targets for OS
-        run: |
-          case "$RUNNER_OS" in
-            "Linux")
-              rustup target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu
-              ;;
-            "macOS")
-              rustup target add x86_64-apple-darwin aarch64-apple-darwin
-              ;;
-            "Windows")
-              rustup target add x86_64-pc-windows-msvc i686-pc-windows-msvc
-              ;;
-            *)
-              echo "Unknown OS: $RUNNER_OS"
-              exit 1
-          esac
+      # Install cross and setup Docker
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+      - uses: docker/setup-buildx-action@v3
 
-      - if: matrix.os == 'ubuntu-22.04' && matrix.target == 'aarch64-unknown-linux-gnu'
-        shell: bash
-        run: |
-          sudo dpkg --add-architecture arm64
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/arm64.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/arm64.list
-          sudo apt-get update
-          sudo apt-get install -y libsqlite3-dev:arm64
-
+      # Build Rust modules
       - working-directory: ./src-rust
         run: |
-          cd analytics && npx napi build --target ${{ matrix.target }} --release
-          cd ../drpc && npx napi build --target ${{ matrix.target }} --release
+          npm install
+          cd analytics && \
+          cross build --target ${{ matrix.rust_target }} --release && \
+          napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
+          cd ../drpc && \
+          cross build --target ${{ matrix.rust_target }} --release && \
+          napi build --platform --target ${{ matrix.node_abi }} --release --cross-compile
 
+      # Collect artifacts
+      - shell: bash
+        run: |
+          mkdir -p "rust-plugins/${{ matrix.rust_target }}"
+          find src-rust -name "*.node" -exec cp {} "rust-plugins/${{ matrix.rust_target }}" \;
+
+      # Install electron-builder
+      - run: npm install electron-builder --save-dev
+
+      # Build Electron app
+      - run: npm run build
+      - run: npx electron-builder --${{ matrix.platform }} --${{ matrix.electron_arch }} --config.extraMetadata.version=${{ steps.get_version.outputs.version }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create release (only once)
       - uses: softprops/action-gh-release@v2.0.6
+        if: matrix.platform == 'win32' && matrix.electron_arch == 'x64' # Only run once
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
-          name: Release ${{ steps.get_version.outputs.version }}
+          name: Redline Client ${{ steps.get_version.outputs.version }}
           draft: true
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - run: npm run build
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.zip
+            dist/*.blockmap
+            dist/*.tar.gz
+            rust-plugins/**/*.node
