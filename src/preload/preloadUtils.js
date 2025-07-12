@@ -1,5 +1,5 @@
-import { createEl, fromRoot, getHost, isNum } from "../utils/functions.js"
 import packageJson from "../../package.json" with { type: "json" }
+import { createEl, getHost, isNum } from "../utils/functions.js"
 import { Config } from "../utils/config.js"
 import { type, release, arch } from "os"
 import { shell } from "electron"
@@ -80,7 +80,7 @@ export const setTrickoLink = cont => {
 // Credits: PVT
 export const changeLogo = cont => {
     if (!cont) return
-    cont.src = fromRoot("assets/logo.png")
+    cont.src = "redline://?path=assets/logo.png"
 }
 
 export const createKDRatio = cont => {
