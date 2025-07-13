@@ -1,13 +1,14 @@
+use chrono::{DateTime, Local, Utc};
 use napi::{Error, Result};
 use napi_derive::napi;
 use once_cell::sync::Lazy;
 use rusqlite::{params, Connection};
 use std::{
-    collections::HashSet,
+    collections::{HashMap, HashSet},
     io::ErrorKind::NotFound,
     path::PathBuf,
     sync::{mpsc, Arc, Mutex},
-    thread,
+    thread::spawn,
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 use url::Url;
@@ -76,7 +77,7 @@ pub fn set_entry(url: String) -> Result<()> {
     let last_entry = LAST_ENTRY.clone();
     let unregistered_duration = UNREGISTERED_DOMAIN_DURATION.clone();
 
-    thread::spawn(move || {
+    spawn(move || {
         if let Err(e) = (|| -> Result<()> {
             let conn = establish_connection()?;
             let parsed_url = Url::parse(&url).map_err(napi_err)?;
@@ -169,7 +170,7 @@ pub fn set_entry(url: String) -> Result<()> {
 pub fn set_last_entry() -> Result<()> {
     let last_entry = LAST_ENTRY.clone();
 
-    thread::spawn(move || {
+    spawn(move || {
         if let Err(e) = (|| -> Result<()> {
             let conn = establish_connection()?;
             let now = Instant::now();
@@ -203,39 +204,98 @@ pub struct Entry {
     pub timestamp: i64,
 }
 
+#[napi(object)]
+pub struct DailyAnalytics {
+    pub date: String,
+    pub total_time_spent: i64,
+    pub game_time_spent: i64,
+}
+
+#[napi(object)]
+pub struct AnalyticsReport {
+    pub entries: Vec<Entry>,
+    pub total_time_spent: i64,
+    pub total_game_time_spent: i64,
+    pub time_spent_per_host: HashMap<String, i64>,
+    pub week_data: Vec<DailyAnalytics>,
+}
+
 #[napi]
-pub fn get_all_data() -> Result<Vec<Entry>> {
+pub fn get_all_data() -> Result<AnalyticsReport> {
     let (tx, rx) = mpsc::channel();
 
-    thread::spawn(move || {
-        let result = (|| -> Result<Vec<Entry>> {
-            let conn = establish_connection()?;
-
-            let mut stmt = conn
-                .prepare("SELECT host, path, duration, timestamp FROM entries")
-                .map_err(napi_err)?;
-
-            let entry_iter = stmt
-                .query_map([], |row| {
-                    Ok(Entry {
-                        host: row.get(0)?,
-                        path: row.get(1)?,
-                        duration: row.get(2)?,
-                        timestamp: row.get(3)?,
-                    })
-                })
-                .map_err(napi_err)?;
-
-            let mut entries = Vec::new();
-            for entry in entry_iter {
-                entries.push(entry.map_err(napi_err)?);
-            }
-
-            Ok(entries)
-        })();
-
-        tx.send(result).unwrap();
+    spawn(move || {
+        let report = prepare_data();
+        let _ = tx.send(report);
     });
 
     rx.recv().unwrap()
+}
+
+fn prepare_data() -> Result<AnalyticsReport> {
+    let conn = establish_connection()?;
+
+    let mut stmt = conn
+        .prepare("SELECT host, path, duration, timestamp FROM entries")
+        .map_err(napi_err)?;
+
+    let entry_iter = stmt
+        .query_map([], |row| {
+            Ok(Entry {
+                host: row.get(0)?,
+                path: row.get(1)?,
+                duration: row.get(2)?,
+                timestamp: row.get(3)?,
+            })
+        })
+        .map_err(napi_err)?;
+
+    let mut entries = Vec::new();
+    let mut total_time_spent = 0;
+    let mut total_game_time_spent = 0;
+    let mut time_spent_per_host: HashMap<String, i64> = HashMap::new();
+    let mut daily_map: HashMap<String, (i64, i64)> = HashMap::new();
+
+    for entry_result in entry_iter {
+        let entry = entry_result.map_err(napi_err)?;
+        total_time_spent += entry.duration;
+        if entry.path.starts_with("/games/") {
+            total_game_time_spent += entry.duration;
+        }
+        *time_spent_per_host.entry(entry.host.clone()).or_insert(0) += entry.duration;
+
+        // Convert timestamp ms → DateTime<Utc>, then to local date string
+        let dt_utc = DateTime::<Utc>::from_timestamp_millis(entry.timestamp)
+            .unwrap_or_else(|| DateTime::<Utc>::from_timestamp_millis(0).unwrap());
+        let local_date = dt_utc.with_timezone(&Local).date_naive().to_string();
+
+        let (total, game) = daily_map.entry(local_date).or_insert((0, 0));
+        *total += entry.duration;
+        if entry.path.starts_with("/games/") {
+            *game += entry.duration;
+        }
+
+        entries.push(entry);
+    }
+
+    // Aggregate per-day stats and keep latest 7 dates
+    let mut week_data: Vec<DailyAnalytics> = daily_map
+        .into_iter()
+        .map(|(date, (total, game))| DailyAnalytics {
+            date,
+            total_time_spent: total,
+            game_time_spent: game,
+        })
+        .collect();
+
+    week_data.sort_by(|a, b| b.date.cmp(&a.date));
+    week_data.truncate(7);
+
+    Ok(AnalyticsReport {
+        entries,
+        total_time_spent,
+        total_game_time_spent,
+        time_spent_per_host,
+        week_data,
+    })
 }

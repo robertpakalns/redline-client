@@ -277,18 +277,23 @@
 
                 <div class="main">
                     <div>
-                        <h1>Time Spent in Client, h</h1>
+                        <h1>Time Spent in Client</h1>
                         <div id="totalTimeSpentInClient"></div>
                     </div>
                     <div>
-                        <h1>Time Spent In-Game, h</h1>
+                        <h1>Time Spent In-Game</h1>
                         <div id="totalTimeSpentInGame"></div>
                     </div>
                 </div>
 
                 <div class="chartBlock">
-                    <h1>Time Spent on Proxies, h</h1>
-                    <canvas id="durationByHostChart"></canvas>
+                    <h1>Last Week Activity</h1>
+                    <canvas id="lastWeekChart"></canvas>
+                </div>
+
+                <div class="chartBlock">
+                    <h1>Time Spent on Proxies</h1>
+                    <canvas class="pie-chart" id="durationByHostChart"></canvas>
                 </div>
 
                 <button id="updateAnalyticsData">Update Data</button>

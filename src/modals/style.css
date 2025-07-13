@@ -473,10 +473,13 @@ label:disabled {
 
 /* Analytics */
 .chartBlock {
-    max-width: 50%;
-    margin: auto;
     text-align: center;
+
+    .pie-chart {
+        margin: auto;
+    }
 }
+
 
 .main {
     display: flex;
@@ -485,7 +488,7 @@ label:disabled {
 }
 
 #updateAnalyticsData {
-    margin: auto;
+    margin: 20px auto;
     width: fit-content;
     color: gold;
     transition: 0.3s ease;

@@ -97,3 +97,31 @@ export const isNum = (aVal, bVal) => {
 
     return Math.round(a / b * 100) / 100
 }
+
+export const output = (v, e) => {
+    const n = parseFloat(v)
+    return `${n} ${n !== 1 ? e + "s" : e}`
+}
+
+export const formatDuration = ms => {
+    const seconds = Math.floor(ms / 1000)
+
+    const units = [
+        { name: "year", value: 31536000 },
+        { name: "month", value: 2592000 },
+        { name: "week", value: 604800 },
+        { name: "day", value: 86400 },
+        { name: "hour", value: 3600 },
+        { name: "minute", value: 60 },
+        { name: "second", value: 1 },
+    ]
+
+    for (const { name, value } of units) {
+        if (seconds >= value) {
+            const count = Math.floor(seconds / value)
+            return output(count, name)
+        }
+    }
+
+    return "No Data"
+}

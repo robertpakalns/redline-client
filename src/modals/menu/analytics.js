@@ -1,26 +1,21 @@
-import { Chart, PieController, ArcElement, Tooltip, Legend } from "chart.js"
+import { Chart, PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController } from "chart.js"
 import { getAllData } from "../../../src-rust/analytics/index.js"
+import { formatDuration, output } from "../../utils/functions.js"
 
-Chart.register(PieController, ArcElement, Tooltip, Legend)
+Chart.register(PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController)
+
+const generateColors = (arr, i) => {
+    const hue = (i * 360 / arr.length) % 360
+    return {
+        bg: `hsla(${hue}, 50%, 50%, 0.6)`,
+        border: `hsla(${hue}, 50%, 50%, 1)`
+    }
+}
 
 const proxyChart = data => {
-    const proxyMap = {}
 
-    data.forEach(el => {
-        if (!proxyMap[el.host]) proxyMap[el.host] = 0
-        proxyMap[el.host] += parseFloat((el.duration / 3600000).toFixed(4))
-    })
-
-    const labels = Object.keys(proxyMap)
-    const durations = Object.values(proxyMap)
-
-    const generateColors = (arr, i) => {
-        const hue = (i * 360 / arr.length) % 360
-        return {
-            bg: `hsl(${hue}, 50%, 50%)`,
-            border: `hsl(${hue}, 50%, 70%)`
-        }
-    }
+    const labels = Object.keys(data)
+    const durations = Object.values(data)
 
     const colors = labels.map((_, i) => generateColors(labels, i))
 
@@ -44,34 +39,84 @@ const proxyChart = data => {
         },
         options: {
             plugins: {
-                legend: { labels: { usePointStyle: true, boxHeight: 10 } },
-                tooltip: { callbacks: { label: el => `${Math.round(el.raw * 10000) / 10000} hours` } }
+                legend: { labels: { usePointStyle: true, boxHeight: 5 } },
+                tooltip: {
+                    usePointStyle: true,
+                    callbacks: {
+                        label: el => formatDuration(el.raw, "hour"),
+                        labelPointStyle: () => ({ pointStyle: "circle" })
+                    }
+                }
             }
         }
     })
 }
 
-const setValues = data => {
-    let clientTime = 0
-    let gameTime = 0
+const lastWeekChart = data => {
+    const labels = data.map(el => el.date).reverse()
+    const gameTimes = data.map(el => el.gameTimeSpent)
+    const totalTimes = data.map(el => el.totalTimeSpent - el.gameTimeSpent)
 
-    data.forEach(el => {
-        if (el.path.startsWith("/games/")) gameTime += el.duration
-        clientTime += el.duration
+    const maxTime = Math.max(...gameTimes, ...totalTimes)
+
+    const [unit, divisor] = maxTime < 60000 ? ["second", 1000] : maxTime < 3600000 ? ["minute", 60000] : ["hour", 3600000]
+
+    const ctx = document.getElementById("lastWeekChart").getContext("2d")
+
+    const existingChart = Chart.getChart(ctx)
+    if (existingChart) existingChart.destroy()
+
+    const categories = ["In-Game", "In Client"]
+    const times = [gameTimes, totalTimes]
+    const colors = categories.map((_, i) => generateColors(categories, i))
+
+    const datasets = categories.map((label, i) => ({
+        label,
+        data: times[i],
+        borderColor: colors[i].border,
+        backgroundColor: colors[i].bg,
+        borderWidth: 2,
+        borderRadius: 10,
+        hoverBackgroundColor: "#ffffff80",
+        hoverBorderColor: "white",
+        barPercentage: 0.6 + i * 0.2,
+    }))
+
+    new Chart(ctx, {
+        type: "bar",
+        data: { labels, datasets },
+        options: {
+            scales: {
+                x: { stacked: true },
+                y: { ticks: { callback: value => output((value / divisor).toFixed(2), unit) } }
+            },
+            plugins: {
+                legend: { labels: { usePointStyle: true, boxHeight: 5 } },
+                tooltip: {
+                    usePointStyle: true,
+                    callbacks: {
+                        label: el => formatDuration(el.raw, unit),
+                        labelPointStyle: () => ({ pointStyle: "circle" })
+                    }
+                }
+            }
+        }
     })
+}
 
-    const clientHours = parseFloat((clientTime / 3600000).toFixed(4))
-    const gameHours = parseFloat((gameTime / 3600000).toFixed(4))
-
-    document.getElementById("totalTimeSpentInClient").textContent = `${clientHours} hours`
-    document.getElementById("totalTimeSpentInGame").textContent = `${gameHours} hours`
+const setValues = ({ totalTimeSpent = 0, totalGameTimeSpent = 0 }) => {
+    document.getElementById("totalTimeSpentInClient").textContent = formatDuration(totalTimeSpent)
+    document.getElementById("totalTimeSpentInGame").textContent = formatDuration(totalGameTimeSpent)
 }
 
 const createAnalyticsSection = async () => {
-    const entries = getAllData()
+    const { entries, totalTimeSpent, totalGameTimeSpent, timeSpentPerHost, weekData } = getAllData()
 
-    proxyChart(entries)
-    setValues(entries)
+    console.log({ entries, totalTimeSpent, totalGameTimeSpent, timeSpentPerHost, weekData })
+
+    proxyChart(timeSpentPerHost)
+    lastWeekChart(weekData)
+    setValues({ totalTimeSpent, totalGameTimeSpent })
 
     document.getElementById("updateAnalyticsData").addEventListener("click", createAnalyticsSection)
 }

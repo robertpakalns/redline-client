@@ -11,4 +11,16 @@ export interface Entry {
   duration: number
   timestamp: number
 }
-export declare function getAllData(): Array<Entry>
+export interface DailyAnalytics {
+  date: string
+  totalTimeSpent: number
+  gameTimeSpent: number
+}
+export interface AnalyticsReport {
+  entries: Array<Entry>
+  totalTimeSpent: number
+  totalGameTimeSpent: number
+  timeSpentPerHost: Record<string, number>
+  weekData: Array<DailyAnalytics>
+}
+export declare function getAllData(): AnalyticsReport
