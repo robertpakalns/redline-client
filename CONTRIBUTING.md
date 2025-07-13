@@ -12,21 +12,20 @@ cd redline-client
 ```bash
 npm i
 # napi should be installed via npm as @napi-rs/cli
-cd src-rust/analytics && npx napi build --release
-cd ../drpc && npx napi build --release
+cd src-rust/analytics
+npx napi build --target <TARGET> --release --platform
+
+cd ../drpc
+npx napi build --target <TARGET> --release --platform
+
 cd ../../
 ```
+Redline Client compiles two `.node` files per plugin:
+- Windows: `x86_64-pc-windows-msvc` and `i686-pc-windows-msvc`
+- macOS: `x86_64-apple-darwin` and `aarch64-apple-darwin`
+- Linux: `x86_64-unknown-linux-gnu` and `aarch64-unknown-linux-gnu`
 
-4. Move `.node` Files:
-```bash
-# Find out your system's triplet name
-rustc -vV  # Look for the 'host' field, e.g., x86_64-pc-windows-msvc
-
-# Replace {triplet} with your actual triplet name
-mkdir -p rust-plugins/{triplet}
-cp src-rust/analytics/analytics.node rust-plugins/{triplet}/
-cp src-rust/drpc/drpc.node rust-plugins/{triplet}/
-```
+Choose the appropriate `--target` value for your platform from the list above, and replace `<TARGET>` in the build commands.
 
 5. Build Electron Client:
 ```bash

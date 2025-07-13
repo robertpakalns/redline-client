@@ -38,7 +38,7 @@ Unofficial Electron client for Kirka.io
 Redline Client uses Electron version `37.2.1`, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the [`@juice-client/node-enject`](https://www.npmjs.com/package/@juice-client/node-enject) package, which resolves the problem on Windows. More information in [`package.json`](https://github.com/robertpakalns/redline-client/blob/main/package.json).
 
 ## 🛡️ Client Safety
-This project is open-source. All Redline Client source code is publicly available in the [GitHub repository](https://github.com/robertpakalns/redline-client). All builds are executed via GitHub Actions. If you have concerns about the safety of your private information while using Redline Client, feel free to inspect the source code. Trust in the client is based on trust in the developer.
+This project is open-source. All Redline Client source code is publicly available in the [GitHub repository](https://github.com/robertpakalns/redline-client). All builds are executed via GitHub Actions. If you have concerns about the safety of your private information while using Redline Client, feel free to inspect the source code. Trust in the client is based on trust in the developer. [Privacy Policy](https://github.com/robertpakalns/redline-client/blob/main/PRIVACY.md)
 
 ## 🔗 Deeplink
 Voxtulate Client uses `voxtulate:` protocol to open the client. For example, `voxtulate://?url=path/to/page` opens the client with the page `https://voxiom.io/path/to/page`. [More information](https://github.com/robertpakalns/VoxtulateClient/wiki/Deeplinks).

@@ -2,5 +2,4 @@ node_modules
 dist
 
 *.node
-src-rust/**/target
-rust-plugins
+src-rust/target
