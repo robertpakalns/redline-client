@@ -471,7 +471,7 @@ label:disabled {
     }
 }
 
-/* Charts */
+/* Analytics */
 .chartBlock {
     max-width: 50%;
     margin: auto;
@@ -482,4 +482,15 @@ label:disabled {
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
+}
+
+#updateAnalyticsData {
+    margin: auto;
+    width: fit-content;
+    color: gold;
+    transition: 0.3s ease;
+
+    &:hover {
+        transform: scale(1.1);
+    }
 }

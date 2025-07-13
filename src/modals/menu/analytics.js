@@ -17,8 +17,8 @@ const proxyChart = data => {
     const generateColors = (arr, i) => {
         const hue = (i * 360 / arr.length) % 360
         return {
-            bg: `hsl(${hue}, 70%, 50%)`,
-            border: `hsl(${hue}, 70%, 70%)`
+            bg: `hsl(${hue}, 50%, 50%)`,
+            border: `hsl(${hue}, 50%, 70%)`
         }
     }
 
@@ -72,6 +72,8 @@ const createAnalyticsSection = async () => {
 
     proxyChart(entries)
     setValues(entries)
+
+    document.getElementById("updateAnalyticsData").addEventListener("click", createAnalyticsSection)
 }
 
 export default createAnalyticsSection

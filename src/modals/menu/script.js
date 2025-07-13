@@ -1,12 +1,14 @@
-import { fromRoot, createEl, domains, getHost, popup, restartMessage } from "../../utils/functions.js"
+import { fromRoot, createEl, popup, restartMessage } from "../../utils/functions.js"
 import packageJson from "../../../package.json" with { type: "json" }
 import { Config, configDir } from "../../utils/config.js"
-import createChangelogSection from "./changelog.js"
-import createUserscriptsBlock from "./userscripts.js"
-import createAnalyticsSection from "./analytics.js"
 import { shell, ipcRenderer } from "electron"
 import Modal from "../modal.js"
 import { join } from "path"
+
+import createCustomizationSection from "./customization.js"
+import createChangelogSection from "./changelog.js"
+import createAnalyticsSection from "./analytics.js"
+import createSettingsSection from "./settings.js"
 
 const config = new Config
 
@@ -28,7 +30,10 @@ class MenuModal extends Modal {
         const sidebar = document.getElementById("menuSideBar")
         sidebar.querySelector("#redlineIcon").src = "redline://?path=assets/icons/icon.png"
 
-        this.modal.querySelector("#menuMainContent > div[name='settingsSection']").classList.add("active") // Open by default
+        // Open settings by default
+        const defaultSection = this.modal.querySelector("#menuMainContent > div[name='settingsSection']")
+        createSettingsSection(defaultSection)
+        defaultSection.classList.add("active")
 
         for (const item of this.modal.querySelectorAll(".sideBarItem")) item.addEventListener("click", e => {
             const activeDiv = this.modal.querySelector(".mainContentBlock.active")
@@ -38,8 +43,12 @@ class MenuModal extends Modal {
             if (targetDiv) targetDiv.classList.add("active")
 
             // Load sections only when needed
-            if (targetDiv.getAttribute("name") === "changelogSection") createChangelogSection()
-            if (targetDiv.getAttribute("name") === "analyticsSection") createAnalyticsSection()
+            switch (targetDiv.getAttribute("name")) {
+                case "changelogSection": createChangelogSection(); break
+                case "analyticsSection": createAnalyticsSection(); break
+                case "settingsSection": createSettingsSection(targetDiv); break
+                case "customizationSection": createCustomizationSection(targetDiv); break
+            }
         })
 
         for (const el of this.modal.querySelectorAll(".url")) el.addEventListener("click", e => {
@@ -51,6 +60,11 @@ class MenuModal extends Modal {
             navigator.clipboard.writeText(e.target.innerText)
             popup("rgb(206, 185, 45)", "Copied!")
         })
+
+        // Restart notifications
+        const restartNotifications = ["fpsUncap", "adblocker", "fullscreen", "swapper", "drpcJoinButton", "enableKeybinding"]
+        for (const id of restartNotifications)
+            this.modal.querySelector(`#${id}`).addEventListener("click", restartMessage)
 
         // Update client
         ipcRenderer.on("client-update", (_, data) => {
@@ -66,6 +80,17 @@ class MenuModal extends Modal {
             }
             else _version.innerText = `Downloading... ${Math.round(data.percent)}%`
         })
+
+        // Open directories/files
+        const openFromShell = {
+            configFolder: "config.json",
+            userscriptsFolder: "scripts",
+            userstylesFolder: "styles",
+            swapperFolder: "swapper"
+        }
+
+        for (const [key, value] of Object.entries(openFromShell))
+            this.modal.querySelector(`#${key}`).addEventListener("click", () => shell.openPath(join(configDir, value)))
 
         // Settings
         const settingsObj = {
@@ -87,127 +112,6 @@ class MenuModal extends Modal {
             document.getElementById(id).checked = config.get(conf)
             document.getElementById(id).addEventListener("change", e => config.set(conf, e.target.checked))
         }
-
-        // FPS uncap works only on Windows
-        if (process.platform === "win32") document.getElementById("fpsUncapWarning").style.display = "none"
-
-        document.getElementById("modalHint").addEventListener("change", e => ipcRenderer.send("toggle-menu-modal", e.target.checked))
-        document.getElementById("kdRatio").addEventListener("change", e => ipcRenderer.send("toggle-kd-ratio", e.target.checked))
-
-        document.getElementById("relaunch").addEventListener("click", () => ipcRenderer.send("relaunch"))
-
-        const openFromShell = {
-            configFolder: "config.json",
-            userscriptsFolder: "scripts",
-            userstylesFolder: "styles",
-            swapperFolder: "swapper"
-        }
-
-        for (const [key, value] of Object.entries(openFromShell))
-            this.modal.querySelector(`#${key}`).addEventListener("click", () => shell.openPath(join(configDir, value)))
-
-        // Keybinding
-        const keybindingCont = this.modal.querySelector("#keybindingBody")
-        const keybindingRow = (name, key) => {
-            const _inputChild = createEl("input", { type: "text", value: key })
-            _inputChild.addEventListener("keydown", e => {
-                e.preventDefault()
-                _inputChild.value = e.code
-                config.set(`keybinding.content.${name}`, e.code)
-                restartMessage()
-            })
-
-            const _name = createEl("td", { textContent: name })
-            const _input = createEl("td", {}, "", [_inputChild])
-            const tr = createEl("tr", {}, "", [_name, _input])
-
-            keybindingCont.appendChild(tr)
-        }
-
-        const { content: c2 } = config.get("keybinding")
-        for (const key in c2) keybindingRow(key, c2[key])
-
-        const _enableKeybinding = document.getElementById("enableKeybinding")
-        const _keybindingTable = document.getElementById("keybindingTable")
-
-        const toggleKeybinding = () => {
-            const checked = _enableKeybinding.checked
-            _keybindingTable.classList.toggle("disabled", !checked)
-            for (const item of _keybindingTable.querySelectorAll("input")) item.disabled = !checked
-        }
-
-        toggleKeybinding()
-        _enableKeybinding.addEventListener("change", toggleKeybinding)
-
-        // Fast CSS
-        const fastCSSURL = this.modal.querySelector("#fastCSSURL")
-        fastCSSURL.addEventListener("change", e => config.set("fastCSS.url", e.target.value))
-        fastCSSURL.value = config.get("fastCSS.url")
-
-        const fastCSSValue = this.modal.querySelector("#fastCSSValue")
-        fastCSSValue.addEventListener("input", e => config.set("fastCSS.value", e.target.value))
-        fastCSSValue.value = config.get("fastCSS.value")
-
-        const enableFastCSS = this.modal.querySelector("#enableFastCSS")
-
-        for (const id of ["enableFastCSS", "fastCSSURL", "fastCSSValue"]) {
-            const eventType = id === "enableFastCSS" ? "change" : "input"
-            this.modal.querySelector(`#${id}`).addEventListener(eventType, () => {
-                ipcRenderer.send("change-fast-css", enableFastCSS.checked, fastCSSURL.value, fastCSSValue.value)
-            })
-        }
-
-        const toggleFastCSS = () => {
-            const checked = enableFastCSS.checked
-            fastCSSURL.disabled = !checked
-            fastCSSValue.disabled = !checked
-            fastCSSURL.classList.toggle("disabled", !checked)
-            fastCSSValue.classList.toggle("disabled", !checked)
-        }
-
-        toggleFastCSS()
-        enableFastCSS.addEventListener("change", toggleFastCSS)
-
-        // Domains
-        const domainSelect = this.modal.querySelector("#gameDomain")
-        domainSelect.addEventListener("change", e => {
-            config.set("client.domain", e.target.value)
-            restartMessage()
-        })
-        for (const el of domains) {
-            const option = createEl("option", { value: el }, "", [el])
-            domainSelect.appendChild(option)
-        }
-        domainSelect.value = getHost()
-
-        // Import/export settings
-        const settingsObject = {
-            importClientSettings: "import-client-settings",
-            exportClientSettings: "export-client-settings"
-        }
-        for (const [id, event] of Object.entries(settingsObject))
-            this.modal.querySelector(`#${id}`).addEventListener("click", () => ipcRenderer.send(event))
-
-        // Restart notifications
-        const restartNotifications = ["fpsUncap", "adblocker", "fullscreen", "swapper", "drpcJoinButton", "enableKeybinding"]
-        for (const id of restartNotifications)
-            this.modal.querySelector(`#${id}`).addEventListener("click", restartMessage)
-
-        // Join game URL
-        const _currentURL = this.modal.querySelector("#currentURL")
-        ipcRenderer.on("update-url", (_, url) => _currentURL.innerText = url || "Unknown URL")
-        ipcRenderer.send("update-url")
-
-        const joinLinkURL = this.modal.querySelector("#joinLinkURL")
-        const joinByURL = () => ipcRenderer.send("join-game", joinLinkURL.value)
-        this.modal.querySelector("#joinLink").addEventListener("click", joinByURL)
-        joinLinkURL.addEventListener("keydown", e => {
-            if (e.key !== "Enter") return
-            e.preventDefault()
-            joinByURL()
-        })
-
-        createUserscriptsBlock()
     }
 }
 

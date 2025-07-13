@@ -16,6 +16,8 @@ const createUserscriptsBlock = () => {
             return
         }
 
+        if (_block.children.length !== 0) return
+
         for (const key in obj) {
             const _checkbox = createEl("input", { type: "checkbox", checked: obj[key] })
             _checkbox.addEventListener("change", e => {
