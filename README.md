@@ -41,7 +41,7 @@ Redline Client uses Electron version `37.2.1`, which supports the latest web sta
 This project is open-source. All Redline Client source code is publicly available in the [GitHub repository](https://github.com/robertpakalns/redline-client). All builds are executed via GitHub Actions. If you have concerns about the safety of your private information while using Redline Client, feel free to inspect the source code. Trust in the client is based on trust in the developer. [Privacy Policy](https://github.com/robertpakalns/redline-client/blob/main/PRIVACY.md)
 
 ## 🔗 Deeplink
-Voxtulate Client uses `voxtulate:` protocol to open the client. For example, `voxtulate://?url=path/to/page` opens the client with the page `https://voxiom.io/path/to/page`. [More information](https://github.com/robertpakalns/VoxtulateClient/wiki/Deeplinks).
+Redline Client uses `redline:` protocol to open the client. For example, `redline://?url=path/to/page` opens the client with the page `https://kirka.io/path/to/page`. [Example with Voxtulate Client](https://github.com/robertpakalns/VoxtulateClient/wiki/Deeplinks).
 
 ## 🔧 Default Keybinding
 | Key        | Action                 |
