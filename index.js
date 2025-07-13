@@ -26,7 +26,7 @@ const handleURL = url => {
     analytics.setEntry(lastURL)
 }
 
-const createWindow = () => {
+const createWindow = initialURL => {
     mainWindow = new BrowserWindow({
         title: "Redline Client",
         icon: getIcon(),
@@ -56,7 +56,7 @@ const createWindow = () => {
 
     mainWindow.maximize()
     mainWindow.setMenu(null)
-    mainWindow.loadURL(`https://${getHost()}`)
+    mainWindow.loadURL(initialURL)
     mainWindow.setFullScreen(config.get("client.fullscreen"))
     mainWindow.on("page-title-updated", e => e.preventDefault())
 
@@ -94,19 +94,18 @@ app.on("second-instance", () => {
 app.on("ready", () => {
     app.setAsDefaultProtocolClient("redline")
 
-    drpc.init(config.get("discord.joinButton"), `https://${getHost()}`)
-
-    createWindow()
-
-    // Deeplink
+    let deeplinkURL = null
     const deeplink = process.argv.find(arg => arg.startsWith("redline:"))
     if (deeplink) {
         const { searchParams, hash } = new URL(deeplink)
         const queryPath = searchParams.get("url")
         const cleanPath = queryPath ? queryPath.replace(/^\/+/, "").replace(/\/+$/, "") : ""
-        const finalURL = `https://${getHost()}/${cleanPath}${hash}`
-        if (queryPath) mainWindow.loadURL(finalURL)
+        deeplinkURL = queryPath ? `https://${getHost()}/${cleanPath}${hash}` : null
     }
+
+    drpc.init(config.get("discord.joinButton"), deeplinkURL || `https://${getHost()}`)
+
+    createWindow(deeplinkURL || `https://${getHost()}`)
 
     const { webContents } = mainWindow
 
