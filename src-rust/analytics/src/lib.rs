@@ -264,7 +264,6 @@ fn prepare_data() -> Result<AnalyticsReport> {
         }
         *time_spent_per_host.entry(entry.host.clone()).or_insert(0) += entry.duration;
 
-        // Convert timestamp ms → DateTime<Utc>, then to local date string
         let dt_utc = DateTime::<Utc>::from_timestamp_millis(entry.timestamp)
             .unwrap_or_else(|| DateTime::<Utc>::from_timestamp_millis(0).unwrap());
         let local_date = dt_utc.with_timezone(&Local).date_naive().to_string();
@@ -278,7 +277,6 @@ fn prepare_data() -> Result<AnalyticsReport> {
         entries.push(entry);
     }
 
-    // Aggregate per-day stats and keep latest 7 dates
     let mut week_data: Vec<DailyAnalytics> = daily_map
         .into_iter()
         .map(|(date, (total, game))| DailyAnalytics {
