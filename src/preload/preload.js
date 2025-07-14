@@ -1,8 +1,8 @@
 import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils.js"
 import { fromRoot, createEl, domains } from "../utils/functions.js"
+import { Config, defaultConfig } from "../utils/config.js"
 import { ipcRenderer, contextBridge } from "electron"
 import MenuModal from "../modals/menu/script.js"
-import { Config, defaultConfig } from "../utils/config.js"
 import { readFileSync } from "fs"
 
 const config = new Config
