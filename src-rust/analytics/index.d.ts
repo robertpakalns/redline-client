@@ -17,10 +17,12 @@ export interface DailyAnalytics {
   gameTimeSpent: number
 }
 export interface AnalyticsReport {
-  entries: Array<Entry>
   totalTimeSpent: number
   totalGameTimeSpent: number
   timeSpentPerHost: Record<string, number>
   weekData: Array<DailyAnalytics>
+  entriesPerRegion: Record<string, number>
+  timeSpentPerRegion: Record<string, number>
+  totalGamesPlayed: number
 }
 export declare function getAllData(): AnalyticsReport

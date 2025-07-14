@@ -12,14 +12,13 @@ const generateColors = (arr, i) => {
     }
 }
 
-const proxyChart = data => {
-
-    const labels = Object.keys(data)
-    const durations = Object.values(data)
+const createPieChart = (obj, id, labelCallback) => {
+    const labels = Object.keys(obj)
+    const data = Object.values(obj)
 
     const colors = labels.map((_, i) => generateColors(labels, i))
 
-    const ctx = document.getElementById("durationByHostChart").getContext("2d")
+    const ctx = document.getElementById(id).getContext("2d")
 
     const existingChart = Chart.getChart(ctx)
     if (existingChart) existingChart.destroy()
@@ -29,7 +28,7 @@ const proxyChart = data => {
         data: {
             labels: labels,
             datasets: [{
-                data: durations,
+                data: data,
                 backgroundColor: colors.map(c => c.bg),
                 borderColor: colors.map(c => c.border),
                 borderWidth: 2,
@@ -43,7 +42,7 @@ const proxyChart = data => {
                 tooltip: {
                     usePointStyle: true,
                     callbacks: {
-                        label: el => formatDuration(el.raw, "hour"),
+                        label: labelCallback,
                         labelPointStyle: () => ({ pointStyle: "circle" })
                     }
                 }
@@ -58,7 +57,6 @@ const lastWeekChart = data => {
     const totalTimes = data.map(el => el.totalTimeSpent - el.gameTimeSpent)
 
     const maxTime = Math.max(...gameTimes, ...totalTimes)
-
     const [unit, divisor] = maxTime < 60000 ? ["second", 1000] : maxTime < 3600000 ? ["minute", 60000] : ["hour", 3600000]
 
     const ctx = document.getElementById("lastWeekChart").getContext("2d")
@@ -72,7 +70,7 @@ const lastWeekChart = data => {
 
     const datasets = categories.map((label, i) => ({
         label,
-        data: times[i],
+        data: times[i].reverse(),
         borderColor: colors[i].border,
         backgroundColor: colors[i].bg,
         borderWidth: 2,
@@ -95,7 +93,7 @@ const lastWeekChart = data => {
                 tooltip: {
                     usePointStyle: true,
                     callbacks: {
-                        label: el => formatDuration(el.raw, unit),
+                        label: el => formatDuration(el.raw),
                         labelPointStyle: () => ({ pointStyle: "circle" })
                     }
                 }
@@ -104,19 +102,25 @@ const lastWeekChart = data => {
     })
 }
 
-const setValues = ({ totalTimeSpent = 0, totalGameTimeSpent = 0 }) => {
+const setValues = (totalTimeSpent = 0, totalGameTimeSpent = 0, totalGamesPlayed = 0) => {
     document.getElementById("totalTimeSpentInClient").textContent = formatDuration(totalTimeSpent)
     document.getElementById("totalTimeSpentInGame").textContent = formatDuration(totalGameTimeSpent)
+    document.getElementById("totalGamesPlayed").textContent = totalGamesPlayed
 }
 
 const createAnalyticsSection = async () => {
-    const { entries, totalTimeSpent, totalGameTimeSpent, timeSpentPerHost, weekData } = getAllData()
+    const data = getAllData()
 
-    console.log({ entries, totalTimeSpent, totalGameTimeSpent, timeSpentPerHost, weekData })
+    setValues(data.totalTimeSpent, data.totalGameTimeSpent, data.totalGamesPlayed)
 
-    proxyChart(timeSpentPerHost)
-    lastWeekChart(weekData)
-    setValues({ totalTimeSpent, totalGameTimeSpent })
+    // Last week activity
+    lastWeekChart(data.weekData)
+    // Time spent on proxies
+    createPieChart(data.timeSpentPerHost, "durationByHostChart", el => formatDuration(el.raw))
+    // Time spent on regions
+    createPieChart(data.timeSpentPerRegion, "durationByRegionChart", el => formatDuration(el.raw))
+    // Played matches on regions
+    createPieChart(data.entriesPerRegion, "playedMatchesByRegionChart", el => el.raw)
 
     document.getElementById("updateAnalyticsData").addEventListener("click", createAnalyticsSection)
 }

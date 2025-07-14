@@ -29,9 +29,11 @@ const createSettingsSection = cont => {
         config.set("client.domain", e.target.value)
         restartMessage()
     })
-    for (const el of domains) {
-        const option = createEl("option", { value: el }, "", [el])
-        domainSelect.appendChild(option)
+    if (domainSelect.children.length === 0) {
+        for (const el of domains) {
+            const option = createEl("option", { value: el }, "", [el])
+            domainSelect.appendChild(option)
+        }
     }
     domainSelect.value = getHost()
 

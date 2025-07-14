@@ -25,14 +25,14 @@ static LAST_ENTRY: Lazy<Arc<Mutex<Option<LastEntry>>>> = Lazy::new(|| Arc::new(M
 static UNREGISTERED_DOMAIN_DURATION: Lazy<Arc<Mutex<i64>>> = Lazy::new(|| Arc::new(Mutex::new(0)));
 
 static ALLOWED_DOMAINS: Lazy<HashSet<&'static str>> = Lazy::new(|| {
-    let mut set = HashSet::new();
-    set.insert("kirka.io");
-    set.insert("cloudyfrogs.com");
-    set.insert("snipers.io");
-    set.insert("ask101math.com");
-    set.insert("fpsiogame.com");
-    set.insert("cloudconverts.com");
-    set
+    HashSet::from([
+        "kirka.io",
+        "cloudyfrogs.com",
+        "snipers.io",
+        "ask101math.com",
+        "fpsiogame.com",
+        "cloudconverts.com",
+    ])
 });
 
 fn napi_err<E: std::fmt::Display>(e: E) -> Error {
@@ -213,11 +213,13 @@ pub struct DailyAnalytics {
 
 #[napi(object)]
 pub struct AnalyticsReport {
-    pub entries: Vec<Entry>,
     pub total_time_spent: i64,
     pub total_game_time_spent: i64,
     pub time_spent_per_host: HashMap<String, i64>,
     pub week_data: Vec<DailyAnalytics>,
+    pub entries_per_region: HashMap<String, i64>,
+    pub time_spent_per_region: HashMap<String, i64>,
+    pub total_games_played: i64,
 }
 
 #[napi]
@@ -250,11 +252,14 @@ fn prepare_data() -> Result<AnalyticsReport> {
         })
         .map_err(napi_err)?;
 
-    let mut entries = Vec::new();
     let mut total_time_spent = 0;
     let mut total_game_time_spent = 0;
     let mut time_spent_per_host: HashMap<String, i64> = HashMap::new();
     let mut daily_map: HashMap<String, (i64, i64)> = HashMap::new();
+    let mut entries_per_region: HashMap<String, i64> = HashMap::new();
+    let mut time_spent_per_region: HashMap<String, i64> = HashMap::new();
+    let mut region_id_tracker: HashMap<String, HashSet<String>> = HashMap::new();
+    let mut unique_ids: HashSet<String> = HashSet::new();
 
     for entry_result in entry_iter {
         let entry = entry_result.map_err(napi_err)?;
@@ -269,12 +274,25 @@ fn prepare_data() -> Result<AnalyticsReport> {
         let local_date = dt_utc.with_timezone(&Local).date_naive().to_string();
 
         let (total, game) = daily_map.entry(local_date).or_insert((0, 0));
+
         *total += entry.duration;
         if entry.path.starts_with("/games/") {
             *game += entry.duration;
-        }
 
-        entries.push(entry);
+            total_game_time_spent += entry.duration;
+
+            if let Some((region, id)) = extract_region_and_id(&entry.path) {
+                unique_ids.insert(id.clone());
+
+                let ids = region_id_tracker
+                    .entry(region.clone())
+                    .or_insert_with(HashSet::new);
+                if ids.insert(id.clone()) {
+                    *entries_per_region.entry(region.clone()).or_insert(0) += 1;
+                }
+                *time_spent_per_region.entry(region.clone()).or_insert(0) += entry.duration;
+            }
+        }
     }
 
     let mut week_data: Vec<DailyAnalytics> = daily_map
@@ -290,10 +308,24 @@ fn prepare_data() -> Result<AnalyticsReport> {
     week_data.truncate(7);
 
     Ok(AnalyticsReport {
-        entries,
         total_time_spent,
         total_game_time_spent,
         time_spent_per_host,
         week_data,
+        entries_per_region,
+        time_spent_per_region,
+        total_games_played: unique_ids.len() as i64,
     })
+}
+
+fn extract_region_and_id(path: &str) -> Option<(String, String)> {
+    // /games/<region>~<id>
+    let prefix = "/games/";
+    if let Some(pos) = path.find(prefix) {
+        let after = &path[pos + prefix.len()..];
+        if let Some((region, id)) = after.split_once("~") {
+            return Some((region.to_string(), id.to_string()));
+        }
+    }
+    None
 }

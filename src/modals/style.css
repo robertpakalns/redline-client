@@ -473,13 +473,13 @@ label:disabled {
 
 /* Analytics */
 .chartBlock {
+    margin: 30px 0;
     text-align: center;
 
     .pie-chart {
         margin: auto;
     }
 }
-
 
 .main {
     display: flex;
