@@ -1,4 +1,4 @@
-import { confirmAction, openDialogModal, saveDialogModal } from "./src/utils/dialogs"
+import { confirmAction, openDialogModal, saveDialogModal, errorModal } from "./src/utils/dialogs"
 import { fromRoot, getIcon, getHost } from "./src/utils/functions"
 import { Config, configPath } from "./src/utils/config"
 import { app, BrowserWindow, ipcMain } from "electron"
@@ -72,7 +72,7 @@ const createWindow = (initialURL: string): void => {
     webContents.on("did-navigate", (_, url) => handleURL(url))
     webContents.on("did-finish-load", () => handleURL(webContents.getURL()))
     webContents.on("did-fail-load", (_, code) => {
-        if (code === -105) webContents.loadURL("https://kirka.io") // ERR_NAME_NOT_RESOLVED 
+        if (code === -105) errorModal(code)  // ERR_NAME_NOT_RESOLVED 
     })
 
     keybinding(mainWindow)

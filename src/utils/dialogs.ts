@@ -1,5 +1,5 @@
-import { dialog } from "electron"
 import { getIcon } from "./functions"
+import { dialog } from "electron"
 
 type Callback<T = string> = (filePath: T) => void
 
@@ -26,4 +26,12 @@ export const saveDialogModal = (callback: Callback): void => {
     dialog.showSaveDialog(f).then(({ canceled, filePath }) => {
         if (!canceled && filePath) callback(filePath)
     })
+}
+
+export const errorModal = (code: number): void => {
+    if (code === -105) dialog.showErrorBox(
+        "Connection Error: ERR_NAME_NOT_RESOLVED",
+        "The Kirka.io proxy domain is unavailable.\n" +
+        "Please change it manually in config.json."
+    )
 }

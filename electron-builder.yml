@@ -9,9 +9,7 @@ electronLanguages:
   - en-US
 
 files:
-  - "dist/**/*"
-  - "assets/**/*"
-  - "src-rust/**/*"
+  - "frontend-dist/**/*"
   - "!**/locales/*"
   - "!**/*.pak"
   - "!**/ffmpeg.dll"
