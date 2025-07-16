@@ -1,6 +1,6 @@
 import { Chart, PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController } from "chart.js"
 import { getAllData } from "../../../src-rust/analytics/index.cjs"
-import { formatDuration, output } from "../../utils/functions.js"
+import { formatDuration, output } from "../../utils/functions"
 
 Chart.register(PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController)
 
@@ -53,8 +53,8 @@ const createPieChart = (obj, id, labelCallback) => {
 
 const lastWeekChart = data => {
     const labels = data.map(el => el.date).reverse()
-    const gameTimes = data.map(el => el.gameTimeSpent).reverse()
-    const totalTimes = data.map(el => el.totalTimeSpent).reverse()
+    const gameTimes = data.map(el => el.gameTimeSpent)
+    const totalTimes = data.map(el => el.totalTimeSpent)
 
     const maxTime = Math.max(...totalTimes)
     const [unit, divisor] = maxTime < 60000 ? ["second", 1000] : maxTime < 3600000 ? ["minute", 60000] : ["hour", 3600000]

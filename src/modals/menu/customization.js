@@ -1,8 +1,8 @@
-import { createEl, restartMessage } from "../../utils/functions.js"
-import { Config } from "../../utils/config.js"
+import { createEl, restartMessage } from "../../utils/functions"
+import { Config } from "../../utils/config"
 import { ipcRenderer } from "electron"
 
-import createUserscriptsBlock from "./userscripts.js"
+import createUserscriptsBlock from "./userscripts"
 
 const config = new Config
 

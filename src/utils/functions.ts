@@ -43,7 +43,7 @@ export const getIcon = (): NativeImage | undefined => {
 // DOM
 export const createEl = (
     tag: string,
-    attrs: Record<string, string> = {},
+    attrs: Record<string, string | boolean> = {},
     className: string = "",
     append: (HTMLElement | string)[] = []
 ): HTMLElement => {

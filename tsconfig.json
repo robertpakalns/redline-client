@@ -24,7 +24,7 @@
     },
     "include": [
         "index.ts",
-        "src/preload/preload.js",
+        "src/preload/preload.ts",
         "src-rust/**/*"
     ],
     "exclude": [

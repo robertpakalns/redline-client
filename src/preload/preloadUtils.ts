@@ -7,8 +7,8 @@ import { shell } from "electron"
 const config = new Config
 
 // Go back to Kirka from Auth page
-export const backToKirka = () => {
-    const authDomains = new Set([
+export const backToKirka = (): void => {
+    const authDomains = new Set<string>([
         "www.facebook.com",
         "accounts.google.com",
         "appleid.apple.com",
@@ -33,11 +33,11 @@ const versions = {
     OS: `${type()} ${release()} (${arch()})`
 }
 
-export const setVersions = (cont, toggle) => {
+export const setVersions = (cont: HTMLElement, toggle: boolean) => {
     if (!cont) return
 
     for (const [key, value] of Object.entries(versions)) {
-        const el = cont.querySelector(`#${key}`)
+        const el = cont.querySelector(`#${key}`) as HTMLElement
         if (el) {
             el.style.display = toggle ? "block" : "none"
             continue
@@ -50,7 +50,7 @@ export const setVersions = (cont, toggle) => {
 }
 
 // Tricko links in profile
-export const setTrickoLink = cont => {
+export const setTrickoLink = (cont: HTMLElement): void => {
     if (!cont) return
 
     if (cont.querySelector(".playerTrickoLink")) return
@@ -62,7 +62,7 @@ export const setTrickoLink = cont => {
     if (!bottomCont) return
 
     const children = Array.from(bottomCont.childNodes).filter(node => node instanceof HTMLElement)
-    const copiedNode = children[0]?.cloneNode(true)
+    const copiedNode = children[0]?.cloneNode(true) as HTMLElement
     if (!copiedNode) return
 
     copiedNode.classList.add("playerTrickoLink")
@@ -78,23 +78,23 @@ export const setTrickoLink = cont => {
 
 // Change logo on the main menu
 // Credits: PVT
-export const changeLogo = cont => {
+export const changeLogo = (cont: HTMLImageElement): void => {
     if (!cont) return
     cont.src = "redline://?path=assets/logo.png"
 }
 
-export const createKDRatio = cont => {
+export const createKDRatio = (cont: HTMLElement): void => {
     if (!cont) return
 
-    const [kills, deaths] = cont.children
+    const [kills, deaths] = Array.from(cont.children)
 
-    const val = isNum(kills.textContent, deaths.textContent)
+    const val = isNum(kills.textContent ?? "", deaths.textContent ?? "")
 
     if (!cont.querySelector(".kd-ratio")) {
         const _kdText = createEl("div", {}, "kd-text", ["K/D"])
-        const _kdValue = createEl("div", {}, "kd-value", [val])
+        const _kdValue = createEl("div", {}, "kd-value", [val.toString()])
 
-        const _kd = kills.cloneNode(true)
+        const _kd = kills.cloneNode(true) as HTMLElement
         _kd.textContent = ""
         _kd.append(_kdValue, _kdText)
         _kd.classList.add("kd-ratio")
@@ -103,5 +103,7 @@ export const createKDRatio = cont => {
         return
     }
 
-    cont.querySelector(".kd-value").textContent = val
+    const kdValue = cont.querySelector(".kd-value")
+    if (!kdValue) return
+    kdValue.textContent = val.toString()
 }

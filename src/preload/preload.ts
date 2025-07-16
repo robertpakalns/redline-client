@@ -1,14 +1,17 @@
-import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils.js"
-import { fromRoot, createEl, domains } from "../utils/functions.js"
-import { Config, defaultConfig } from "../utils/config.js"
+import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils"
+import { fromRoot, createEl, domains } from "../utils/functions"
+import { Config, defaultConfig } from "../utils/config"
 import { ipcRenderer, contextBridge } from "electron"
 import MenuModal from "../modals/menu/script.js"
 import { readFileSync } from "fs"
 
 const config = new Config
 
-const { enable = enableKeybinding, content } = config.get("keybinding")
-const keybinding = enable ? content : defaultConfig.keybinding.content
+const { enable: enableKeybinding, content } = config.get("keybinding") as {
+    enable: boolean,
+    content: Record<string, string>
+}
+const keybinding = enableKeybinding ? content : defaultConfig.keybinding.content
 
 // With contextIsolation: true, window.appconsole is an alternative for window.console
 contextBridge.exposeInMainWorld("appconsole", window.console)
@@ -25,9 +28,13 @@ const appendStyles = () => {
         .clientModalHint { display: ${config.get("interface.modalHint") ? "block" : "none"} }`
 
     const fastCSSStyles = createEl("style", { id: "fastCSSStyles" })
-    const fastCSSLink = createEl("link", { id: "fastCSSLink", rel: "stylesheet" })
+    const fastCSSLink = createEl("link", { id: "fastCSSLink", rel: "stylesheet" }) as HTMLAnchorElement
 
-    const { enable, url, value } = config.get("fastCSS")
+    const { enable, url, value } = config.get("fastCSS") as {
+        enable: boolean,
+        url: string,
+        value: string
+    }
 
     if (enable) {
         fastCSSStyles.innerHTML = value
@@ -39,7 +46,8 @@ const appendStyles = () => {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    trustedTypes.createPolicy("default", { createHTML: html => html })
+    (window as any).trustedTypes.createPolicy("default", { createHTML: (html: string) => html })
+
     backToKirka()
     appendStyles()
 
@@ -49,11 +57,12 @@ window.addEventListener("DOMContentLoaded", () => {
     menuModal.init()
     menuModal.work()
 
-    const app = document.getElementById("app")
+    const app: HTMLElement | null = document.getElementById("app")
+    if (!app) return
 
     // Modal hint
     const _hint = createEl("div", {}, "clientModalHint", [`Press ${keybinding.MenuModal} to open menu`])
-    app.querySelector("#left-icons").appendChild(_hint)
+    app.querySelector("#left-icons")?.appendChild(_hint)
 
     ipcRenderer.on("toggle-menu-modal", (_, toggle) => _hint.style.display = toggle ? "block" : "none")
 
@@ -65,13 +74,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Observers
     const appObserver = new MutationObserver(() => {
-        const logoCont = app.querySelector("img.logo#logo")
+        const logoCont = app.querySelector("img.logo#logo") as HTMLImageElement
         if (logoCont) changeLogo(logoCont)
 
-        const profileCont = app.querySelector(".profile-cont")
+        const profileCont = app.querySelector(".profile-cont") as HTMLElement
         if (profileCont) setTrickoLink(profileCont)
 
-        const kdrCont = app.querySelector(".kill-death")
+        const kdrCont: HTMLElement | null = app.querySelector(".kill-death")
         if (kdrCont && !kdrCont.dataset.kdrObserved) {
             kdrCont.dataset.kdrObserved = "true"
             createKDRatio(kdrCont)
@@ -85,7 +94,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const kdrObserver = new MutationObserver(() => {
         kdrObserver.disconnect()
 
-        const kdrCont = app.querySelector(".kill-death")
+        const kdrCont = app.querySelector(".kill-death") as HTMLElement
         if (!kdrCont) return
 
         createKDRatio(kdrCont)
@@ -93,8 +102,8 @@ window.addEventListener("DOMContentLoaded", () => {
         kdrObserver.observe(kdrCont, { childList: true, subtree: true, characterData: true })
     })
 
-    const overlay = document.getElementById("overlay")
-    let lastVersionState = null
+    const overlay = document.getElementById("overlay") as HTMLElement
+    let lastVersionState: boolean | null = null
     const consoleObserver = new MutationObserver(mut => {
         // Ping always has textContent
         let isNonEmpty = mut[3].target.textContent !== ""
@@ -103,11 +112,11 @@ window.addEventListener("DOMContentLoaded", () => {
         lastVersionState = isNonEmpty
         setVersions(overlay, isNonEmpty)
     })
-    consoleObserver.observe(overlay, { childList: true, subtree: true })
+    consoleObserver.observe(overlay!, { childList: true, subtree: true })
 
     // Fast CSS
-    const fastCSSStyles = document.getElementById("fastCSSStyles")
-    let fastCSSLink = document.getElementById("fastCSSLink")
+    const fastCSSStyles = document.getElementById("fastCSSStyles") as HTMLElement
+    let fastCSSLink = document.getElementById("fastCSSLink") as HTMLLinkElement | null
 
     ipcRenderer.on("change-fast-css", (_, enable, url, value) => {
         if (!enable) {
@@ -123,10 +132,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (url) {
             if (!fastCSSLink) {
-                fastCSSLink = createEl("link", { id: "fastCSSLink", rel: "stylesheet" })
-                document.head.appendChild(fastCSSLink)
+                fastCSSLink = createEl("link", { id: "fastCSSLink", rel: "stylesheet" }) as HTMLLinkElement
+                document.head.appendChild(fastCSSLink!)
             }
-            fastCSSLink.href = url
+            if (fastCSSLink) fastCSSLink.href = url
         }
         else if (fastCSSLink) {
             fastCSSLink.remove()
@@ -145,14 +154,14 @@ ipcRenderer.on("toggle-window", (_, modal) => { // Toggles modals on keybinds
         return
     }
 
-    if (modal === "null") document.querySelector(".enmYtp") ? document.querySelector("canvas").requestPointerLock() : document.exitPointerLock()
+    if (modal === "null") document.querySelector(".enmYtp") ? document.querySelector("canvas")?.requestPointerLock() : document.exitPointerLock()
     if (openedModal) {
         openedModal.classList.toggle("open")
-        if (modal === "null" || openedModal.id === modal) document.querySelector("canvas").requestPointerLock()
-        else document.getElementById(modal).classList.toggle("open")
+        if (modal === "null" || openedModal.id === modal) document.querySelector("canvas")?.requestPointerLock()
+        else document.getElementById(modal)?.classList.toggle("open")
     }
     else if (modal !== "null") {
-        document.getElementById(modal).classList.toggle("open")
+        document.getElementById(modal)?.classList.toggle("open")
         document.exitPointerLock()
     }
 })

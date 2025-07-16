@@ -1,12 +1,12 @@
-import { fromRoot, createEl, popup, restartMessage } from "../../utils/functions.js"
+import { fromRoot, createEl, popup, restartMessage } from "../../utils/functions"
 import packageJson from "../../../package.json" with { type: "json" }
-import { Config, configDir } from "../../utils/config.js"
+import { Config, configDir } from "../../utils/config"
 import { shell, ipcRenderer } from "electron"
-import Modal from "../modal.js"
+import Modal from "../modal"
 import { join } from "path"
 
 import createCustomizationSection from "./customization.js"
-import createChangelogSection from "./changelog.js"
+import createChangelogSection from "./changelog"
 import createAnalyticsSection from "./analytics.js"
 import createSettingsSection from "./settings.js"
 
