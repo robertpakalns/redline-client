@@ -6,7 +6,10 @@ import createUserscriptsBlock from "./userscripts.js"
 
 const config = new Config
 
+let loaded = false
 const createCustomizationSection = cont => {
+    if (loaded) return
+    loaded = true
 
     // Userscripts
     createUserscriptsBlock()

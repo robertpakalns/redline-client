@@ -53,10 +53,10 @@ const createPieChart = (obj, id, labelCallback) => {
 
 const lastWeekChart = data => {
     const labels = data.map(el => el.date).reverse()
-    const gameTimes = data.map(el => el.gameTimeSpent)
-    const totalTimes = data.map(el => el.totalTimeSpent - el.gameTimeSpent)
+    const gameTimes = data.map(el => el.gameTimeSpent).reverse()
+    const totalTimes = data.map(el => el.totalTimeSpent).reverse()
 
-    const maxTime = Math.max(...gameTimes, ...totalTimes)
+    const maxTime = Math.max(...totalTimes)
     const [unit, divisor] = maxTime < 60000 ? ["second", 1000] : maxTime < 3600000 ? ["minute", 60000] : ["hour", 3600000]
 
     const ctx = document.getElementById("lastWeekChart").getContext("2d")

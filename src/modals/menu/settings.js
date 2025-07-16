@@ -4,7 +4,10 @@ import { ipcRenderer } from "electron"
 
 const config = new Config
 
+let loaded = false
 const createSettingsSection = cont => {
+    if (loaded) return
+    loaded = true
 
     // FPS uncap works only on Windows
     if (process.platform === "win32") cont.querySelector("#fpsUncapWarning").style.display = "none"

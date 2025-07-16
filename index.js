@@ -71,6 +71,9 @@ const createWindow = initialURL => {
     })
     webContents.on("did-navigate", (_, url) => handleURL(url))
     webContents.on("did-finish-load", () => handleURL(webContents.getURL()))
+    webContents.on("did-fail-load", (_, code) => {
+        if (code === -105) webContents.loadURL("https://kirka.io") // ERR_NAME_NOT_RESOLVED 
+    })
 
     keybinding(mainWindow)
     swapper(webContents)
