@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "lib": [
+            "ES2020",
+            "DOM"
+        ],
+        "outDir": "./dist",
+        "strict": true,
+        "baseUrl": ".",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "sourceMap": false,
+        "allowJs": true,
+        "plugins": [
+            {
+                "transform": "tsc-alias"
+            }
+        ]
+    },
+    "include": [
+        "index.ts",
+        "src/preload/preload.js",
+        "src-rust/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "src-rust/target"
+    ],
+    "tsc-alias": {
+        "verbose": false,
+        "resolveFullPaths": true,
+        "fileExtensions": {
+            "inputGlob": "{js,cjs}",
+            "outputCheck": [
+                "js",
+            ]
+        }
+    }
+}

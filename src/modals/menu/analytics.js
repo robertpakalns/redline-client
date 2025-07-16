@@ -1,5 +1,5 @@
 import { Chart, PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController } from "chart.js"
-import { getAllData } from "../../../src-rust/analytics/index.js"
+import { getAllData } from "../../../src-rust/analytics/index.cjs"
 import { formatDuration, output } from "../../utils/functions.js"
 
 Chart.register(PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController)

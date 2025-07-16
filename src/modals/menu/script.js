@@ -15,7 +15,7 @@ const config = new Config
 class MenuModal extends Modal {
     constructor() {
         super()
-        this.modalHTMLPath = fromRoot("src/modals/menu/index.html")
+        this.modalHTMLPath = fromRoot("assets/html/menu.html")
     }
 
     init() {

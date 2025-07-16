@@ -1,17 +1,24 @@
 import { readFileSync, mkdirSync, existsSync, readdirSync, writeFileSync } from "fs"
 import { configDir } from "./config.js"
+import { WebContents } from "electron"
 import { join } from "path"
 
-const defaultConfig = {
+interface IUserscripts {
+    enable: boolean
+    scripts: Record<string, boolean>
+    styles: Record<string, boolean>
+}
+
+const defaultConfig: IUserscripts = {
     enable: true,
     scripts: {},
     styles: {}
 }
 
-let userScripts = []
-let userStyles = []
+let userScripts: string[] = []
+let userStyles: string[] = []
 
-const handleObject = (obj, array) => {
+const handleObject = (obj: Record<string, boolean>, array: string[]): void => {
 
     // Fill the object if missing keys
     for (const key of array) if (!(key in obj)) obj[key] = true
@@ -30,8 +37,8 @@ if (!existsSync(userscriptsFolder)) mkdirSync(userscriptsFolder, { recursive: tr
 const userstylesFolder = join(configDir, "styles")
 if (!existsSync(userstylesFolder)) mkdirSync(userstylesFolder, { recursive: true })
 
-const getUserScriptsFiles = () => {
-    let data
+const getUserScriptsFiles = (): void => {
+    let data: IUserscripts
     try { data = JSON.parse(readFileSync(userScriptsPath, "utf8")) } catch {
         data = JSON.parse(JSON.stringify(defaultConfig))
         writeFileSync(userScriptsPath, JSON.stringify(defaultConfig, null, 2))
@@ -59,7 +66,7 @@ const getUserScriptsFiles = () => {
 
 // User scripts
 // .js files only
-const setUserscripts = webContents => {
+const setUserscripts = (webContents: WebContents): void => {
     let data
     try { data = JSON.parse(readFileSync(userScriptsPath, "utf8")) }
     catch {
@@ -83,7 +90,7 @@ const setUserscripts = webContents => {
 
 // User styles
 // .css files only
-const setUserstyles = webContents => {
+const setUserstyles = (webContents: WebContents): void => {
     let data
     try { data = JSON.parse(readFileSync(userScriptsPath, "utf8")) }
     catch {
@@ -103,7 +110,7 @@ const setUserstyles = webContents => {
     }
 }
 
-export const userscripts = webContents => {
+export const userscripts = (webContents: WebContents): void => {
     getUserScriptsFiles()
     setUserscripts(webContents)
 

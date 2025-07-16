@@ -1,32 +1,32 @@
-import { confirmAction, openDialogModal, saveDialogModal } from "./src/utils/dialogs.js"
-import { fromRoot, getIcon, getHost } from "./src/utils/functions.js"
-import { Config, configPath } from "./src/utils/config.js"
+import { confirmAction, openDialogModal, saveDialogModal } from "./src/utils/dialogs"
+import { fromRoot, getIcon, getHost } from "./src/utils/functions"
+import { Config, configPath } from "./src/utils/config"
 import { app, BrowserWindow, ipcMain } from "electron"
 import { writeFileSync, readFileSync } from "fs"
 import electronUpdater from "electron-updater"
 
 // JavaScript modules
-import { userscripts } from "./src/utils/userscripts.js"
-import keybinding from "./src/utils/keybinding.js"
-import swapper from "./src/utils/swapper.js"
+import { userscripts } from "./src/utils/userscripts"
+import keybinding from "./src/utils/keybinding"
+import swapper from "./src/utils/swapper"
 
 // Rust modules
-import analytics from "./src-rust/analytics/index.js"
-import drpc from "./src-rust/drpc/index.js"
+import * as analytics from "./src-rust/analytics/index.cjs"
+import * as drpc from "./src-rust/drpc/index.cjs"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
 
-let mainWindow = null
-let lastURL = null
+let mainWindow: BrowserWindow | null = null
+let lastURL: string | null = null
 
-const handleURL = url => {
+const handleURL = (url: string): void => {
     lastURL = url
     drpc.setStatus(lastURL)
     analytics.setEntry(lastURL)
 }
 
-const createWindow = initialURL => {
+const createWindow = (initialURL: string): void => {
     mainWindow = new BrowserWindow({
         title: "Redline Client",
         icon: getIcon(),
@@ -38,12 +38,12 @@ const createWindow = initialURL => {
         }
     })
 
-    mainWindow.once("ready-to-show", async () => {
+    mainWindow.once("ready-to-show", async (): Promise<void> => {
         if (process.platform === "win32") {
             const { default: enject } = await import("@juice-client/node-enject")
 
-            const handleBuffer = mainWindow.getNativeWindowHandle()
-            let hwnd
+            const handleBuffer = mainWindow!.getNativeWindowHandle()
+            let hwnd: number
 
             if (process.arch === "x64" || process.arch === "arm64") hwnd = Number(handleBuffer.readBigUInt64LE(0))
             else hwnd = handleBuffer.readUInt32LE(0)
@@ -51,16 +51,16 @@ const createWindow = initialURL => {
             enject.startHook(hwnd)
         }
 
-        mainWindow.show()
+        mainWindow!.show()
     })
 
     mainWindow.maximize()
     mainWindow.setMenu(null)
     mainWindow.loadURL(initialURL)
-    mainWindow.setFullScreen(config.get("client.fullscreen"))
+    mainWindow.setFullScreen(config.get("client.fullscreen") as boolean)
     mainWindow.on("page-title-updated", e => e.preventDefault())
 
-    ipcMain.on("join-game", (_, url) => mainWindow.loadURL(url))
+    ipcMain.on("join-game", (_, url: string) => mainWindow!.loadURL(url))
 
     const { webContents } = mainWindow
     ipcMain.on("update-url", e => e.reply("update-url", webContents.getURL()))
@@ -97,7 +97,7 @@ app.on("second-instance", () => {
 app.on("ready", () => {
     app.setAsDefaultProtocolClient("redline")
 
-    let deeplinkURL = null
+    let deeplinkURL: string | null = null
     const deeplink = process.argv.find(arg => arg.startsWith("redline:"))
     if (deeplink) {
         const { searchParams, hash } = new URL(deeplink)
@@ -106,11 +106,11 @@ app.on("ready", () => {
         deeplinkURL = queryPath ? `https://${getHost()}/${cleanPath}${hash}` : null
     }
 
-    drpc.init(config.get("discord.joinButton"), deeplinkURL || `https://${getHost()}`)
+    drpc.init(config.get("discord.joinButton") as boolean, deeplinkURL || `https://${getHost()}`)
 
     createWindow(deeplinkURL || `https://${getHost()}`)
 
-    const { webContents } = mainWindow
+    const webContents = mainWindow!.webContents
 
     // Updater
     autoUpdater.checkForUpdates()
@@ -135,7 +135,7 @@ app.on("ready", () => {
     ipcMain.on("export-client-settings", () => saveDialogModal(file => writeFileSync(file, readFileSync(configPath))))
 
     // Save last URL
-    mainWindow.on("close", () => {
+    mainWindow!.on("close", () => {
         if (mainWindow && mainWindow.webContents) lastURL = mainWindow.webContents.getURL()
     })
 })
