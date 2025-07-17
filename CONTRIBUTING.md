@@ -1,6 +1,6 @@
 # 🚀 Build Project Locally
 1. Prerequisites:
-- [Node.js](https://nodejs.org/)
+- [Bun](https://bun.com/docs/installation)
 - [Rust & rustup](https://rustup.rs/)
 
 2. Clone the repository:
@@ -10,13 +10,13 @@ cd redline-client
 ```
 3. Build rust plugins
 ```bash
-npm i
-# napi should be installed via npm as @napi-rs/cli
+bun install
+# napi should be installed via bun as @napi-rs/cli
 cd src-rust/analytics
-npx napi build --release --platform --js index.cjs
+npx napi build --release --platform --js false
 
 cd ../drpc
-npx napi build --release --platform --js index.cjs
+npx napi build --release --platform --js false
 
 cd ../../
 ```
@@ -25,11 +25,11 @@ Redline Client compiles two `.node` files per plugin:
 - macOS: `x86_64-apple-darwin` and `aarch64-apple-darwin`
 - Linux: `x86_64-unknown-linux-gnu` and `aarch64-unknown-linux-gnu`
 
-To build the client locally, you will need only one `.node` file (`npx napi build --release --platform --js index.cjs`).
+To build the client locally, you will need only one `.node` file for each plugin (`npx napi build --release --platform --js false`).
 
 5. Build Electron Client:
 ```bash
-npm run build
+bun run build
 ```
 
 Contributions are open and welcome! Feel free to open issues or submit a pull request.
