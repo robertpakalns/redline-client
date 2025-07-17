@@ -19,15 +19,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "npm"
 
       - id: get_version
         shell: bash
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - run: npm ci
+      - shell: bash
+        run: |
+          tag="v${{ steps.get_version.outputs.version }}"
+          if git show-ref --tags --verify --quiet "refs/tags/${tag}"; then
+            echo "Tag ${tag} already exists."
+            exit 1
+          fi
+
+      - run: npm i --ignore-scripts
 
       - uses: dtolnay/rust-toolchain@stable
 
@@ -41,36 +51,28 @@ jobs:
         uses: taiki-e/install-action@v2
         with:
           tool: cross
-      - if: matrix.os == 'ubuntu-latest'
-        uses: docker/setup-buildx-action@v3
 
-      - if: contains(matrix.targets, 'aarch64-unknown-linux-gnu') && matrix.os == 'ubuntu-latest'
+      - if: contains(matrix.targets, 'aarch64-unknown-linux-gnu') # Ubuntu ARM64 only
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - if: contains(matrix.targets, 'aarch64-unknown-linux-gnu') # Ubuntu ARM64 only
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            gcc-aarch64-linux-gnu \
-            g++-aarch64-linux-gnu \
-            binutils-aarch64-linux-gnu \
-            libc6-dev-arm64-cross
-
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
           echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
 
-      - if: contains(matrix.targets, 'aarch64-apple-darwin') && matrix.os == 'macos-latest'
-        run: |
-          echo "RUSTFLAGS=-C link-arg=-undefined -C link-arg=dynamic_lookup" >> $GITHUB_ENV
+      - if: contains(matrix.targets, 'aarch64-apple-darwin') # macOS ARM64 only
+        run: echo "RUSTFLAGS=-C link-arg=-undefined -C link-arg=dynamic_lookup" >> $GITHUB_ENV
 
       - working-directory: ./src-rust
         shell: bash
         run: |
-          npm install
           for target in ${{ join(matrix.targets, ' ') }}; do
-            if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-              cd analytics && cross build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
-              cd drpc && cross build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
-            else
-              cd analytics && cargo build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
-              cd drpc && cargo build --target "$target" --release && npx napi build --target "$target" --release --platform && cd ..
-            fi
+              cd analytics && npx napi build --target "$target" --release --platform --js false
+              cd ../drpc && npx napi build --target "$target" --release --platform --js false
+              cd ..
           done
 
       - uses: softprops/action-gh-release@v2.0.6

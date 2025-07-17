@@ -7,9 +7,9 @@
   "main": "frontend-dist/index.js",
   "scripts": {
     "copy": "copyfiles -u 1 \"src-rust/**/*.node\" frontend-dist/src-rust && copy-folder-util assets frontend-dist/assets",
-    "prepare": "tsc && tsc-alias && bun run copy",
-    "dev": "bun run prepare && electron .",
-    "build": "bun run prepare && electron-builder"
+    "prepare": "tsc && tsc-alias && npm run copy",
+    "dev": "npm run prepare && electron .",
+    "build": "npm run prepare && electron-builder"
   },
   "license": "ISC",
   "devDependencies": {
