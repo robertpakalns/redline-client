@@ -1,6 +1,6 @@
 import { readFileSync, mkdirSync, existsSync, readdirSync, writeFileSync } from "fs"
-import { configDir } from "./config.js"
 import { WebContents } from "electron"
+import { configDir } from "./config"
 import { join } from "path"
 
 interface IUserscripts {

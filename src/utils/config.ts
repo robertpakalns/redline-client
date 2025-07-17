@@ -113,7 +113,7 @@ export class Config {
         return result as ConfigType
     }
 
-    set(key: string, value: string): void {
+    set(key: string, value: string | boolean): void {
         const keys = key.split(".")
         const lastKey = keys.pop()
 

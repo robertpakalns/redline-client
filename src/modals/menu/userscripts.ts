@@ -1,5 +1,5 @@
-import { userScriptsPath } from "../../utils/userscripts.js"
-import { createEl } from "../../utils/functions.js"
+import { userScriptsPath } from "../../utils/userscripts"
+import { createEl } from "../../utils/functions"
 import { readFileSync, writeFileSync } from "fs"
 
 const createUserscriptsBlock = () => {

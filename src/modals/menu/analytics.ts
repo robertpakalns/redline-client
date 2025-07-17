@@ -1,10 +1,11 @@
 import { Chart, PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController } from "chart.js"
-import { getAllData } from "../../../src-rust/analytics/index.cjs"
+import { getAllData } from "../../../src-rust/analytics/index"
 import { formatDuration, output } from "../../utils/functions"
+import type { TooltipItem } from "chart.js"
 
 Chart.register(PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController)
 
-const generateColors = (arr, i) => {
+const generateColors = (arr: string[], i: number): { bg: string, border: string } => {
     const hue = (i * 360 / arr.length) % 360
     return {
         bg: `hsla(${hue}, 50%, 50%, 0.6)`,
@@ -12,18 +13,22 @@ const generateColors = (arr, i) => {
     }
 }
 
-const createPieChart = (obj, id, labelCallback) => {
+const createPieChart = (
+    obj: object,
+    id: string,
+    labelCallback: (tooltipItem: TooltipItem<"pie">) => string | void | string[]
+): void => {
     const labels = Object.keys(obj)
     const data = Object.values(obj)
 
     const colors = labels.map((_, i) => generateColors(labels, i))
 
-    const ctx = document.getElementById(id).getContext("2d")
+    const ctx = (document.getElementById(id) as HTMLCanvasElement)?.getContext("2d")
 
-    const existingChart = Chart.getChart(ctx)
+    const existingChart = Chart.getChart(ctx!)
     if (existingChart) existingChart.destroy()
 
-    new Chart(ctx, {
+    new Chart(ctx!, {
         type: "pie",
         data: {
             labels: labels,
@@ -43,7 +48,7 @@ const createPieChart = (obj, id, labelCallback) => {
                     usePointStyle: true,
                     callbacks: {
                         label: labelCallback,
-                        labelPointStyle: () => ({ pointStyle: "circle" })
+                        labelPointStyle: () => ({ pointStyle: "circle", rotation: 0 })
                     }
                 }
             }
@@ -51,17 +56,17 @@ const createPieChart = (obj, id, labelCallback) => {
     })
 }
 
-const lastWeekChart = data => {
-    const labels = data.map(el => el.date).reverse()
-    const gameTimes = data.map(el => el.gameTimeSpent)
-    const totalTimes = data.map(el => el.totalTimeSpent)
+const lastWeekChart = (data: object[]): void => {
+    const labels = data.map((el: any) => el.date).reverse()
+    const gameTimes = data.map((el: any) => el.gameTimeSpent)
+    const totalTimes = data.map((el: any) => el.totalTimeSpent)
 
     const maxTime = Math.max(...totalTimes)
     const [unit, divisor] = maxTime < 60000 ? ["second", 1000] : maxTime < 3600000 ? ["minute", 60000] : ["hour", 3600000]
 
-    const ctx = document.getElementById("lastWeekChart").getContext("2d")
+    const ctx = (document.getElementById("lastWeekChart") as HTMLCanvasElement)?.getContext("2d")
 
-    const existingChart = Chart.getChart(ctx)
+    const existingChart = Chart.getChart(ctx!)
     if (existingChart) existingChart.destroy()
 
     const categories = ["In-Game", "In Client"]
@@ -80,21 +85,21 @@ const lastWeekChart = data => {
         barPercentage: 0.6 + i * 0.2,
     }))
 
-    new Chart(ctx, {
+    new Chart(ctx!, {
         type: "bar",
         data: { labels, datasets },
         options: {
             scales: {
                 x: { stacked: true },
-                y: { ticks: { callback: value => output((value / divisor).toFixed(2), unit) } }
+                y: { ticks: { callback: value => output((value as number / divisor).toFixed(2), unit) } }
             },
             plugins: {
                 legend: { labels: { usePointStyle: true, boxHeight: 5 } },
                 tooltip: {
                     usePointStyle: true,
                     callbacks: {
-                        label: el => formatDuration(el.raw),
-                        labelPointStyle: () => ({ pointStyle: "circle" })
+                        label: el => formatDuration(el.raw as number),
+                        labelPointStyle: () => ({ pointStyle: "circle", rotation: 0 })
                     }
                 }
             }
@@ -103,9 +108,9 @@ const lastWeekChart = data => {
 }
 
 const setValues = (totalTimeSpent = 0, totalGameTimeSpent = 0, totalGamesPlayed = 0) => {
-    document.getElementById("totalTimeSpentInClient").textContent = formatDuration(totalTimeSpent)
-    document.getElementById("totalTimeSpentInGame").textContent = formatDuration(totalGameTimeSpent)
-    document.getElementById("totalGamesPlayed").textContent = totalGamesPlayed
+    document.getElementById("totalTimeSpentInClient")!.textContent = formatDuration(totalTimeSpent)
+    document.getElementById("totalTimeSpentInGame")!.textContent = formatDuration(totalGameTimeSpent)
+    document.getElementById("totalGamesPlayed")!.textContent = totalGamesPlayed.toString()
 }
 
 const createAnalyticsSection = async () => {
@@ -116,13 +121,13 @@ const createAnalyticsSection = async () => {
     // Last week activity
     lastWeekChart(data.weekData)
     // Time spent on proxies
-    createPieChart(data.timeSpentPerHost, "durationByHostChart", el => formatDuration(el.raw))
+    createPieChart(data.timeSpentPerHost, "durationByHostChart", (el: any) => formatDuration(el.raw))
     // Time spent on regions
-    createPieChart(data.timeSpentPerRegion, "durationByRegionChart", el => formatDuration(el.raw))
+    createPieChart(data.timeSpentPerRegion, "durationByRegionChart", (el: any) => formatDuration(el.raw))
     // Played matches on regions
-    createPieChart(data.entriesPerRegion, "playedMatchesByRegionChart", el => el.raw)
+    createPieChart(data.entriesPerRegion, "playedMatchesByRegionChart", (el: any) => el.raw)
 
-    document.getElementById("updateAnalyticsData").addEventListener("click", createAnalyticsSection)
+    document.getElementById("updateAnalyticsData")?.addEventListener("click", createAnalyticsSection)
 }
 
 export default createAnalyticsSection

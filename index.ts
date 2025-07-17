@@ -11,8 +11,8 @@ import keybinding from "./src/utils/keybinding"
 import swapper from "./src/utils/swapper"
 
 // Rust modules
-import analytics from "./src-rust/analytics/index.cjs"
-import drpc from "./src-rust/drpc/index.cjs"
+import * as analytics from "./src-rust/analytics/index"
+import * as drpc from "./src-rust/drpc/index"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
