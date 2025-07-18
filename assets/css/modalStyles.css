@@ -69,21 +69,30 @@
     }
 
     input[type="checkbox"] {
-        cursor: pointer;
-        outline: none;
         appearance: none;
-        width: 10px;
-        height: 10px;
-        border: 2px solid #4CAF50;
-        border-radius: 2px;
+        width: 50px;
+        height: 25px;
+        background: #e5e7eb55;
+        border-radius: 25px;
+        position: relative;
         transition: 0.3s ease;
+        cursor: pointer;
 
-        &:hover {
-            transform: scale(1.1);
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0px;
+            height: 25px;
+            width: 25px;
+            background: #c93e34;
+
+            border-radius: 50%;
+            transition: 0.3s ease;
         }
 
-        &:checked {
-            background-color: #4CAF50;
+        &:checked::before {
+            left: 25px;
+            background: #4CAF50;
         }
     }
 
@@ -238,6 +247,37 @@
             transform: scale(1.1);
         }
     }
+
+    /* Generate Configs */
+    .configCont {
+        margin: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .upCont {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .leftCont {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .restart {
+            background: #ff000080;
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .name {
+            font-size: 1.25rem;
+        }
+    }
 }
 
 @keyframes hop {
@@ -316,6 +356,10 @@ label:disabled {
     padding: 10px;
 }
 
+#joinLink {
+    padding: 0;
+}
+
 #joinLinkURL {
     width: 300px;
 }
@@ -351,13 +395,19 @@ label:disabled {
     gap: 20px;
 }
 
+#userScriptsStyles {
+    display: flex;
+    gap: 20px;
+    margin: 10px 0;
+}
+
 .warning {
     color: #f44336 !important;
 }
 
 /* Settings */
 .subText {
-    font-size: 0.6rem;
+    font-size: 0.8rem;
     color: gray;
 }
 

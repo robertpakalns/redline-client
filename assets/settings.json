@@ -1,0 +1,91 @@
+[
+    {
+        "name": "Adblocker",
+        "description": "Blocks all ads",
+        "type": "checkbox",
+        "config": "client.adblocker",
+        "section": "settings",
+        "requires": "restart"
+    },
+    {
+        "name": "Fullscreen",
+        "description": "Open the client in the fullscreen mode",
+        "type": "checkbox",
+        "config": "client.fullscreen",
+        "section": "settings",
+        "requires": "restart"
+    },
+    {
+        "name": "Unlimited FPS",
+        "description": "Uncaps FPS for better performance. Works only on Windows",
+        "type": "checkbox",
+        "config": "client.fpsUncap",
+        "section": "settings",
+        "requires": "restart"
+    },
+    {
+        "name": "Discord RPC Join Button",
+        "description": "Allows players to join your game from your Discord profile",
+        "type": "checkbox",
+        "config": "discord.joinButton",
+        "section": "settings",
+        "requires": "restart"
+    },
+    {
+        "id": "modalHint",
+        "name": "Toggle Modal Hint",
+        "description": "The hint to open the menu modal will be placed on the main menu in the bottom right corner",
+        "type": "checkbox",
+        "config": "interface.modalHint",
+        "section": "settings"
+    },
+    {
+        "id": "toggleKDRatio",
+        "name": "Toggle K/D Ratio",
+        "description": "K/D ratio will be shown in-game near kills and deaths",
+        "type": "checkbox",
+        "config": "interface.kdRatio",
+        "section": "settings"
+    },
+    {
+        "name": "Proxy Domain",
+        "description": "Choose a proxy domain in case kirka.io is blocked in your region",
+        "type": "select",
+        "config": "client.domain",
+        "section": "settings",
+        "requires": "restart",
+        "select": [
+            "kirka.io",
+            "cloudyfrogs.com",
+            "snipers.io",
+            "ask101math.com",
+            "fpsiogame.com",
+            "cloudconverts.com"
+        ]
+    },
+    {
+        "id": "enableKeybinding",
+        "name": "Enable Custom Keybinding",
+        "description": "Setting multiple options to the same key might lead to unpredictable behavior",
+        "type": "checkbox",
+        "config": "keybinding.enable",
+        "section": "customization",
+        "requires": "restart"
+    },
+    {
+        "name": "Enable Resource Swapper",
+        "description": "Enables resource swapper which replaces game assets with local ones",
+        "type": "checkbox",
+        "config": "client.swapper",
+        "section": "customization",
+        "requires": "restart"
+    },
+    {
+        "id": "enableFastCSS",
+        "name": "Enable Fast CSS",
+        "description": "Fast CSS will allow you to customize the game via CSS",
+        "type": "checkbox",
+        "config": "fastCSS.enable",
+        "section": "customization"
+    }
+]

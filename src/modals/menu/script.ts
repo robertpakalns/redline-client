@@ -1,6 +1,6 @@
-import { fromRoot, createEl, popup, restartMessage } from "../../utils/functions"
 import packageJson from "../../../package.json" with { type: "json" }
-import { Config, configDir } from "../../utils/config"
+import { fromRoot, createEl, popup } from "../../utils/functions"
+import { configDir } from "../../utils/config"
 import { shell, ipcRenderer } from "electron"
 import Modal from "../modal"
 import { join } from "path"
@@ -9,8 +9,7 @@ import createCustomizationSection from "./customization"
 import createChangelogSection from "./changelog"
 import createAnalyticsSection from "./analytics"
 import createSettingsSection from "./settings"
-
-const config = new Config
+import generateConfigs from "./generateConfigs"
 
 class MenuModal extends Modal {
     modalHTMLPath: string | null = null
@@ -27,6 +26,8 @@ class MenuModal extends Modal {
     }
 
     work() {
+        generateConfigs()
+
         const _version = this.modal?.querySelector("#clientVersion") as HTMLElement
         _version!.textContent = `v${packageJson.version}`
 
@@ -65,11 +66,6 @@ class MenuModal extends Modal {
             popup("rgb(206, 185, 45)", "Copied!")
         })
 
-        // Restart notifications
-        const restartNotifications = ["fpsUncap", "adblocker", "fullscreen", "swapper", "drpcJoinButton", "enableKeybinding"]
-        for (const id of restartNotifications)
-            this.modal?.querySelector(`#${id}`)?.addEventListener("click", restartMessage)
-
         // Update client
         ipcRenderer.on("client-update", (_, data) => {
             if (data === null) popup("rgb(45, 206, 72)", "Update available!")
@@ -92,31 +88,8 @@ class MenuModal extends Modal {
             userstylesFolder: "styles",
             swapperFolder: "swapper"
         }
-
         for (const [key, value] of Object.entries(openFromShell))
             this.modal?.querySelector(`#${key}`)?.addEventListener("click", () => shell.openPath(join(configDir, value)))
-
-        // Settings
-        const settingsObj = {
-            fpsUncap: "client.fpsUncap",
-            adblocker: "client.adblocker",
-            fullscreen: "client.fullscreen",
-            swapper: "client.swapper",
-
-            modalHint: "interface.modalHint",
-            kdRatio: "interface.kdRatio",
-
-            drpcJoinButton: "discord.joinButton",
-
-            enableKeybinding: "keybinding.enable",
-
-            enableFastCSS: "fastCSS.enable"
-        }
-        for (const [id, conf] of Object.entries(settingsObj)) {
-            const el = document.getElementById(id) as HTMLInputElement
-            el!.checked = config.get(conf) as boolean
-            el?.addEventListener("change", e => config.set(conf, (e.target as HTMLInputElement).checked))
-        }
     }
 }
 

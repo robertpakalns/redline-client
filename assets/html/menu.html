@@ -28,53 +28,7 @@
             <div class="mainContentBlock" name="settingsSection">
                 <header>Settings</header>
 
-                <div class="block">
-                    <h1>Client</h1>
-                    <div class="content">
-                        <input type="checkbox" id="fpsUncap">
-                        <div>Unlimited FPS</div>
-                        <div id="fpsUncapWarning" class="warning">You can use this feature only on Windows</div>
-                    </div>
-                    <div class="content">
-                        <input type="checkbox" id="adblocker">
-                        <div>Enable Adblocker</div>
-                    </div>
-                    <div class="content">
-                        <input type="checkbox" id="fullscreen">
-                        <div>Fullscreen on Start</div>
-                    </div>
-                    <div class="content">
-                        <input type="checkbox" id="swapper">
-                        <div>Resource Swapper</div>
-                    </div>
-                    <div class="content">
-                        <label for="cars">Domain</label>
-                        <select name="gameDomain" id="gameDomain"></select>
-                    </div>
-
-                </div>
-
-                <div class="block">
-                    <h1>Discord Rich Presence</h1>
-                    <div class="content">
-                        <input type="checkbox" id="drpcJoinButton">
-                        <div>Join Button</div>
-                    </div>
-                </div>
-
-                <p class="block warning">Requires client restart!</p>
-
-                <div class="block">
-                    <h1>Interface</h1>
-                    <div class="content">
-                        <input type="checkbox" id="modalHint">
-                        <div>Toggle Modal Hint</div>
-                    </div>
-                    <div class="content">
-                        <input type="checkbox" id="kdRatio">
-                        <div>Toggle K/D Ratio</div>
-                    </div>
-                </div>
+                <div class="settingsCont"></div>
 
                 <div class="block">
                     <h1>Fast Join</h1>
@@ -110,15 +64,11 @@
             </div>
 
             <div class="mainContentBlock" name="customizationSection">
-                <header>Custom Keybinding</header>
-                <div class="content">
-                    <input type="checkbox" id="enableKeybinding">
-                    <div>Enable Custom Keybinding</div>
-                </div>
-                <div class="subText">
-                    Setting multiple options to the same key might lead to unpredictable behavior
-                </div>
-                <p class="warning">Requires client restart!</p>
+
+                <header>Customizations</header>
+
+                <div class="settingsCont"></div>
+
                 <table id="keybindingTable">
                     <thead>
                         <tr>
@@ -128,6 +78,14 @@
                     </thead>
                     <tbody id="keybindingBody"></tbody>
                 </table>
+
+                <div class="content">
+                    <div>Fast CSS URL</div>
+                    <input type="url" id="fastCSSURL">
+                </div>
+                <div class="content">
+                    <textarea id="fastCSSValue" placeholder="Write your CSS here..."></textarea>
+                </div>
 
                 <div class="block" id="userscriptsBlock">
                     <h1>Userscripts</h1>
@@ -145,40 +103,24 @@
                             <div id="userStyles"></div>
                         </div>
                     </div>
-
-                    To use the userscripts:
-                    <ol>
-                        <li>Open the <a href="#" id="userscriptsFolder">userscripts folder</a></li>
-                        <li>Put there your scripts. Make sure the files are ending with the .js extension!</li>
-                        <li>Reload the client to apply changes</li>
-                    </ol>
-
-                    To use the userstyles:
-
-                    <ol>
-                        <li>Open the <a href="#" id="userstylesFolder">userstyles folder</a></li>
-                        <li>Put there your styles. Make sure the files are ending with the .css extension!</li>
-                        <li>Reload the client to apply changes</li>
-                    </ol>
-
                 </div>
 
+                To use the userscripts:
+                <ol>
+                    <li>Open the <a href="#" id="userscriptsFolder">userscripts folder</a></li>
+                    <li>Put there your scripts. Make sure the files are ending with the .js extension!</li>
+                    <li>Reload the client to apply changes</li>
+                </ol>
 
-                <header>Fast CSS</header>
+                To use the userstyles:
 
-                <div class="content">
-                    <input type="checkbox" id="enableFastCSS">
-                    <div>Enable Fast CSS</div>
-                </div>
-                <div class="content">
-                    <div>URL</div>
-                    <input type="url" id="fastCSSURL">
-                </div>
-                <div class="content">
-                    <textarea id="fastCSSValue" placeholder="Write your CSS here..."></textarea>
-                </div>
+                <ol>
+                    <li>Open the <a href="#" id="userstylesFolder">userstyles folder</a></li>
+                    <li>Put there your styles. Make sure the files are ending with the .css extension!</li>
+                    <li>Reload the client to apply changes</li>
+                </ol>
 
-                <header>Resource Swapper</header>
+
                 To use the swapper:
                 <ol>
                     <li>Make sure you enabled it in the menu modal Settings section</li>
@@ -317,3 +259,5 @@
 
     </div>
 </div>
+
+<!-- 319 lines & 13700 characters -->

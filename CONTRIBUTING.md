@@ -10,7 +10,8 @@ cd redline-client
 ```
 3. Build rust plugins
 ```bash
-npm install  --ignore-scripts
+npm install --ignore-scripts
+
 # napi should be installed via npm as @napi-rs/cli
 cd src-rust/analytics
 npx napi build --release --platform --js false

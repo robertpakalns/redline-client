@@ -86,12 +86,6 @@
     }
 }
 
-#userScriptsStyles {
-    display: flex;
-    gap: 20px;
-    margin: 10px 0;
-}
-
 /* Fixing xip's bugs in styling */
 .profile-cont .bottom {
     gap: 10px;
