@@ -1,8 +1,20 @@
+import settingsJson from "../../../assets/userscriptsSettings.json" with { type: "json" }
+import { appendConfig, Setting, sendNotification } from "./generateConfigs"
 import { userScriptsPath } from "../../utils/userscripts"
 import { createEl } from "../../utils/functions"
 import { readFileSync, writeFileSync } from "fs"
 
+const data = settingsJson as Setting[];
+
+const appendUserscriptConfig = (): void => {
+    
+}
+
+let loaded = false
 const createUserscriptsSection = () => {
+    if (loaded) return
+    loaded = true
+
     const userScriptsConfig = JSON.parse(readFileSync(userScriptsPath, "utf8"))
     const { enable: userScriptsEnabled, scripts, styles } = userScriptsConfig
 
@@ -23,6 +35,7 @@ const createUserscriptsSection = () => {
             _checkbox.addEventListener("change", e => {
                 obj[key] = (e.target as HTMLInputElement).checked
                 writeFileSync(userScriptsPath, JSON.stringify(userScriptsConfig, null, 2))
+                sendNotification("refresh")
             })
 
             const _text = createEl("span", {}, "", [key])
@@ -31,21 +44,23 @@ const createUserscriptsSection = () => {
         }
     }
 
-
     userScriptsInit(scripts, "userScripts")
     userScriptsInit(styles, "userStyles")
 
-    const _userScriptsEnabled = cont.querySelector("#userScriptsEnabled") as HTMLInputElement
+    const userscriptsEnabled = createEl("input", { type: "checkbox" }, "", []) as HTMLInputElement
 
-    _userScriptsEnabled!.checked = userScriptsEnabled
-    _userScriptsEnabled!.addEventListener("change", e => {
+    userscriptsEnabled!.checked = userScriptsEnabled
+    userscriptsEnabled!.addEventListener("change", e => {
         toggleUserScripts()
-        userScriptsConfig.enable = (e.target as HTMLInputElement)?.checked
+        userScriptsConfig.enable = (e.target as HTMLInputElement).checked
         writeFileSync(userScriptsPath, JSON.stringify(userScriptsConfig, null, 2))
+        sendNotification("refresh")
     })
 
+    appendConfig(data[0], userscriptsEnabled)
+
     const toggleUserScripts = () => {
-        const checked = _userScriptsEnabled?.checked
+        const checked = userscriptsEnabled?.checked
         cont.querySelector("#userScriptsStyles")?.classList.toggle("disabled", !checked)
         for (const item of Array.from(cont.querySelector("#userScripts")!.querySelectorAll("input"))) item.disabled = !checked
         for (const item of Array.from(cont.querySelector("#userStyles")!.querySelectorAll("input"))) item.disabled = !checked

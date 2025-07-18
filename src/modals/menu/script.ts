@@ -6,11 +6,11 @@ import Modal from "../modal"
 import { join } from "path"
 
 import createCustomizationSection from "./customization"
+import createUserscriptsSection from "./userscripts"
+import { generateConfigs } from "./generateConfigs"
 import createChangelogSection from "./changelog"
 import createAnalyticsSection from "./analytics"
 import createSettingsSection from "./settings"
-import generateConfigs from "./generateConfigs"
-import createUserscriptsSection from "./userscripts"
 
 class MenuModal extends Modal {
     modalHTMLPath: string | null = null

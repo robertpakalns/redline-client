@@ -3,20 +3,57 @@ import { WebContents } from "electron"
 import { configDir } from "./config"
 import { join } from "path"
 
+interface ScriptMeta {
+    file: string
+    name: string
+    description: string
+    authors: string
+    category: string
+    enabled: boolean
+}
+
 interface IUserscripts {
     enable: boolean
-    scripts: Record<string, boolean>
+    scripts: ScriptMeta[]
     styles: Record<string, boolean>
 }
 
 const defaultConfig: IUserscripts = {
     enable: true,
-    scripts: {},
+    scripts: [],
     styles: {}
 }
 
 let userScripts: string[] = []
 let userStyles: string[] = []
+
+const extractMetadata = (content: string, file: string): ScriptMeta => {
+    const blockRegex = /\/\/\s*==RedlineClientPlugin==([\s\S]*?)\/\/\s*==RedlineClientPlugin==/
+    const match = content.match(blockRegex)
+
+    const meta: ScriptMeta = {
+        file,
+        name: file,
+        description: "",
+        authors: "",
+        category: "",
+        enabled: true
+    }
+
+    if (match) {
+        const lines = match[1].split("\n")
+        for (const line of lines) {
+            const trimmed = line.trim()
+            if (trimmed.startsWith("// @name")) meta.name = trimmed.replace("// @name", "").trim()
+            if (trimmed.startsWith("// @description")) meta.description = trimmed.replace("// @description", "").trim()
+            if (trimmed.startsWith("// @authors")) meta.authors = trimmed.replace("// @authors", "").trim()
+            if (trimmed.startsWith("// @category")) meta.category = trimmed.replace("// @category", "").trim()
+            if (trimmed.startsWith("// @enabled")) meta.enabled = trimmed.replace("// @enabled", "").trim().toLowerCase() !== "false"
+        }
+    }
+
+    return meta
+}
 
 const handleObject = (obj: Record<string, boolean>, array: string[]): void => {
 
@@ -52,22 +89,30 @@ const getUserScriptsFiles = (): void => {
     userScripts = readdirSync(userscriptsFolder).filter(script => script.endsWith(".js"))
     userStyles = readdirSync(userstylesFolder).filter(style => style.endsWith(".css"))
 
-    handleObject(scripts, userScripts)
+    const newScripts: ScriptMeta[] = []
+    for (const file of userScripts) {
+        const path = join(userscriptsFolder, file)
+        if (!existsSync(path)) continue
+        const content = readFileSync(path, "utf8")
+        const meta = extractMetadata(content, file)
+        newScripts.push(meta)
+    }
+
     handleObject(styles, userStyles)
 
     if (
         originalEnable !== enable ||
-        originalScripts !== JSON.stringify(scripts) ||
+        originalScripts !== JSON.stringify(newScripts) ||
         originalStyles !== JSON.stringify(styles)
     ) {
-        writeFileSync(userScriptsPath, JSON.stringify({ enable, scripts, styles }, null, 2))
+        writeFileSync(userScriptsPath, JSON.stringify({ enable, scripts: newScripts, styles }, null, 2))
     }
 }
 
 // User scripts
 // .js files only
 const setUserscripts = (webContents: WebContents): void => {
-    let data
+    let data: IUserscripts
     try { data = JSON.parse(readFileSync(userScriptsPath, "utf8")) }
     catch {
         data = JSON.parse(JSON.stringify(defaultConfig))
@@ -75,12 +120,14 @@ const setUserscripts = (webContents: WebContents): void => {
     }
 
     const { enable, scripts } = data
+    if (!enable) return
 
     for (const el of userScripts) {
-        if (scripts[el] === false) continue
+        const meta = scripts.find(s => s.file === el)
+        if (!meta?.enabled) continue
 
         const scriptPath = join(userscriptsFolder, el)
-        if (enable && existsSync(scriptPath)) {
+        if (existsSync(scriptPath)) {
             const script = readFileSync(scriptPath, "utf8")
             const content = new Function(script)
             webContents.executeJavaScript(`(${content.toString()})()`)
