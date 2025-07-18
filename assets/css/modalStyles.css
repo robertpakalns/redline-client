@@ -248,6 +248,12 @@
             align-items: center;
         }
 
+        .downCont {
+            display: flex;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
         .leftCont {
             display: flex;
             flex-direction: column;
@@ -255,7 +261,8 @@
         }
 
         .restart,
-        .refresh {
+        .refresh,
+        .category {
             padding: 4px 6px;
             border-radius: 6px;
             font-size: 0.8rem;
@@ -267,6 +274,10 @@
 
         .refresh {
             background: #db710080;
+        }
+
+        .category {
+            background: #3ab80080;
         }
 
         .name {
@@ -383,11 +394,6 @@ label:disabled {
             background-color: #4CAF50;
         }
     }
-}
-
-#userScriptsBlock {
-    display: flex;
-    gap: 20px;
 }
 
 #userScriptsStyles {

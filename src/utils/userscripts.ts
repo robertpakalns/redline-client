@@ -3,7 +3,7 @@ import { WebContents } from "electron"
 import { configDir } from "./config"
 import { join } from "path"
 
-interface ScriptMeta {
+export interface ScriptMeta {
     file: string
     name: string
     description: string
@@ -48,7 +48,6 @@ const extractMetadata = (content: string, file: string): ScriptMeta => {
             if (trimmed.startsWith("// @description")) meta.description = trimmed.replace("// @description", "").trim()
             if (trimmed.startsWith("// @authors")) meta.authors = trimmed.replace("// @authors", "").trim()
             if (trimmed.startsWith("// @category")) meta.category = trimmed.replace("// @category", "").trim()
-            if (trimmed.startsWith("// @enabled")) meta.enabled = trimmed.replace("// @enabled", "").trim().toLowerCase() !== "false"
         }
     }
 
@@ -95,6 +94,10 @@ const getUserScriptsFiles = (): void => {
         if (!existsSync(path)) continue
         const content = readFileSync(path, "utf8")
         const meta = extractMetadata(content, file)
+
+        const existing = scripts.find(s => s.file === file)
+        if (existing) meta.enabled = existing.enabled
+
         newScripts.push(meta)
     }
 
