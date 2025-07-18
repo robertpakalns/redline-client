@@ -2,7 +2,7 @@ import { userScriptsPath } from "../../utils/userscripts"
 import { createEl } from "../../utils/functions"
 import { readFileSync, writeFileSync } from "fs"
 
-const createUserscriptsBlock = () => {
+const createUserscriptsSection = () => {
     const userScriptsConfig = JSON.parse(readFileSync(userScriptsPath, "utf8"))
     const { enable: userScriptsEnabled, scripts, styles } = userScriptsConfig
 
@@ -54,4 +54,4 @@ const createUserscriptsBlock = () => {
     toggleUserScripts()
 }
 
-export default createUserscriptsBlock
+export default createUserscriptsSection

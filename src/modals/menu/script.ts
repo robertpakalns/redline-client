@@ -10,6 +10,7 @@ import createChangelogSection from "./changelog"
 import createAnalyticsSection from "./analytics"
 import createSettingsSection from "./settings"
 import generateConfigs from "./generateConfigs"
+import createUserscriptsSection from "./userscripts"
 
 class MenuModal extends Modal {
     modalHTMLPath: string | null = null
@@ -44,15 +45,16 @@ class MenuModal extends Modal {
             const activeDiv = this.modal?.querySelector(".mainContentBlock.active")
             if (activeDiv) activeDiv.classList.remove("active")
 
-            const targetDiv = this.modal?.querySelector(`#menuMainContent > div[name="${(e.target as HTMLElement)?.id}"]`)
+            const targetDiv = this.modal?.querySelector(`#menuMainContent > div[name="${(e.target as HTMLElement)?.id}"]`) as HTMLElement
             if (targetDiv) targetDiv.classList.add("active")
 
             // Load sections only when needed
             switch (targetDiv?.getAttribute("name")) {
                 case "changelogSection": createChangelogSection(); break
                 case "analyticsSection": createAnalyticsSection(); break
-                case "settingsSection": createSettingsSection(targetDiv as HTMLElement); break
-                case "customizationSection": createCustomizationSection(targetDiv as HTMLElement); break
+                case "settingsSection": createSettingsSection(targetDiv); break
+                case "customizationSection": createCustomizationSection(targetDiv); break
+                case "userscriptsSection": createUserscriptsSection(); break
             }
         })
 

@@ -34,7 +34,7 @@
                     <h1>Fast Join</h1>
                     <div class="content">
                         <button id="joinLink">Join</button>
-                        <input type="text" id="joinLinkURL">
+                        <input type="url" id="joinLinkURL">
                     </div>
                     <div class="content">
                         <div class="copy" id="currentURL"></div>
@@ -44,7 +44,7 @@
                 <div class="block">
                     <h1>Configs</h1>
                     <div class="content">
-                        <a id="configFolder" href="#">Open Configs</a>
+                        <a id="configFolder">Open Configs</a>
                     </div>
                 </div>
 
@@ -85,24 +85,6 @@
                 </div>
                 <div class="content">
                     <textarea id="fastCSSValue" placeholder="Write your CSS here..."></textarea>
-                </div>
-
-                <div class="block" id="userscriptsBlock">
-                    <h1>Userscripts</h1>
-                    <div class="content">
-                        <input type="checkbox" id="userScriptsEnabled">
-                        <div>Enable Userscripts</div>
-                    </div>
-                    <div id="userScriptsStyles">
-                        <div>
-                            <h1>Scripts</h1>
-                            <div id="userScripts"></div>
-                        </div>
-                        <div>
-                            <h1>Styles</h1>
-                            <div id="userStyles"></div>
-                        </div>
-                    </div>
                 </div>
 
                 To use the userscripts:
@@ -211,6 +193,24 @@
             </div>
 
             <div class="mainContentBlock" name="userscriptsSection">
+                <div class="block" id="userscriptsBlock">
+                    <h1>Userscripts</h1>
+                    <div class="content">
+                        <input type="checkbox" id="userScriptsEnabled">
+                        <div>Enable Userscripts</div>
+                    </div>
+                    <div id="userScriptsStyles">
+                        <div>
+                            <h1>Scripts</h1>
+                            <div id="userScripts"></div>
+                        </div>
+                        <div>
+                            <h1>Styles</h1>
+                            <div id="userStyles"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <p class="userscriptsInfo">Here, you will be able to interact with your loaded userscripts!</p>
             </div>
 

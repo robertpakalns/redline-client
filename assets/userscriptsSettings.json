@@ -1,0 +1,10 @@
+[
+    {
+        "name": "Enable Userscripts",
+        "description": "Allows the userscripts from the scripts folder execute",
+        "type": "checkbox",
+        "config": "client.adblocker",
+        "section": "settings",
+        "requires": "refresh"
+    }
+]

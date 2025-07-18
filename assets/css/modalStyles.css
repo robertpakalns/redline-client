@@ -123,16 +123,6 @@
         }
     }
 
-    input[type="range"] {
-        width: 70px;
-        height: 5px;
-    }
-
-    input[type="range"]:hover {
-        filter: drop-shadow(0 0 2px #4CAF50);
-    }
-
-
     input:disabled:hover {
         box-shadow: none;
     }
@@ -166,12 +156,9 @@
     }
 
     a {
+        cursor: pointer;
         text-decoration: none;
         color: #00A1E4;
-    }
-
-    input[type="file"] {
-        display: none;
     }
 
     thead {

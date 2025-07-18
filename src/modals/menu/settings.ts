@@ -19,16 +19,22 @@ const createSettingsSection = (cont: HTMLElement): void => {
         joinByURL()
     })
 
-    // Import/export settings
+    // Toggle
+    const toggleObject = {
+        modalHint: "toggle-menu-modal",
+        kdRatio: "toggle-kd-ratio"
+    }
+    for (const [id, event] of Object.entries(toggleObject))
+        cont.querySelector(`#${id}`)?.addEventListener("change", e => ipcRenderer.send(event, (e.target as HTMLInputElement).checked))
+
+    // Settings
     const settingsObject = {
+        relaunch: "relaunch",
         importClientSettings: "import-client-settings",
         exportClientSettings: "export-client-settings"
     }
     for (const [id, event] of Object.entries(settingsObject))
         cont.querySelector(`#${id}`)?.addEventListener("click", () => ipcRenderer.send(event))
-
-    // Relaunch
-    cont.querySelector("#relaunch")?.addEventListener("click", () => ipcRenderer.send("relaunch"))
 }
 
 export default createSettingsSection
