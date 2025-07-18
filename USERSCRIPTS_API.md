@@ -2,6 +2,7 @@
 Redline Client supports simple syntax to extract metadata from `.js` files in the `scripts` directory.
 
 ## Syntax
+This block of code must be placed at the start of the script:
 ```
 // ==RedlineClientPlugin==
 // @name {name}
@@ -19,4 +20,6 @@ Redline Client supports simple syntax to extract metadata from `.js` files in th
 // @authors Rob, Someone
 // @category Textures
 // ==RedlineClientPlugin==
+
+... your script
 ```
