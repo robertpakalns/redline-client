@@ -54,6 +54,12 @@ const extractMetadata = (content: string, file: string): ScriptMeta => {
     return meta
 }
 
+const handleConfig = (data: any): IUserscripts => ({
+    enable: typeof data.enable === "boolean" ? data.enable : true,
+    scripts: Array.isArray(data.scripts) ? data.scripts : [],
+    styles: typeof data.styles === "object" ? data.styles : {}
+})
+
 const handleObject = (obj: Record<string, boolean>, array: string[]): void => {
 
     // Fill the object if missing keys
@@ -75,12 +81,15 @@ if (!existsSync(userstylesFolder)) mkdirSync(userstylesFolder, { recursive: true
 
 const getUserScriptsFiles = (): void => {
     let data: IUserscripts
-    try { data = JSON.parse(readFileSync(userScriptsPath, "utf8")) } catch {
+    try { data = handleConfig(JSON.parse(readFileSync(userScriptsPath, "utf8"))) } catch {
         data = JSON.parse(JSON.stringify(defaultConfig))
         writeFileSync(userScriptsPath, JSON.stringify(defaultConfig, null, 2))
     }
 
-    const { enable, scripts, styles } = data
+    let { enable, scripts, styles } = data
+
+    if (!Array.isArray(scripts)) scripts = []
+
     const originalEnable = enable
     const originalScripts = JSON.stringify(scripts)
     const originalStyles = JSON.stringify(styles)
