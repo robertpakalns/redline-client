@@ -62,7 +62,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Modal hint
     const _hint = createEl("div", {}, "clientModalHint", [`Press ${keybinding.MenuModal} to open menu`])
-    app.querySelector("#left-icons")?.appendChild(_hint)
 
     ipcRenderer.on("toggle-menu-modal", (_, toggle) => _hint.style.display = toggle ? "block" : "none")
 
@@ -79,6 +78,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
         const profileCont = app.querySelector(".profile-cont") as HTMLElement
         if (profileCont) setTrickoLink(profileCont)
+
+        if (app.querySelector("#left-icons") && !app.querySelector("#left-icons")?.querySelector(".clientModalHint"))
+            app.querySelector("#left-icons")?.appendChild(_hint)
 
         const kdrCont: HTMLElement | null = app.querySelector(".kill-death")
         if (kdrCont && !kdrCont.dataset.kdrObserved) {

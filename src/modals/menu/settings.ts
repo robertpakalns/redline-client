@@ -19,14 +19,6 @@ const createSettingsSection = (cont: HTMLElement): void => {
         joinByURL()
     })
 
-    // Toggle
-    const toggleObject = {
-        modalHint: "toggle-menu-modal",
-        kdRatio: "toggle-kd-ratio"
-    }
-    for (const [id, event] of Object.entries(toggleObject))
-        cont.querySelector(`#${id}`)?.addEventListener("change", e => ipcRenderer.send(event, (e.target as HTMLInputElement).checked))
-
     // Settings
     const settingsObject = {
         relaunch: "relaunch",

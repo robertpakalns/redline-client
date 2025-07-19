@@ -45,6 +45,10 @@ class MenuModal extends Modal {
             const activeDiv = this.modal?.querySelector(".mainContentBlock.active")
             if (activeDiv) activeDiv.classList.remove("active")
 
+            const activeBar = this.modal?.querySelector(".sideBarItem.active")
+            if (activeBar) activeBar.classList.remove("active")
+            item.classList.add("active")
+
             const targetDiv = this.modal?.querySelector(`#menuMainContent > div[name="${(e.target as HTMLElement)?.id}"]`) as HTMLElement
             if (targetDiv) targetDiv.classList.add("active")
 

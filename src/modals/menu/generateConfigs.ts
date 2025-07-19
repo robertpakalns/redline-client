@@ -1,6 +1,7 @@
 import settingsJson from "../../../assets/settings.json" with { type: "json" }
 import { createEl, popup } from "../../utils/functions"
 import { Config } from "../../utils/config"
+import { ipcRenderer } from "electron"
 
 const config = new Config
 
@@ -74,5 +75,18 @@ export const generateConfigs = (): void => {
         }
 
         appendConfig(el, configCont)
+    }
+
+    // Toggle
+    const toggleObject = {
+        modalHint: "toggle-menu-modal",
+        toggleKDRatio: "toggle-kd-ratio"
+    }
+    for (const [id, event] of Object.entries(toggleObject)) {
+        console.log(document.querySelector(`#${id}`))
+        document.querySelector(`#${id}`)?.addEventListener("change", e => {
+            console.log(id, (e.target as HTMLInputElement).checked)
+            ipcRenderer.send(event, (e.target as HTMLInputElement).checked)
+        })
     }
 }

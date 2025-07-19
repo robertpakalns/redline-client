@@ -9,25 +9,31 @@ import { join } from "path"
 
 const data = settingsJson as Setting[]
 
-const appendUserscriptConfig = (meta: ScriptMeta, configCont: HTMLElement): void => {
-    const parentCont = document.querySelector(`div[name=userscriptsSection] > div.userscriptsCont`)
+const testCont = (className: string, children: (HTMLElement | string | null | undefined)[]): HTMLElement | null => {
+    const valid = children.filter(Boolean)
+    return valid.length ? createEl("div", {}, className, valid as (HTMLElement | string)[]) : null
+}
 
+const appendUserscriptConfig = (meta: ScriptMeta, configCont: HTMLElement, sh: string, parentCont: HTMLElement): void => {
     const name = createEl("div", {}, "name", [meta.name])
-    const description = createEl("div", {}, "subText", [`${meta.description} | by ${meta.authors}`])
-    const category = createEl("div", {}, "category", [meta.category])
+    const description = meta.description ? createEl("div", {}, "subText", [meta.description]) : null
+    const authors = meta.authors ? createEl("div", {}, "subText", [`by ${meta.authors}`]) : null
+    const category = meta.category ? createEl("div", {}, "category", [meta.category]) : null
+
     const open = createEl("a", {}, "", ["Open"])
-    open.addEventListener("click", () => shell.openPath(join(configDir, "scripts", meta.file)))
+    open.addEventListener("click", () => shell.openPath(join(configDir, sh, meta.file)))
 
     const requires = createEl("div", {}, "refresh", ["Requires page refresh"])
 
-    const upCont = createEl("div", {}, "upCont", [name, requires, category])
-    const downCont = createEl("div", {}, "downCont", [description, open])
+    const upCont = testCont("upCont", [name, requires, category])
+    const downCont = testCont("downCont", [description, authors, open])
 
-    const leftCont = createEl("div", {}, "leftCont", [upCont, downCont])
-    const cont = createEl("div", {}, "configCont", [leftCont, configCont])
+    const leftCont = testCont("leftCont", [upCont, downCont])
+    const cont = createEl("div", {}, "configCont", [leftCont!, configCont])
 
     parentCont?.appendChild(cont)
 }
+
 
 let loaded = false
 const createUserscriptsSection = () => {
@@ -38,10 +44,10 @@ const createUserscriptsSection = () => {
     const { enable: userScriptsEnabled, scripts, styles } = userScriptsConfig
 
     const userscriptsInit = (arr: ScriptMeta[]): void => {
-        const _block = document.querySelector(`div[name=userscriptsSection] > div.userscriptsCont`) as HTMLElement
+        const cont = document.querySelector(`#userscriptsCont`) as HTMLElement
 
         if (arr.length === 0) {
-            _block!.innerText = "No .js files found"
+            cont!.innerText = "No .js files found"
             return
         }
 
@@ -53,31 +59,38 @@ const createUserscriptsSection = () => {
                 sendNotification("refresh")
             })
 
-            appendUserscriptConfig(el, _checkbox)
+            appendUserscriptConfig(el, _checkbox, "scripts", cont)
         }
     }
 
     const userstylesInit = (obj: Record<string, boolean>): void => {
-        const _block = document.querySelector(`#userStyles`) as HTMLElement
+        const cont = document.querySelector(`#userstylesCont`) as HTMLElement
 
         if (Object.keys(obj).length === 0) {
-            _block!.innerText = "No .css files found"
+            cont!.innerText = "No .css files found"
             return
         }
 
-        if (_block?.children.length !== 0) return
+        if (cont?.children.length !== 0) return
 
         for (const key in obj) {
-            const _checkbox = createEl("input", { type: "checkbox", checked: obj[key] })
-            _checkbox.addEventListener("change", e => {
+            const meta: ScriptMeta = {
+                file: key,
+                name: key,
+                description: "",
+                authors: "",
+                category: "",
+                enabled: obj[key]
+            }
+
+            const checkbox = createEl("input", { type: "checkbox", checked: obj[key] })
+            checkbox.addEventListener("change", e => {
                 obj[key] = (e.target as HTMLInputElement).checked
                 writeFileSync(userScriptsPath, JSON.stringify(userScriptsConfig, null, 2))
                 sendNotification("refresh")
             })
 
-            const _text = createEl("span", {}, "", [key])
-            const _cont = createEl("div", {}, "content", [_checkbox, _text])
-            _block.appendChild(_cont)
+            appendUserscriptConfig(meta, checkbox, "styles", cont)
         }
     }
 
@@ -88,7 +101,7 @@ const createUserscriptsSection = () => {
 
     userscriptsEnabled!.checked = userScriptsEnabled
     userscriptsEnabled!.addEventListener("change", e => {
-        // toggleUserScripts()
+        toggleUserScripts()
         userScriptsConfig.enable = (e.target as HTMLInputElement).checked
         writeFileSync(userScriptsPath, JSON.stringify(userScriptsConfig, null, 2))
         sendNotification("refresh")
@@ -96,14 +109,15 @@ const createUserscriptsSection = () => {
 
     appendConfig(data[0], userscriptsEnabled)
 
-    // const toggleUserScripts = () => {
-    //     const checked = userscriptsEnabled?.checked
-    //     cont.querySelector("#userScriptsStyles")?.classList.toggle("disabled", !checked)
-    //     for (const item of Array.from(cont.querySelector("#userScripts")!.querySelectorAll("input"))) item.disabled = !checked
-    //     for (const item of Array.from(cont.querySelector("#userStyles")!.querySelectorAll("input"))) item.disabled = !checked
-    // }
+    const toggleUserScripts = () => {
+        const checked = userscriptsEnabled?.checked
+        document.querySelector("#userscriptsCont")?.classList.toggle("disabled", !checked)
+        document.querySelector("#userstylesCont")?.classList.toggle("disabled", !checked)
+        for (const item of Array.from(document.querySelector("#userscriptsCont")!.querySelectorAll("input"))) item.disabled = !checked
+        for (const item of Array.from(document.querySelector("#userstylesCont")!.querySelectorAll("input"))) item.disabled = !checked
+    }
 
-    // toggleUserScripts()
+    toggleUserScripts()
 }
 
 export default createUserscriptsSection

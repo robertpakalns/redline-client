@@ -237,7 +237,7 @@
 
     /* Generate Configs */
     .configCont {
-        margin: 10px;
+        margin: 15px 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -265,19 +265,19 @@
         .category {
             padding: 4px 6px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
         }
 
         .restart {
-            background: #ff000080;
+            background: #ff000060;
         }
 
         .refresh {
-            background: #db710080;
+            background: #db710060;
         }
 
         .category {
-            background: #3ab80080;
+            background: #3ab80060;
         }
 
         .name {
@@ -329,6 +329,10 @@ label:disabled {
     width: 100%;
     padding: 10px;
     font-size: 1.2rem;
+
+    &.active {
+        background: rgba(200, 200, 200, 0.3);
+    }
 }
 
 #menuMainContent {
