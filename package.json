@@ -30,6 +30,7 @@
     "electron-updater": "^6.6.2"
   },
   "optionalDependencies": {
-    "@juice-client/node-enject": "^1.0.4"
+    "@juice-client/node-enject": "^1.0.4",
+    "dmg-license": "^1.0.11"
   }
 }
