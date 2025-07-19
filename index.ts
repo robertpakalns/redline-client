@@ -40,6 +40,8 @@ const createWindow = (initialURL: string): void => {
 
     mainWindow.once("ready-to-show", async (): Promise<void> => {
         if (process.platform === "win32") {
+            // @ts-ignore
+            // Windows only
             const { default: enject } = await import("@juice-client/node-enject")
 
             const handleBuffer = mainWindow!.getNativeWindowHandle()
