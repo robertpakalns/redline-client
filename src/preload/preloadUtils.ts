@@ -1,6 +1,6 @@
 import packageJson from "../../package.json" with { type: "json" }
-import { createEl, getHost, isNum } from "../utils/functions"
-import { Config } from "../utils/config"
+import { createEl, getHost, isNum } from "../utils/functions.js"
+import { Config } from "../utils/config.js"
 import { type, release, arch } from "os"
 import { shell } from "electron"
 

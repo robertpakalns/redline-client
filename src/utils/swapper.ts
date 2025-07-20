@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readdirSync } from "fs"
 import { protocol, net, WebContents } from "electron"
-import { domains, fromRoot } from "./functions"
-import { Config, configDir } from "./config"
+import { domains, fromRoot } from "./functions.js"
+import { Config, configDir } from "./config.js"
 import { pathToFileURL } from "url"
 import { join } from "path"
 

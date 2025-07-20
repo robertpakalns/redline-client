@@ -32,12 +32,6 @@
     ],
     "tsc-alias": {
         "verbose": false,
-        "resolveFullPaths": true,
-        "fileExtensions": {
-            "inputGlob": "{js,cjs}",
-            "outputCheck": [
-                "js",
-            ]
-        }
+        "resolveFullPaths": true
     }
 }

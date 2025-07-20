@@ -1,4 +1,4 @@
-import { createEl, sessionFetch, getAsset } from "../../utils/functions"
+import { createEl, sessionFetch, getAsset } from "../../utils/functions.js"
 
 interface UpdateEntry {
     version: string

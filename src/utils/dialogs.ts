@@ -1,4 +1,4 @@
-import { getIcon } from "./functions"
+import { getIcon } from "./functions.js"
 import { dialog } from "electron"
 
 type Callback<T = string> = (filePath: T) => void

@@ -1,18 +1,18 @@
-import { confirmAction, openDialogModal, saveDialogModal, errorModal } from "./src/utils/dialogs"
-import { fromRoot, getIcon, getHost } from "./src/utils/functions"
-import { Config, configPath } from "./src/utils/config"
+import { confirmAction, openDialogModal, saveDialogModal, errorModal } from "./src/utils/dialogs.js"
+import { fromRoot, getIcon, getHost } from "./src/utils/functions.js"
+import { Config, configPath } from "./src/utils/config.js"
 import { app, BrowserWindow, ipcMain } from "electron"
 import { writeFileSync, readFileSync } from "fs"
 import electronUpdater from "electron-updater"
 
 // JavaScript modules
-import { userscripts } from "./src/utils/userscripts"
-import keybinding from "./src/utils/keybinding"
-import swapper from "./src/utils/swapper"
+import { userscripts } from "./src/utils/userscripts.js"
+import keybinding from "./src/utils/keybinding.js"
+import swapper from "./src/utils/swapper.js"
 
 // Rust modules
-import * as analytics from "./src-rust/analytics/index"
-import * as drpc from "./src-rust/drpc/index"
+import * as analytics from "./src-rust/analytics/index.js"
+import * as drpc from "./src-rust/drpc/index.js"
 
 const { autoUpdater } = electronUpdater
 const config = new Config

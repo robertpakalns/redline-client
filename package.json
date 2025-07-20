@@ -6,9 +6,8 @@
   "author": "robertpakalns",
   "main": "ts-dist/index.js",
   "scripts": {
-    "prepare": "tsc && tsc-alias",
-    "dev": "npm run prepare && electron .",
-    "build": "npm run prepare && electron-builder"
+    "dev": "tsc && electron .",
+    "build": "tsc && electron-builder"
   },
   "license": "ISC",
   "devDependencies": {
@@ -18,7 +17,6 @@
     "@types/node": "^24.0.15",
     "electron": "^37.2.3",
     "electron-builder": "^26.0.12",
-    "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3"
   },
   "dependencies": {

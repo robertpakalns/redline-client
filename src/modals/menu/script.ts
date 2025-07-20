@@ -1,16 +1,16 @@
 import packageJson from "../../../package.json" with { type: "json" }
-import { fromRoot, createEl, popup } from "../../utils/functions"
-import { configDir } from "../../utils/config"
+import { fromRoot, createEl, popup } from "../../utils/functions.js"
+import { configDir } from "../../utils/config.js"
 import { shell, ipcRenderer } from "electron"
-import Modal from "../modal"
+import Modal from "../modal.js"
 import { join } from "path"
 
-import createCustomizationSection from "./customization"
-import createUserscriptsSection from "./userscripts"
-import { generateConfigs } from "./generateConfigs"
-import createChangelogSection from "./changelog"
-import createAnalyticsSection from "./analytics"
-import createSettingsSection from "./settings"
+import createCustomizationSection from "./customization.js"
+import createUserscriptsSection from "./userscripts.js"
+import { generateConfigs } from "./generateConfigs.js"
+import createChangelogSection from "./changelog.js"
+import createAnalyticsSection from "./analytics.js"
+import createSettingsSection from "./settings.js"
 
 class MenuModal extends Modal {
     modalHTMLPath: string | null = null

@@ -1,6 +1,6 @@
 import { Chart, PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController } from "chart.js"
-import { getAllData } from "../../../src-rust/analytics/index"
-import { formatDuration, output } from "../../utils/functions"
+import { getAllData } from "../../../src-rust/analytics/index.js"
+import { formatDuration, output } from "../../utils/functions.js"
 import type { TooltipItem } from "chart.js"
 
 Chart.register(PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController)

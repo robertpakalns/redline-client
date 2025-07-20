@@ -1,6 +1,6 @@
-import { app, BrowserWindow } from "electron"
-import { Config, defaultConfig } from "./config"
 import electronLocalshortcut from "electron-localshortcut"
+import { Config, defaultConfig } from "./config.js"
+import { app, BrowserWindow } from "electron"
 
 const { register } = electronLocalshortcut
 const config = new Config

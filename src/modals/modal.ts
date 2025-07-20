@@ -1,4 +1,4 @@
-import { createEl } from "../utils/functions"
+import { createEl } from "../utils/functions.js"
 import { readFileSync } from "fs"
 
 class Modal {

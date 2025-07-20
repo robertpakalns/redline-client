@@ -1,9 +1,9 @@
 import settingsJson from "../../../assets/userscriptsSettings.json" with { type: "json" }
-import { appendConfig, Setting, sendNotification } from "./generateConfigs"
-import { userScriptsPath, ScriptMeta } from "../../utils/userscripts"
-import { createEl } from "../../utils/functions"
+import { appendConfig, Setting, sendNotification } from "./generateConfigs.js"
+import { userScriptsPath, ScriptMeta } from "../../utils/userscripts.js"
+import { createEl } from "../../utils/functions.js"
 import { readFileSync, writeFileSync } from "fs"
-import { configDir } from "src/utils/config"
+import { configDir } from "../../utils/config.js"
 import { shell } from "electron"
 import { join } from "path"
 

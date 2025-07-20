@@ -1,6 +1,6 @@
 import { nativeImage, NativeImage } from "electron"
+import { Config, ConfigType } from "./config.js"
 import { resolve, dirname, join } from "path"
-import { Config, ConfigType } from "./config"
 import { fileURLToPath } from "url"
 
 const config = new Config
