@@ -1,8 +1,6 @@
-import electronLocalshortcut from "electron-localshortcut"
 import { Config, defaultConfig } from "./config.js"
 import { app, BrowserWindow } from "electron"
 
-const { register } = electronLocalshortcut
 const config = new Config
 const keybindings = config.get("keybinding.enable") ? config.get("keybinding.content") : defaultConfig.keybinding.content
 const { CloseModal, MenuModal, Reload, Fullscreen, DevTools } = keybindings as {
@@ -17,10 +15,20 @@ const keySet = new Set([MenuModal, Reload, Fullscreen, DevTools])
 const keybinding = (win: BrowserWindow): void => {
     const { webContents } = win
 
-    webContents.on("before-input-event", (e, { code }) => {
-        if (keySet.has(code)) e.preventDefault()
+    webContents.on("before-input-event", (e, input) => {
+        if (keySet.has(input.code)) e.preventDefault()
 
-        switch (code) {
+        if (input.code === "F4" && input.alt) {
+            e.preventDefault()
+            app.quit()
+        }
+
+        if (input.control && input.shift && input.key.toLowerCase() === "c") {
+            e.preventDefault()
+            webContents.toggleDevTools()
+        }
+
+        switch (input.code) {
             case CloseModal: webContents.send("toggle-window", "null"); break
             case MenuModal: webContents.send("toggle-window", "menuModal"); break
             case Reload: webContents.reload(); break
@@ -29,9 +37,6 @@ const keybinding = (win: BrowserWindow): void => {
             default: break
         }
     })
-
-    register("Alt+F4", app.quit)
-    register("Ctrl+Shift+C", () => webContents.toggleDevTools())
 }
 
 export default keybinding
