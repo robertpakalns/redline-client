@@ -18,7 +18,7 @@ class MenuModal extends Modal {
 
     constructor() {
         super()
-        this.modalHTMLPath = fromRoot("assets/html/menu.html")
+        this.modalHTMLPath = fromRoot("../assets/html/menu.html")
     }
 
     init() {

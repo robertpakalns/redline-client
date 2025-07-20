@@ -16,7 +16,6 @@ import * as drpc from "./src-rust/drpc/index"
 
 const { autoUpdater } = electronUpdater
 const config = new Config
-
 let mainWindow: BrowserWindow | null = null
 let lastURL: string | null = null
 

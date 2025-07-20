@@ -31,7 +31,7 @@ const swapper = (webContents: WebContents): void => {
         const relPath = u.searchParams.get("path")
 
         let localPath: string | undefined
-        if (relPath) localPath = fromRoot(relPath)
+        if (relPath) localPath = fromRoot(join("../", relPath))
         else if (assetName) localPath = join(configDir, "swapper", assetName)
         else return Promise.resolve(new Response(null, { status: 404 }))
 

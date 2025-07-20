@@ -4,7 +4,7 @@ import { fileURLToPath } from "url"
 import triplet from "../triplet.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const modulePath = join(__dirname, `drpc.${triplet()}.node`)
+const modulePath = join(__dirname, `../../../src-rust/drpc/drpc.${triplet()}.node`)
 const require = createRequire(import.meta.url)
 
 const { init, setStatus } = require(modulePath)

@@ -9,7 +9,7 @@ electronLanguages:
   - en-US
 
 files:
-  - "frontend-dist/**/*"
+  - "ts-dist/**/*"
   - "!**/locales/*"
   - "!**/*.pak"
   - "!**/ffmpeg.dll"

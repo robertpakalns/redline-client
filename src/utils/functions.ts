@@ -36,7 +36,7 @@ export const getIcon = (): NativeImage | undefined => {
     const ext: string = extObj[process.platform]
     if (!ext) return undefined
 
-    cachedIcon = nativeImage.createFromPath(fromRoot(`assets/icons/icon.${ext}`))
+    cachedIcon = nativeImage.createFromPath(fromRoot(`../assets/icons/icon.${ext}`))
     return cachedIcon
 }
 

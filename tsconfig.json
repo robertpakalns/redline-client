@@ -7,7 +7,7 @@
             "ES2020",
             "DOM"
         ],
-        "outDir": "./frontend-dist",
+        "outDir": "./ts-dist",
         "strict": true,
         "baseUrl": ".",
         "esModuleInterop": true,
@@ -24,8 +24,7 @@
     },
     "include": [
         "index.ts",
-        "src/preload/preload.ts",
-        "src-rust/**/*"
+        "src/preload/preload.ts"
     ],
     "exclude": [
         "node_modules",

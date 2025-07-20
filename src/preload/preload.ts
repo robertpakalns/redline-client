@@ -18,12 +18,12 @@ contextBridge.exposeInMainWorld("appconsole", window.console)
 
 const appendStyles = () => {
     const modalStyles = createEl("style")
-    modalStyles.innerHTML = readFileSync(fromRoot("assets/css/modalStyles.css"), "utf8")
+    modalStyles.innerHTML = readFileSync(fromRoot("../assets/css/modalStyles.css"), "utf8")
 
     const fontURL = "redline://?path=assets/fonts/Roboto.ttf"
 
     const clientStyles = createEl("style")
-    clientStyles.innerHTML = readFileSync(fromRoot("assets/css/clientStyles.css"), "utf8") + `
+    clientStyles.innerHTML = readFileSync(fromRoot("../assets/css/clientStyles.css"), "utf8") + `
         @font-face { font-family: "Roboto"; src: url(${fontURL}) format("truetype") }
         .clientModalHint { display: ${config.get("interface.modalHint") ? "block" : "none"} }`
 
