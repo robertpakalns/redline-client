@@ -14,13 +14,7 @@
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "skipLibCheck": true,
-        "sourceMap": false,
-        "allowJs": true,
-        "plugins": [
-            {
-                "transform": "tsc-alias"
-            }
-        ]
+        "allowJs": true
     },
     "include": [
         "index.ts",
@@ -29,9 +23,5 @@
     "exclude": [
         "node_modules",
         "src-rust/target"
-    ],
-    "tsc-alias": {
-        "verbose": false,
-        "resolveFullPaths": true
-    }
+    ]
 }
