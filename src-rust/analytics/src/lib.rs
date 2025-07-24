@@ -1,17 +1,16 @@
 use chrono::{DateTime, Local, Utc};
 use napi::{Error, Result};
 use napi_derive::napi;
-use once_cell::sync::Lazy;
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use std::{
     collections::{HashMap, HashSet},
     io::ErrorKind::NotFound,
     path::PathBuf,
-    sync::{mpsc, Arc, Mutex},
+    sync::{LazyLock, Mutex, mpsc},
     thread::spawn,
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
-use url::Url;
+use url_parse::core::Parser;
 
 #[derive(Clone)]
 struct LastEntry {
@@ -21,10 +20,10 @@ struct LastEntry {
     instant: Instant,
 }
 
-static LAST_ENTRY: Lazy<Arc<Mutex<Option<LastEntry>>>> = Lazy::new(|| Arc::new(Mutex::new(None)));
-static UNREGISTERED_DOMAIN_DURATION: Lazy<Arc<Mutex<i64>>> = Lazy::new(|| Arc::new(Mutex::new(0)));
+static LAST_ENTRY: LazyLock<Mutex<Option<LastEntry>>> = LazyLock::new(|| Mutex::new(None));
+static UNREGISTERED_DOMAIN_DURATION: LazyLock<Mutex<i64>> = LazyLock::new(|| Mutex::new(0));
 
-static ALLOWED_DOMAINS: Lazy<HashSet<&'static str>> = Lazy::new(|| {
+static ALLOWED_DOMAINS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "kirka.io",
         "cloudyfrogs.com",
@@ -74,18 +73,17 @@ fn establish_connection() -> Result<Connection> {
 #[napi]
 pub fn set_entry(url: String) -> Result<()> {
     let url = url.clone();
-    let last_entry = LAST_ENTRY.clone();
-    let unregistered_duration = UNREGISTERED_DOMAIN_DURATION.clone();
+    let last_entry = &*LAST_ENTRY;
+    let unregistered_duration = &*UNREGISTERED_DOMAIN_DURATION;
 
     spawn(move || {
         if let Err(e) = (|| -> Result<()> {
             let conn = establish_connection()?;
-            let parsed_url = Url::parse(&url).map_err(napi_err)?;
+            let parsed_url = Parser::new(None).parse(&url).map_err(napi_err)?;
             let host = parsed_url
                 .host_str()
-                .ok_or_else(|| napi_err("Invalid host"))?
-                .to_string();
-            let path = parsed_url.path().to_string();
+                .ok_or_else(|| napi_err("Invalid host"))?;
+            let path = parsed_url.path.unwrap_or_default().join("/");
             let instant_now = Instant::now();
 
             let mut last_entry_lock = last_entry.lock().unwrap();
@@ -168,7 +166,7 @@ pub fn set_entry(url: String) -> Result<()> {
 
 #[napi]
 pub fn set_last_entry() -> Result<()> {
-    let last_entry = LAST_ENTRY.clone();
+    let last_entry = &*LAST_ENTRY;
 
     spawn(move || {
         if let Err(e) = (|| -> Result<()> {
