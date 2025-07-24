@@ -1,17 +1,16 @@
 use discord_rich_presence::{
-    activity::{self, Activity, Button, Timestamps},
     DiscordIpc, DiscordIpcClient,
+    activity::{self, Activity, Button, Timestamps},
 };
 use napi::{Error, Result};
 use napi_derive::napi;
-use once_cell::sync::Lazy;
 use std::{
     collections::HashMap,
-    sync::{Arc, Mutex},
+    sync::{Arc, LazyLock, Mutex},
     thread::{sleep, spawn},
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
-use url::Url;
+use url_parse::core::Parser;
 
 struct Drpc {
     client: DiscordIpcClient,
@@ -23,9 +22,9 @@ struct Drpc {
     join_url: String,
 }
 
-static INSTANCE: Lazy<Mutex<Option<Arc<Mutex<Drpc>>>>> = Lazy::new(|| Mutex::new(None));
+static INSTANCE: LazyLock<Mutex<Option<Arc<Mutex<Drpc>>>>> = LazyLock::new(|| Mutex::new(None));
 
-static STATIC_LINKS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+static STATIC_LINKS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     HashMap::from([
         ("/", "Viewing main lobby"),
         ("/auth", "Viewing authentication page"),
@@ -121,34 +120,36 @@ pub fn init(join_btn: bool, initial_url: String) -> Result<()> {
 }
 
 fn set_status_internal(drpc: &mut Drpc, url: &str) -> Result<()> {
-    let parsed_url = Url::parse(url).map_err(napi_err)?;
-    let path = parsed_url.path();
-    let host = parsed_url.host_str().unwrap_or_default();
+    let parsed_url = Parser::new(None).parse(&url).map_err(napi_err)?;
+    let host = parsed_url
+        .host_str()
+        .ok_or_else(|| napi_err("Invalid host"))?;
+    let path = format!("{}", parsed_url.path.unwrap_or_default().join("/"));
 
     drpc.state = if path.starts_with("/games") {
         let server = path
-            .split('/')
+            .split("/")
             .nth(2)
             .unwrap_or_default()
-            .split('~')
+            .split("~")
             .next()
             .unwrap_or_default();
         format!("Playing a match on the {} server", server)
     } else if path.starts_with("/profile") {
-        let profile_id = path.split('/').nth(2).unwrap_or_default();
+        let profile_id = path.split("/").nth(2).unwrap_or_default();
         format!("Viewing player profile with ID {}", profile_id)
     } else if path.starts_with("/___lobby___") {
         let lobby = path
-            .split('/')
+            .split("/")
             .nth(2)
             .unwrap_or_default()
-            .split('~')
+            .split("~")
             .next()
             .unwrap_or_default();
         format!("In the {} lobby", lobby)
     } else {
         STATIC_LINKS
-            .get(path)
+            .get(path.as_str())
             .map(|s| s.to_string())
             .unwrap_or_else(|| "Playing Kirka.io".to_string())
     };
