@@ -71,77 +71,55 @@ fn establish_connection() -> Result<Connection> {
 }
 
 #[napi]
-pub fn set_entry(url: String) -> Result<()> {
+pub fn set_entry(url: String) {
     let url = url.clone();
     let last_entry = &*LAST_ENTRY;
     let unregistered_duration = &*UNREGISTERED_DOMAIN_DURATION;
 
     spawn(move || {
-        if let Err(e) = (|| -> Result<()> {
-            let conn = establish_connection()?;
-            let parsed_url = Parser::new(None).parse(&url).map_err(napi_err)?;
-            let host = parsed_url
-                .host_str()
-                .ok_or_else(|| napi_err("Invalid host"))?;
-            let path = parsed_url.path.unwrap_or_default().join("/");
-            let instant_now = Instant::now();
+        let conn = establish_connection().unwrap();
+        let parsed_url = Parser::new(None).parse(&url).map_err(napi_err).unwrap();
+        let host = parsed_url
+            .host_str()
+            .ok_or_else(|| napi_err("Invalid host"))
+            .unwrap();
+        let path = format!("/{}", parsed_url.path.unwrap_or_default().join("/"));
+        let instant_now = Instant::now();
 
-            let mut last_entry_lock = last_entry.lock().unwrap();
-            let mut unregistered_lock = unregistered_duration.lock().unwrap();
+        let mut last_entry_lock = last_entry.lock().unwrap();
+        let mut unregistered_lock = unregistered_duration.lock().unwrap();
 
-            if let Some(ref last) = *last_entry_lock {
-                let duration = instant_now.duration_since(last.instant).as_millis() as i64;
+        if let Some(ref last) = *last_entry_lock {
+            let duration = instant_now.duration_since(last.instant).as_millis() as i64;
 
-                if ALLOWED_DOMAINS.contains(host.as_str()) {
-                    if last.host == host && last.path == path {
-                        *last_entry_lock = Some(LastEntry {
-                            id: last.id,
-                            host: last.host.clone(),
-                            path: last.path.clone(),
-                            instant: instant_now,
-                        });
-                        return Ok(());
-                    }
-
-                    let total_duration = duration + *unregistered_lock;
-
-                    conn.execute(
-                        "UPDATE entries SET duration = ?1 WHERE id = ?2",
-                        params![total_duration, last.id],
-                    )
-                    .map_err(napi_err)?;
-
-                    *unregistered_lock = 0;
-
-                    conn.execute(
-                        "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, 0, ?3)",
-                        params![host, path, get_timestamp()],
-                    )
-                    .map_err(napi_err)?;
-
-                    let id = conn.last_insert_rowid();
-
-                    *last_entry_lock = Some(LastEntry {
-                        id,
-                        host,
-                        path,
-                        instant: instant_now,
-                    });
-                } else {
-                    *unregistered_lock += duration;
+            if ALLOWED_DOMAINS.contains(host.as_str()) {
+                if last.host == host && last.path == path {
                     *last_entry_lock = Some(LastEntry {
                         id: last.id,
                         host: last.host.clone(),
                         path: last.path.clone(),
                         instant: instant_now,
                     });
+                    return;
                 }
-            } else if ALLOWED_DOMAINS.contains(host.as_str()) {
+
+                let total_duration = duration + *unregistered_lock;
+
+                conn.execute(
+                    "UPDATE entries SET duration = ?1 WHERE id = ?2",
+                    params![total_duration, last.id],
+                )
+                .map_err(napi_err)
+                .unwrap();
+
+                *unregistered_lock = 0;
+
                 conn.execute(
                     "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, 0, ?3)",
                     params![host, path, get_timestamp()],
                 )
-                .map_err(napi_err)?;
+                .map_err(napi_err)
+                .unwrap();
 
                 let id = conn.last_insert_rowid();
 
@@ -152,46 +130,58 @@ pub fn set_entry(url: String) -> Result<()> {
                     instant: instant_now,
                 });
             } else {
-                *unregistered_lock = 0;
+                *unregistered_lock += duration;
+                *last_entry_lock = Some(LastEntry {
+                    id: last.id,
+                    host: last.host.clone(),
+                    path: last.path.clone(),
+                    instant: instant_now,
+                });
             }
+        } else if ALLOWED_DOMAINS.contains(host.as_str()) {
+            conn.execute(
+                "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, 0, ?3)",
+                params![host, path, get_timestamp()],
+            )
+            .map_err(napi_err)
+            .unwrap();
 
-            Ok(())
-        })() {
-            eprintln!("Error in set_entry thread: {}", e);
+            let id = conn.last_insert_rowid();
+
+            *last_entry_lock = Some(LastEntry {
+                id,
+                host,
+                path,
+                instant: instant_now,
+            });
+        } else {
+            *unregistered_lock = 0;
         }
     });
-
-    Ok(())
 }
 
 #[napi]
-pub fn set_last_entry() -> Result<()> {
+pub fn set_last_entry() {
     let last_entry = &*LAST_ENTRY;
 
     spawn(move || {
-        if let Err(e) = (|| -> Result<()> {
-            let conn = establish_connection()?;
-            let now = Instant::now();
+        let conn = establish_connection().unwrap();
+        let now = Instant::now();
 
-            let mut last_entry_lock = last_entry.lock().unwrap();
-            if let Some(ref last) = *last_entry_lock {
-                let duration = now.duration_since(last.instant).as_millis() as i64;
+        let mut last_entry_lock = last_entry.lock().unwrap();
+        if let Some(ref last) = *last_entry_lock {
+            let duration = now.duration_since(last.instant).as_millis() as i64;
 
-                conn.execute(
-                    "UPDATE entries SET duration = COALESCE(duration, 0) + ?1 WHERE id = ?2",
-                    params![duration, last.id],
-                )
-                .map_err(napi_err)?;
-            }
-
-            *last_entry_lock = None;
-            Ok(())
-        })() {
-            eprintln!("Error in set_last_entry thread: {}", e);
+            conn.execute(
+                "UPDATE entries SET duration = COALESCE(duration, 0) + ?1 WHERE id = ?2",
+                params![duration, last.id],
+            )
+            .map_err(napi_err)
+            .unwrap();
         }
-    });
 
-    Ok(())
+        *last_entry_lock = None;
+    });
 }
 
 #[napi(object)]

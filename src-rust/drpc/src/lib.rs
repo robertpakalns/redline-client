@@ -1,6 +1,6 @@
 use discord_rich_presence::{
     DiscordIpc, DiscordIpcClient,
-    activity::{self, Activity, Button, Timestamps},
+    activity::{Activity, Assets, Button, Timestamps},
 };
 use napi::{Error, Result};
 use napi_derive::napi;
@@ -63,16 +63,16 @@ fn napi_err<E: std::fmt::Display>(e: E) -> Error {
 }
 
 #[napi]
-pub fn init(join_btn: bool, initial_url: String) -> Result<()> {
+pub fn init(join_btn: bool, initial_url: String) {
     let client_id = "1385893715519864933";
 
     let mut instance = INSTANCE.lock().unwrap();
     if instance.is_some() {
-        return Err(napi_err("DRPC already initialized."));
+        return;
     }
 
     let drpc = Arc::new(Mutex::new(Drpc {
-        client: DiscordIpcClient::new(&client_id).map_err(napi_err)?,
+        client: DiscordIpcClient::new(&client_id).map_err(napi_err).unwrap(),
         start_ts: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
@@ -88,35 +88,21 @@ pub fn init(join_btn: bool, initial_url: String) -> Result<()> {
 
     {
         let mut drpc_lock = drpc.lock().unwrap();
-        set_status_internal(&mut drpc_lock, &initial_url)?;
+        set_status_internal(&mut drpc_lock, &initial_url).unwrap();
     }
 
     spawn(move || {
-        if let Err(e) = drpc_thread.lock().unwrap().client.connect() {
-            eprintln!("Failed to connect to Discord: {}", e);
-            return;
-        }
+        drpc_thread.lock().unwrap().client.connect().unwrap();
 
-        if let Err(e) = update_activity(&mut drpc_thread.lock().unwrap()) {
-            eprintln!("Failed to set initial activity: {}", e);
-            return;
-        }
+        update_activity(&mut drpc_thread.lock().unwrap());
 
         loop {
-            {
-                let mut drpc = drpc_thread.lock().unwrap();
-                if let Err(e) = update_activity(&mut drpc) {
-                    eprintln!("Failed to update activity: {}", e);
-                    break;
-                }
-            }
-
+            update_activity(&mut drpc_thread.lock().unwrap());
             sleep(Duration::from_secs(15));
         }
     });
 
     *instance = Some(drpc);
-    Ok(())
 }
 
 fn set_status_internal(drpc: &mut Drpc, url: &str) -> Result<()> {
@@ -124,7 +110,7 @@ fn set_status_internal(drpc: &mut Drpc, url: &str) -> Result<()> {
     let host = parsed_url
         .host_str()
         .ok_or_else(|| napi_err("Invalid host"))?;
-    let path = format!("{}", parsed_url.path.unwrap_or_default().join("/"));
+    let path = format!("/{}", parsed_url.path.unwrap_or_default().join("/"));
 
     drpc.state = if path.starts_with("/games") {
         let server = path
@@ -173,15 +159,13 @@ pub fn set_status(url: String) -> Result<()> {
     let drpc_clone = drpc.clone();
 
     spawn(move || {
-        if let Err(e) = set_status_internal(&mut drpc_clone.lock().unwrap(), &url) {
-            eprintln!("Failed to update status: {}", e);
-        }
+        set_status_internal(&mut drpc_clone.lock().unwrap(), &url).ok();
     });
 
     Ok(())
 }
 
-fn update_activity(drpc: &mut Drpc) -> Result<()> {
+fn update_activity(drpc: &mut Drpc) {
     let mut buttons = vec![Button::new(
         "Download Client",
         "https://github.com/robertpakalns/redline-client/releases/latest",
@@ -201,9 +185,7 @@ fn update_activity(drpc: &mut Drpc) -> Result<()> {
         .details(&drpc.details)
         .timestamps(Timestamps::new().start(drpc.start_ts))
         .buttons(buttons)
-        .assets(activity::Assets::new().large_image("redline"));
+        .assets(Assets::new().large_image("redline"));
 
-    drpc.client.set_activity(act).map_err(napi_err)?;
-
-    Ok(())
+    drpc.client.set_activity(act).map_err(napi_err).unwrap();
 }
