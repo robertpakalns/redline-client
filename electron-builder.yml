@@ -54,4 +54,5 @@ nsis:
   differentialPackage: false
 
 dmg:
- writeUpdateInfo: false
+  writeUpdateInfo: false
+  background: "assets/background.tiff"

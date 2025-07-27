@@ -1,6 +1,5 @@
 {
-    "napi": {
-        "name": "drpc",
-        "js": "index.cjs"
-    }
+  "napi": {
+    "name": "drpc"
+  }
 }
