@@ -1,5 +1,5 @@
 import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils.js"
-import { getBadges, getUser, mainMenuBadge, profileMenuBadge } from "./badges.js"
+import { getBadges, getUser, mainMenuBadge, profileMenuBadge, gameLeaderboardBadges } from "./badges.js"
 import { fromRoot, createEl, domains } from "../utils/functions.js"
 import { Config, defaultConfig } from "../utils/config.js"
 import { ipcRenderer, contextBridge } from "electron"
@@ -61,7 +61,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     const app: HTMLElement | null = document.getElementById("app")
     if (!app) return
 
-    // Badges
     await getUser()
     await getBadges()
 
@@ -89,7 +88,10 @@ window.addEventListener("DOMContentLoaded", async () => {
             profileMenuBadge(profileCont)
         }
 
-        const playerCont = app.querySelector(".player-cont") as HTMLElement
+        const gameLeaderboardCont = app.querySelector(".tab-team-info") as HTMLElement
+        if (gameLeaderboardCont) gameLeaderboardBadges(gameLeaderboardCont)
+
+        const playerCont = app.querySelector("#team-section > .player-cont") as HTMLElement
         if (playerCont) mainMenuBadge(playerCont)
 
         if (app.querySelector("#left-icons") && !app.querySelector("#left-icons")?.querySelector(".clientModalHint"))
