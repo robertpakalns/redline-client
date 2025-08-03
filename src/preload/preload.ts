@@ -1,4 +1,5 @@
 import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils.js"
+import { getBadges, getUser, mainMenuBadge, profileMenuBadge } from "./badges.js"
 import { fromRoot, createEl, domains } from "../utils/functions.js"
 import { Config, defaultConfig } from "../utils/config.js"
 import { ipcRenderer, contextBridge } from "electron"
@@ -45,7 +46,7 @@ const appendStyles = () => {
     document.head.append(modalStyles, clientStyles, fastCSSStyles)
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
     (window as any).trustedTypes.createPolicy("default", { createHTML: (html: string) => html })
 
     backToKirka()
@@ -60,6 +61,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const app: HTMLElement | null = document.getElementById("app")
     if (!app) return
 
+    // Badges
+    await getUser()
+    await getBadges()
+
     // Modal hint
     const _hint = createEl("div", {}, "clientModalHint", [`Press ${keybinding.MenuModal} to open menu`])
 
@@ -73,11 +78,19 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Observers
     const appObserver = new MutationObserver(() => {
+        appObserver.disconnect()
+
         const logoCont = app.querySelector("img.logo#logo") as HTMLImageElement
         if (logoCont) changeLogo(logoCont)
 
         const profileCont = app.querySelector(".profile-cont") as HTMLElement
-        if (profileCont) setTrickoLink(profileCont)
+        if (profileCont) {
+            setTrickoLink(profileCont)
+            profileMenuBadge(profileCont)
+        }
+
+        const playerCont = app.querySelector(".player-cont") as HTMLElement
+        if (playerCont) mainMenuBadge(playerCont)
 
         if (app.querySelector("#left-icons") && !app.querySelector("#left-icons")?.querySelector(".clientModalHint"))
             app.querySelector("#left-icons")?.appendChild(_hint)
@@ -90,6 +103,8 @@ window.addEventListener("DOMContentLoaded", () => {
             kdrObserver.observe(kdrCont, { childList: true, subtree: true, characterData: true })
         }
 
+
+        appObserver.observe(app, { childList: true, subtree: true })
     })
     appObserver.observe(app, { childList: true, subtree: true })
 
