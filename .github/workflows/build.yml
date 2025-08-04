@@ -38,6 +38,8 @@ jobs:
           fi
 
       - run: npm i --ignore-scripts
+      - if: matrix.os == 'macos-latest'
+        run: npm i dmg-license # macOS only
 
       - uses: dtolnay/rust-toolchain@stable
 
