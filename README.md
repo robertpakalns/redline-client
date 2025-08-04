@@ -70,6 +70,8 @@ Redline Client uses `redline:` protocol to open the client. For example, `redlin
 * Menu Modal (`F1`)
 * Popup Messages
 * Proxy Domains Support
+* Public Customizations
+  * Badges
 * Tricko Links in Player Modals
 
 ## 🖼️ Menu Modal
@@ -87,7 +89,7 @@ To use the swapper:
 * xip for Kirka.io
 * Voxtulate Client (robertpakalns) for core features
 * Juice Client (irrvlo) for additional features
-* PVT and CarrySheriff for the client assets
+* PVT, CarrySheriff, and Lightbulb for the client assets
 * slavcp for enject
 
 In partnership with Kirka.io clan [`ImOn_Smoko`](https://discord.gg/BBchaJvZVU)

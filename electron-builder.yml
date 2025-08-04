@@ -10,6 +10,8 @@ electronLanguages:
 
 files:
   - "ts-dist/**/*"
+  - "assets/**/*"
+  - "src-rust/**/*.node"
   - "!**/locales/*"
   - "!**/*.pak"
   - "!**/ffmpeg.dll"
