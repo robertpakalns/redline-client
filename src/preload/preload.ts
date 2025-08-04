@@ -1,5 +1,5 @@
+import { getBadges, getUser, mainMenuBadge, profileMenuBadge, gameTDMBadges, gameDMBadges, escGameBadges, incomingFriendsBadges } from "./badges.js"
 import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils.js"
-import { getBadges, getUser, mainMenuBadge, profileMenuBadge, gameLeaderboardBadges } from "./badges.js"
 import { fromRoot, createEl, domains } from "../utils/functions.js"
 import { Config, defaultConfig } from "../utils/config.js"
 import { ipcRenderer, contextBridge } from "electron"
@@ -88,8 +88,20 @@ window.addEventListener("DOMContentLoaded", async () => {
             profileMenuBadge(profileCont)
         }
 
-        const gameLeaderboardCont = app.querySelector(".tab-team-info") as HTMLElement
-        if (gameLeaderboardCont) gameLeaderboardBadges(gameLeaderboardCont)
+        const incomingFriendsCont = app.querySelector(".view .friends") as HTMLElement
+        if (incomingFriendsCont) {
+            incomingFriendsBadges(incomingFriendsCont, "requests")
+            incomingFriendsBadges(incomingFriendsCont, "list")
+        }
+
+        const TDMCont = app.querySelector(".tab-team-info") as HTMLElement
+        if (TDMCont) gameTDMBadges(TDMCont)
+        const DMCont = app.querySelector(".tab-info") as HTMLElement
+        console.log(DMCont)
+        if (DMCont) gameDMBadges(DMCont)
+
+        const escPlayersCont = app.querySelector(".game-interface .left-container") as HTMLElement
+        if (escPlayersCont) escGameBadges(escPlayersCont)
 
         const playerCont = app.querySelector("#team-section > .player-cont") as HTMLElement
         if (playerCont) mainMenuBadge(playerCont)
