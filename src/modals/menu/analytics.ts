@@ -1,6 +1,6 @@
 import { Chart, PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController } from "chart.js"
 import { getAllData } from "../../../src-rust/analytics/index.js"
-import { formatDuration, output } from "../../utils/functions.js"
+import { createEl, formatDuration, output } from "../../utils/functions.js"
 import type { TooltipItem } from "chart.js"
 
 Chart.register(PieController, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController)
@@ -14,8 +14,9 @@ const generateColors = (arr: string[], i: number): { bg: string, border: string 
 }
 
 const createPieChart = (
+    cont: HTMLElement,
     obj: object,
-    id: string,
+    label: string,
     labelCallback: (tooltipItem: TooltipItem<"pie">) => string | void | string[]
 ): void => {
     const labels = Object.keys(obj)
@@ -23,7 +24,14 @@ const createPieChart = (
 
     const colors = labels.map((_, i) => generateColors(labels, i))
 
-    const ctx = (document.getElementById(id) as HTMLCanvasElement)?.getContext("2d")
+    const chartCont = createEl("div", {}, "chartBlock") as HTMLElement
+    const canvas = createEl("canvas", {}, "pie-chart") as HTMLCanvasElement
+
+    const labelCont = createEl("h1", {}, "", [label])
+
+    chartCont.append(labelCont, canvas)
+    cont.appendChild(chartCont)
+    const ctx = canvas?.getContext("2d")
 
     const existingChart = Chart.getChart(ctx!)
     if (existingChart) existingChart.destroy()
@@ -113,7 +121,7 @@ const setValues = (totalTimeSpent = 0, totalGameTimeSpent = 0, totalGamesPlayed 
     document.getElementById("totalGamesPlayed")!.textContent = totalGamesPlayed.toString()
 }
 
-const createAnalyticsSection = async () => {
+const createAnalyticsSection = async (cont: HTMLElement) => {
     const data = getAllData()
 
     setValues(data.totalTimeSpent, data.totalGameTimeSpent, data.totalGamesPlayed)
@@ -121,13 +129,13 @@ const createAnalyticsSection = async () => {
     // Last week activity
     lastWeekChart(data.weekData)
     // Time spent on proxies
-    createPieChart(data.timeSpentPerHost, "durationByHostChart", (el: any) => formatDuration(el.raw))
+    createPieChart(cont, data.timeSpentPerHost, "Time Spent on Proxies", (el: any) => formatDuration(el.raw))
     // Time spent on regions
-    createPieChart(data.timeSpentPerRegion, "durationByRegionChart", (el: any) => formatDuration(el.raw))
+    createPieChart(cont, data.timeSpentPerRegion, "Time Spent on Regions", (el: any) => formatDuration(el.raw))
     // Played matches on regions
-    createPieChart(data.entriesPerRegion, "playedMatchesByRegionChart", (el: any) => el.raw)
+    createPieChart(cont, data.entriesPerRegion, "Played matches on Regions", (el: any) => el.raw)
 
-    document.getElementById("updateAnalyticsData")?.addEventListener("click", createAnalyticsSection)
+    document.getElementById("updateAnalyticsData")?.addEventListener("click", () => createAnalyticsSection(cont))
 }
 
 export default createAnalyticsSection

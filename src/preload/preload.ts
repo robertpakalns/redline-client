@@ -100,7 +100,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         const TDMCont = app.querySelector(".tab-team-info") as HTMLElement
         if (TDMCont) gameTDMBadges(TDMCont)
         const DMCont = app.querySelector(".tab-info") as HTMLElement
-        console.log(DMCont)
         if (DMCont) gameDMBadges(DMCont)
 
         const escPlayersCont = app.querySelector(".game-interface .left-container") as HTMLElement

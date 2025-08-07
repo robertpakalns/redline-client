@@ -55,7 +55,7 @@ class MenuModal extends Modal {
             // Load sections only when needed
             switch (targetDiv?.getAttribute("name")) {
                 case "changelogSection": createChangelogSection(); break
-                case "analyticsSection": createAnalyticsSection(); break
+                case "analyticsSection": createAnalyticsSection(targetDiv); break
                 case "settingsSection": createSettingsSection(targetDiv); break
                 case "customizationSection": createCustomizationSection(targetDiv); break
                 case "userscriptsSection": createUserscriptsSection(); break
