@@ -83,6 +83,31 @@ export const changeLogo = (cont: HTMLImageElement): void => {
     cont.src = "redline://?path=assets/logo.png"
 }
 
+export const changeSocLinks = (cont: HTMLElement): void => {
+    const btn = document.querySelectorAll(".card-cont.soc-group")[1]
+    if (!btn || document.querySelector("#redline-discord")) return
+
+    const discordBtn = btn.cloneNode(true) as HTMLButtonElement
+    discordBtn.id = "redline-discord"
+    discordBtn.className = "card-cont soc-group"
+
+    const textDivs = Array.from(discordBtn.querySelector(".text-soc")!.children) as HTMLLinkElement[]
+    textDivs[0].innerText = "REDLINE"
+    textDivs[1].innerText = "DOWNLOAD"
+
+    const useEl = discordBtn.querySelector("svg use")!;
+    useEl.setAttribute("href", "redline://?path=assets/icons/download.svg");
+
+
+    discordBtn.onclick = () => shell.openExternal("https://tricko.pro/redline")
+
+    btn.replaceWith(discordBtn)
+
+    // setInterval(() => {
+    //     discordBtn.className = "card-cont soc-group"
+    // }, 300)
+}
+
 export const createKDRatio = (cont: HTMLElement): void => {
     if (!cont) return
 

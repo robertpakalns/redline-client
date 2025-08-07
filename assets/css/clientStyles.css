@@ -58,6 +58,14 @@
     display: flex !important;
 }
 
+#redline-discord {
+    background: url("redline://?path=assets/icons/icon.svg") no-repeat center !important;
+    background-size: 100% !important;
+    border-bottom-color: #121415 !important;
+    border-top-color: #D0322B !important;
+    border-right-color: #5B1616 !important;
+}
+
 /* Popup message */
 #clientPopup {
     padding: 10px;

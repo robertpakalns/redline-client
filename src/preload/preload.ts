@@ -1,5 +1,5 @@
 import { getBadges, getUser, mainMenuBadge, profileMenuBadge, gameTDMBadges, gameDMBadges, escGameBadges, incomingFriendsBadges } from "./badges.js"
-import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio } from "./preloadUtils.js"
+import { backToKirka, setVersions, setTrickoLink, changeLogo, createKDRatio, changeSocLinks } from "./preloadUtils.js"
 import { fromRoot, createEl, domains } from "../utils/functions.js"
 import { Config, defaultConfig } from "../utils/config.js"
 import { ipcRenderer, contextBridge } from "electron"
@@ -81,6 +81,9 @@ window.addEventListener("DOMContentLoaded", async () => {
 
         const logoCont = app.querySelector("img.logo#logo") as HTMLImageElement
         if (logoCont) changeLogo(logoCont)
+
+        const socCont = app.querySelector(".settings-and-socicons") as HTMLElement
+        if (socCont) changeSocLinks(socCont)
 
         const profileCont = app.querySelector(".profile-cont") as HTMLElement
         if (profileCont) {
