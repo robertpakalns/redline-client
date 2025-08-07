@@ -84,28 +84,28 @@ export const changeLogo = (cont: HTMLImageElement): void => {
 }
 
 export const changeSocLinks = (cont: HTMLElement): void => {
-    const btn = document.querySelectorAll(".card-cont.soc-group")[1]
-    if (!btn || document.querySelector("#redline-discord")) return
+    const btns = cont.querySelectorAll(".card-cont.soc-group")
+    if (btns.length === 0 || cont.querySelector("#redline-discord") || cont.querySelector("#redline-download")) return
 
-    const discordBtn = btn.cloneNode(true) as HTMLButtonElement
-    discordBtn.id = "redline-discord"
-    discordBtn.className = "card-cont soc-group"
+    const discordButton = btns[0].cloneNode(true) as HTMLButtonElement
+    discordButton.id = "redline-discord"
+    discordButton.className = "card-cont soc-group"
+    discordButton.querySelector("svg use")!.setAttribute("href", "redline://?path=assets/icons/discord.svg")
+    discordButton.onclick = () => shell.openExternal("https://discord.gg/cTE6CVuGen")
 
-    const textDivs = Array.from(discordBtn.querySelector(".text-soc")!.children) as HTMLLinkElement[]
-    textDivs[0].innerText = "REDLINE"
-    textDivs[1].innerText = "DOWNLOAD"
+    btns[0].replaceWith(discordButton)
 
-    const useEl = discordBtn.querySelector("svg use")!;
-    useEl.setAttribute("href", "redline://?path=assets/icons/download.svg");
+    const downloadButton = btns[1].cloneNode(true) as HTMLButtonElement
+    downloadButton.id = "redline-download"
+    downloadButton.className = "card-cont soc-group"
+    downloadButton.querySelector("svg use")!.setAttribute("href", "redline://?path=assets/icons/download.svg")
+    downloadButton.onclick = () => shell.openExternal("https://tricko.pro/redline")
 
+    const texts = Array.from(downloadButton.querySelector(".text-soc")!.children) as HTMLLinkElement[]
+    texts[0].innerText = "REDLINE"
+    texts[1].innerText = "DOWNLOAD"
 
-    discordBtn.onclick = () => shell.openExternal("https://tricko.pro/redline")
-
-    btn.replaceWith(discordBtn)
-
-    // setInterval(() => {
-    //     discordBtn.className = "card-cont soc-group"
-    // }, 300)
+    btns[1].replaceWith(downloadButton)
 }
 
 export const createKDRatio = (cont: HTMLElement): void => {

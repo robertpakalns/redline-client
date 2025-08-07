@@ -58,7 +58,8 @@
     display: flex !important;
 }
 
-#redline-discord {
+#redline-discord,
+#redline-download {
     background: url("redline://?path=assets/icons/icon.svg") no-repeat center !important;
     background-size: 100% !important;
     border-bottom-color: #121415 !important;
