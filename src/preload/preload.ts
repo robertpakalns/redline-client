@@ -6,7 +6,6 @@ import {
   gameTDMBadges,
   gameDMBadges,
   escGameBadges,
-  incomingFriendsBadges,
 } from "./badges.js";
 import {
   backToKirka,
@@ -14,9 +13,9 @@ import {
   setTrickoLink,
   changeLogo,
   createKDRatio,
-  initFriendSearch,
   changeSocLinks,
 } from "./preloadUtils.js";
+import { manageFriendsPage } from "./friends.js";
 import { fromRoot, createEl, domains } from "../utils/functions.js";
 import { Config, defaultConfig } from "../utils/config.js";
 import { ipcRenderer, contextBridge } from "electron";
@@ -137,16 +136,8 @@ window.addEventListener("DOMContentLoaded", async () => {
       profileMenuBadge(profileCont);
     }
 
-    const incomingFriendsCont = app.querySelector(
-      ".view .friends",
-    ) as HTMLElement;
-    if (incomingFriendsCont) {
-      incomingFriendsBadges(incomingFriendsCont, "requests");
-      incomingFriendsBadges(incomingFriendsCont, "list");
-    }
-
     const friendsCont = app.querySelector(".container .friends") as HTMLElement;
-    if (friendsCont) initFriendSearch(friendsCont);
+    if (friendsCont) manageFriendsPage(friendsCont);
 
     const tdmCont = app.querySelector(".tab-team-info") as HTMLElement;
     if (tdmCont) gameTDMBadges(tdmCont);

@@ -152,7 +152,7 @@ export const escGameBadges = (cont: HTMLElement): void => {
   });
 };
 
-export const incomingFriendsBadges = (cont: HTMLElement, c: String): void => {
+export const setFriendBadges = (cont: HTMLElement, c: String): void => {
   const subCont = cont.querySelector(`.${c}`);
   if (!subCont) return;
 
