@@ -148,6 +148,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (TDMCont) gameTDMBadges(TDMCont);
     const DMCont = app.querySelector(".tab-info") as HTMLElement;
     if (DMCont) gameDMBadges(DMCont);
+    const ParkourCont = app.querySelector(".tab-parkour-info") as HTMLElement;
+    if (ParkourCont) gameDMBadges(ParkourCont);
 
     const escPlayersCont = app.querySelector(
       ".game-interface .left-container",
