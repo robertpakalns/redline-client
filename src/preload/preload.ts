@@ -14,6 +14,7 @@ import {
   setTrickoLink,
   changeLogo,
   createKDRatio,
+  initFriendSearch,
   changeSocLinks,
 } from "./preloadUtils.js";
 import { fromRoot, createEl, domains } from "../utils/functions.js";
@@ -144,12 +145,15 @@ window.addEventListener("DOMContentLoaded", async () => {
       incomingFriendsBadges(incomingFriendsCont, "list");
     }
 
-    const TDMCont = app.querySelector(".tab-team-info") as HTMLElement;
-    if (TDMCont) gameTDMBadges(TDMCont);
-    const DMCont = app.querySelector(".tab-info") as HTMLElement;
-    if (DMCont) gameDMBadges(DMCont);
-    const ParkourCont = app.querySelector(".tab-parkour-info") as HTMLElement;
-    if (ParkourCont) gameDMBadges(ParkourCont);
+    const friendsCont = app.querySelector(".container .friends") as HTMLElement;
+    if (friendsCont) initFriendSearch(friendsCont);
+
+    const tdmCont = app.querySelector(".tab-team-info") as HTMLElement;
+    if (tdmCont) gameTDMBadges(tdmCont);
+    const dmCont = app.querySelector(".tab-info") as HTMLElement;
+    if (dmCont) gameDMBadges(dmCont);
+    const parkourCont = app.querySelector(".tab-parkour-info") as HTMLElement;
+    if (parkourCont) gameDMBadges(parkourCont);
 
     const escPlayersCont = app.querySelector(
       ".game-interface .left-container",
