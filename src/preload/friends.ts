@@ -6,17 +6,17 @@ const filterFriends = (cont: HTMLElement, search: string): void => {
   const list = cont.querySelector(".list") || cont.querySelector(".requests");
   if (!list) return;
 
-  const friends = Array.from(list.querySelectorAll<HTMLElement>(".friend"));
+  const friends = list.querySelectorAll<HTMLElement>(".friend");
 
-  friends.forEach((el) => {
-    const friendId =
+  for (const el of Array.from(friends)) {
+    const shortId =
       el.querySelector(".friend-id")?.textContent?.toLowerCase() || "";
-    const nickname =
+    const name =
       el.querySelector(".nickname")?.textContent?.toLowerCase() || "";
 
     el.style.display =
-      friendId.includes(query) || nickname.includes(query) ? "" : "none";
-  });
+      shortId.includes(query) || name.includes(query) ? "" : "none";
+  }
 };
 
 const searchFriends = (cont: HTMLElement): void => {

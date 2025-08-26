@@ -1,21 +1,32 @@
 import { createEl } from "../utils/functions.js";
 
-const linkedBadge = () =>
+const linkedBadge = (): HTMLElement =>
   createEl(
     "img",
     { src: "redline://?path=assets/icons/badges/linked.png" },
     "redlineBadge",
   );
 
-let badgesCache: Object[] = [];
+const addBadges = (cont: HTMLElement, shortId: string): void => {
+  if (!cont) return;
+
+  let user = badgesMap.get(shortId);
+  if (!user) return;
+
+  cont.appendChild(linkedBadge());
+};
+
+let badgesMap: Map<string, any> = new Map();
+
 export const getBadges = async () => {
-  badgesCache = await fetch("https://redline.tricko.pro/get_data").then((r) =>
-    r.json(),
-  );
+  const response = await fetch("https://redline.tricko.pro/get_data");
+  const data = await response.json();
+
+  badgesMap = new Map(data.map((u: any) => [u.short_id, u]));
 };
 
 let userCache: Object = {};
-let shortIdCache: String = "";
+let shortIdCache: string = "";
 export const getUser = async () => {
   userCache = await fetch(`https://api.kirka.io/api/user`, {
     headers: {
@@ -34,24 +45,20 @@ export const profileMenuBadge = (cont: HTMLElement): void => {
   if (!shortIdCont) return;
 
   const shortId = shortIdCont.innerHTML.replace("#", "");
-  const user = badgesCache.find((el: any) => el.short_id === shortId);
-  if (!user) return;
+  const nameCont = cont.querySelector(".you .nickname") as HTMLElement;
 
-  const nameCont = cont.querySelector(".you .nickname")!;
-  if (!nameCont) return;
-
-  nameCont.appendChild(linkedBadge());
+  addBadges(nameCont, shortId);
 };
 
 export const mainMenuBadge = (cont: HTMLElement): void => {
-  cont.querySelectorAll("div")?.forEach((el: HTMLElement) => {
-    if (cont.querySelector(".redlineBadge")) return;
+  const divs = cont.querySelectorAll("div");
 
-    const user = badgesCache.find((el: any) => el.short_id === shortIdCache);
-    if (!user) return;
+  for (const el of Array.from(divs)) {
+    if (cont.querySelector(".redlineBadge")) continue;
 
-    el.querySelector(".nickname")!.appendChild(linkedBadge());
-  });
+    const nameCont = el.querySelector(".nickname") as HTMLElement;
+    addBadges(nameCont, shortIdCache);
+  }
 };
 
 export const gameTDMBadges = (cont: HTMLElement): void => {
@@ -61,111 +68,96 @@ export const gameTDMBadges = (cont: HTMLElement): void => {
 
   const allContainers = [leftCont, rightCont];
 
-  allContainers.forEach((cont) =>
-    cont.querySelectorAll(".player-cont").forEach((el: any) => {
-      const shortIdCont = el.querySelector(".short-id");
-      const playerLeft = el.querySelector(".player-left");
-      if (!playerLeft) return;
-
-      const oldBadge = playerLeft.querySelector(".redlineBadge");
-
-      if (!shortIdCont) {
-        if (oldBadge) oldBadge.remove();
-        return;
-      }
+  for (const container of allContainers) {
+    const players = container.querySelectorAll(".player-cont");
+    for (const el of Array.from(players)) {
+      const shortIdCont = el.querySelector(".short-id") as HTMLElement | null;
+      if (!shortIdCont) continue;
 
       const shortId = shortIdCont.textContent?.replace("#", "");
-      if (!shortId) {
+      const playerLeft = el.querySelector(".player-left");
+      if (!playerLeft) continue;
+
+      const oldBadge = playerLeft.querySelector(".redlineBadge");
+      const user = shortId ? badgesMap.get(shortId) : null;
+
+      if (user) {
+        if (!oldBadge) playerLeft.appendChild(linkedBadge());
+      } else {
         if (oldBadge) oldBadge.remove();
-        return;
       }
-
-      const user = badgesCache.find((u: any) => u.short_id === shortId);
-
-      if (!user) {
-        if (oldBadge) oldBadge.remove();
-        return;
-      }
-
-      if (!oldBadge) playerLeft.appendChild(linkedBadge());
-    }),
-  );
+    }
+  }
 };
 
 export const gameDMBadges = (cont: HTMLElement): void => {
-  cont.querySelectorAll(".player-cont").forEach((el: any) => {
-    const shortIdCont = el.querySelector(".short-id");
-    const playerLeft = el.querySelector(".player-left");
-    if (!playerLeft) return;
+  const players = cont.querySelectorAll(".player-cont");
 
-    const oldBadge = playerLeft.querySelector(".redlineBadge");
-
-    if (!shortIdCont) {
-      if (oldBadge) oldBadge.remove();
-      return;
-    }
+  for (const el of Array.from(players)) {
+    const shortIdCont = el.querySelector(".short-id") as HTMLElement | null;
+    if (!shortIdCont) continue;
 
     const shortId = shortIdCont.textContent?.replace("#", "");
-    if (!shortId) {
+    const playerLeft = el.querySelector(".player-left");
+    if (!playerLeft) continue;
+
+    const oldBadge = playerLeft.querySelector(".redlineBadge");
+    const user = shortId ? badgesMap.get(shortId) : null;
+
+    if (user) {
+      if (!oldBadge) playerLeft.appendChild(linkedBadge());
+    } else {
       if (oldBadge) oldBadge.remove();
-      return;
     }
-
-    const user = badgesCache.find((u: any) => u.short_id === shortId);
-
-    if (!user) {
-      if (oldBadge) oldBadge.remove();
-      return;
-    }
-
-    if (!oldBadge) playerLeft.appendChild(linkedBadge());
-  });
+  }
 };
 
 export const escGameBadges = (cont: HTMLElement): void => {
   const playerCont = cont.querySelectorAll(".player-cont");
   if (!playerCont) return;
 
-  playerCont.forEach((el: any) => {
-    const shortIdEl = el.querySelector(".short-id") as HTMLElement;
-    const nicknameEl = el.querySelector(".nickname") as HTMLElement;
+  for (const el of Array.from(playerCont)) {
+    const shortIdEl = el.querySelector(".short-id") as HTMLElement | null;
+    const nicknameEl = el.querySelector(".nickname") as HTMLElement | null;
     const existingBadge = el.querySelector(".redlineBadge");
 
     if (!shortIdEl || !nicknameEl) {
       if (existingBadge) existingBadge.remove();
-      return;
+      continue;
     }
 
     const shortId = shortIdEl.textContent?.replace("#", "");
     if (!shortId) {
       if (existingBadge) existingBadge.remove();
-      return;
+      continue;
     }
 
-    const user = badgesCache.find((u: any) => u.short_id === shortId);
+    const user = badgesMap.get(shortId);
     if (!user) {
       if (existingBadge) existingBadge.remove();
-      return;
+      continue;
     }
 
     if (!existingBadge) nicknameEl.appendChild(linkedBadge());
-  });
+  }
 };
 
-export const setFriendBadges = (cont: HTMLElement, c: String): void => {
+export const setFriendBadges = (cont: HTMLElement, c: string): void => {
   const subCont = cont.querySelector(`.${c}`);
   if (!subCont) return;
 
-  subCont.querySelectorAll(".friend").forEach((el: any) => {
-    if (el.querySelector(".redlineBadge")) return;
+  const friends = subCont.querySelectorAll(".friend");
 
-    const shortIdCont = el.querySelector(".friend-id");
-    if (!shortIdCont) return;
+  for (const el of Array.from(friends)) {
+    if (el.querySelector(".redlineBadge")) continue;
+
+    const shortIdCont = el.querySelector(".friend-id") as HTMLElement | null;
+    if (!shortIdCont) continue;
 
     const shortId = shortIdCont.textContent;
-    const user = badgesCache.find((u: any) => u.short_id === shortId);
-    if (!user) return;
+    const nameCont = el.querySelector(".nickname") as HTMLElement;
+    if (!nameCont) continue;
 
-    el.querySelector(".nickname")!.appendChild(linkedBadge());
-  });
+    addBadges(nameCont, shortId);
+  }
 };
