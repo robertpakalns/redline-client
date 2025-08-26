@@ -1,30 +1,38 @@
 <div class="modal">
     <div id="menuWrapper">
-
         <div id="menuSideBar">
-
             <div id="menuHeader">
-                <img id="redlineIcon">
+                <img id="redlineIcon" />
                 <header>Redline Client</header>
             </div>
 
             <div id="menuSideBarList">
-                <button id="settingsSection" class="sideBarItem list-el">Settings</button>
-                <button id="customizationSection" class="sideBarItem list-el">Customizations</button>
-                <button id="changelogSection" class="sideBarItem list-el">Changelog</button>
-                <button id="infoSection" class="sideBarItem list-el">Info</button>
-                <button id="userscriptsSection" class="sideBarItem list-el">Userscripts</button>
-                <button id="analyticsSection" class="sideBarItem list-el">Analytics</button>
+                <button id="settingsSection" class="sideBarItem list-el">
+                    Settings
+                </button>
+                <button id="customizationSection" class="sideBarItem list-el">
+                    Customizations
+                </button>
+                <button id="changelogSection" class="sideBarItem list-el">
+                    Changelog
+                </button>
+                <button id="infoSection" class="sideBarItem list-el">
+                    Info
+                </button>
+                <button id="userscriptsSection" class="sideBarItem list-el">
+                    Userscripts
+                </button>
+                <button id="analyticsSection" class="sideBarItem list-el">
+                    Analytics
+                </button>
             </div>
 
             <div class="sideBarFooter">
                 <div id="clientVersion"></div>
             </div>
-
         </div>
 
         <div id="menuMainContent">
-
             <div class="mainContentBlock" name="settingsSection">
                 <header>Settings</header>
 
@@ -34,7 +42,7 @@
                     <h1>Fast Join</h1>
                     <div class="content">
                         <button id="joinLink">Join</button>
-                        <input type="url" id="joinLinkURL">
+                        <input type="url" id="joinLinkURL" />
                     </div>
                     <div class="content">
                         <div class="copy" id="currentURL"></div>
@@ -51,20 +59,25 @@
                 <div class="block">
                     <h1>Import/Export Settings</h1>
                     <div class="content">
-                        <button class="btn" id="importClientSettings">Import</button> |
-                        <button class="btn" id="exportClientSettings">Export</button>
+                        <button class="btn" id="importClientSettings">
+                            Import
+                        </button>
+                        |
+                        <button class="btn" id="exportClientSettings">
+                            Export
+                        </button>
                         <div>Client Settings</div>
                     </div>
                 </div>
 
                 <footer>
-                    <button id="relaunch" class="warning">Relaunch Client</button>
+                    <button id="relaunch" class="warning">
+                        Relaunch Client
+                    </button>
                 </footer>
-
             </div>
 
             <div class="mainContentBlock" name="customizationSection">
-
                 <header>Customizations</header>
 
                 <div class="settingsCont"></div>
@@ -81,28 +94,42 @@
 
                 <div class="content">
                     <div>Fast CSS URL</div>
-                    <input type="url" id="fastCSSURL">
+                    <input type="url" id="fastCSSURL" />
                 </div>
                 <div class="content">
-                    <textarea id="fastCSSValue" placeholder="Write your CSS here..."></textarea>
+                    <textarea
+                        id="fastCSSValue"
+                        placeholder="Write your CSS here..."
+                    ></textarea>
                 </div>
 
                 <div class="block">
                     To use the swapper:
                     <ol>
-                        <li>Make sure you enabled it in the menu modal Settings section</li>
-                        <li>Get the file URL you want to swap and extract only the file name and extension</li>
-                        <li>Open the <a href="#" id="swapperFolder">swapper folder</a> and place the file there</li>
+                        <li>
+                            Make sure you enabled it in the menu modal Settings
+                            section
+                        </li>
+                        <li>
+                            Get the file URL you want to swap and extract only
+                            the file name and extension
+                        </li>
+                        <li>
+                            Open the
+                            <a href="#" id="swapperFolder">swapper folder</a>
+                            and place the file there
+                        </li>
                         <li>Reload the client to apply changes</li>
                         <li>
-                            <a class="url"
-                                href="https://github.com/robertpakalns/VoxtulateClient/wiki/Resource-Swapper">
+                            <a
+                                class="url"
+                                href="https://github.com/robertpakalns/VoxtulateClient/wiki/Resource-Swapper"
+                            >
                                 Example with Voxtulate Client (Extended Swapper)
                             </a>
                         </li>
                     </ol>
                 </div>
-
             </div>
 
             <div class="mainContentBlock" name="changelogSection">
@@ -119,10 +146,15 @@
                     <p>Redline Client is an unofficial Kirka.io client.</p>
                     <h4>Features</h4>
                     <ul>
-                        <li>Adblocker</li>
                         <li>Analytics</li>
-                        <li>Changelog</li>
-                        <li>Client, OS, and Engine Stats in-game</li>
+                        <li>Client</li>
+                        <ul>
+                            <li>Deeplinks (redline: Protocol)</li>
+                            <li>Discord Rich Presence</li>
+                            <li>FPS Uncap (Windows Only)</li>
+                            <li>Import/Export Client Settings</li>
+                            <li>Proxy Domains Support</li>
+                        </ul>
                         <li>Customizations</li>
                         <ul>
                             <li>Custom Keybinding</li>
@@ -131,59 +163,81 @@
                             <li>Userstyles</li>
                             <li>Resource Swapper</li>
                         </ul>
-                        <li>Deeplinks (redline: Protocol)</li>
-                        <li>Discord Rich Presence</li>
-                        <li>FPS Uncap (Windows Only)</li>
-                        <li>Import/Export Client Settings</li>
-                        <li>Menu Modal (F1)</li>
-                        <li>Popup Messages</li>
-                        <li> Public Customizations</li>
+                        <li>User Customizations</li>
                         <ul>
                             <li>Badges</li>
+                            <li>Login System</li>
                         </ul>
-                        <li>Proxy Domain Support</li>
-                        <li>Tricko Links in Player Modals</li>
+                        <li>User Interface</li>
+                        <ul>
+                            <li>Changelog</li>
+                            <li>Client, OS, and Engine Stats in-game</li>
+                            <li>(Incoming) Friend Search</li>
+                            <li>Tricko Links in Player Modals</li>
+                        </ul>
                     </ul>
                 </div>
 
                 <div class="block">
                     <header>Client Safety</header>
-                    This project is open-source. All Redline Client source code is publicly available in the
-                    <a class="url" href="https://github.com/robertpakalns/redline-client">GitHub repository</a>.
-                    All builds are executed via GitHub Actions. If you have concerns about the safety of your
-                    private information while using Redline Client, feel free to inspect the source code. Trust in
-                    the client is based on trust in the developer. <a class="url"
-                        href="https://github.com/robertpakalns/redline-client/blob/main/PRIVACY.md">Privacy Policy</a>
+                    This project is open-source. All Redline Client source code
+                    is publicly available in the
+                    <a
+                        class="url"
+                        href="https://github.com/robertpakalns/redline-client"
+                        >GitHub repository</a
+                    >. All builds are executed via GitHub Actions. If you have
+                    concerns about the safety of your private information while
+                    using Redline Client, feel free to inspect the source code.
+                    Trust in the client is based on trust in the developer.
+                    <a
+                        class="url"
+                        href="https://github.com/robertpakalns/redline-client/blob/main/PRIVACY.md"
+                        >Privacy Policy</a
+                    >
                 </div>
 
                 <div class="block">
                     <header>Credits</header>
                     <ul>
                         <li>xip for Kirka.io</li>
-                        <li>Voxtulate Client (robertpakalns) for core features</li>
+                        <li>
+                            Voxtulate Client (robertpakalns) for core features
+                        </li>
                         <li>Juice Client (irrvlo) for additional features</li>
-                        <li>PVT, CarrySheriff, and Lightbulb for the client assets</li>
+                        <li>
+                            PVT, CarrySheriff, and Lightbulb for the client
+                            assets
+                        </li>
                     </ul>
-                    <p>In partnership with Kirka clan
-                        <a class="url" href="https://discord.gg/BBchaJvZVU">ImOn_Smoko</a>
+                    <p>
+                        In partnership with Kirka clan
+                        <a class="url" href="https://discord.gg/BBchaJvZVU"
+                            >ImOn_Smoko</a
+                        >
                     </p>
                 </div>
 
                 <footer>
                     <button>
-                        <a href="https://github.com/robertpakalns" class="url">by robertpakalns</a>
+                        <a href="https://github.com/robertpakalns" class="url"
+                            >by robertpakalns</a
+                        >
                     </button>
                     <button>
-                        <a href="https://discord.gg/cTE6CVuGen" class="url">Community Server</a>
+                        <a href="https://discord.gg/cTE6CVuGen" class="url"
+                            >Community Server</a
+                        >
                     </button>
                     <button>
-                        <a href="https://discord.gg/yPjrUrvSzv" class="url">Powered by Tricko</a>
+                        <a href="https://discord.gg/yPjrUrvSzv" class="url"
+                            >Powered by Tricko</a
+                        >
                     </button>
                 </footer>
             </div>
 
             <div class="mainContentBlock" name="userscriptsSection">
-
                 <header>Userscripts</header>
 
                 <div class="settingsCont"></div>
@@ -197,8 +251,16 @@
                 <div class="block">
                     To use the userscripts:
                     <ol>
-                        <li>Open the <a href="#" id="userscriptsFolder">userscripts folder</a></li>
-                        <li>Put there your scripts. Make sure the files are ending with the .js extension!</li>
+                        <li>
+                            Open the
+                            <a href="#" id="userscriptsFolder"
+                                >userscripts folder</a
+                            >
+                        </li>
+                        <li>
+                            Put there your scripts. Make sure the files are
+                            ending with the .js extension!
+                        </li>
                         <li>Reload the client to apply changes</li>
                     </ol>
                 </div>
@@ -207,12 +269,19 @@
                     To use the userstyles:
 
                     <ol>
-                        <li>Open the <a href="#" id="userstylesFolder">userstyles folder</a></li>
-                        <li>Put there your styles. Make sure the files are ending with the .css extension!</li>
+                        <li>
+                            Open the
+                            <a href="#" id="userstylesFolder"
+                                >userstyles folder</a
+                            >
+                        </li>
+                        <li>
+                            Put there your styles. Make sure the files are
+                            ending with the .css extension!
+                        </li>
                         <li>Reload the client to apply changes</li>
                     </ol>
                 </div>
-
             </div>
 
             <div class="mainContentBlock" name="analyticsSection">
@@ -240,8 +309,6 @@
                     <canvas id="lastWeekChart"></canvas>
                 </div>
             </div>
-
         </div>
-
     </div>
 </div>

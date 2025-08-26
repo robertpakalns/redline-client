@@ -53,26 +53,28 @@ Redline Client uses `redline:` protocol to open the client. For example, `redlin
 | `F12`      | Toggle Developer Tools |
 
 ## 🚀 Features
-* Adblocker
 * Analytics
-* Changelog
-* Client, OS, and Engine Stats in-game
+* Client
+  * Adblocker
+  * Deeplinks (`redline:` Protocol)
+  * Discord Rich Presence
+  * FPS Uncap (Windows Only)
+  * Import/Export Client Settings
+  * Proxy Domains Support
 * Customizations
    * Custom Keybinding
    * Fast CSS
    * Userscripts
    * Userstyles
    * Resource Swapper
-* Deeplinks (`redline:` Protocol)
-* Discord Rich Presence
-* FPS Uncap (Windows Only)
-* Import/Export Client Settings
-* Menu Modal (`F1`)
-* Popup Messages
-* Proxy Domains Support
-* Public Customizations
+* User Customizations
   * Badges
-* Tricko Links in Player Modals
+  * Login System
+* User Interface
+  * Changelog
+  * Client, OS, and Engine Stats in-game
+  * (Incoming) Friend Search
+  * Tricko Links in Player Modals
 
 ## 🖼️ Menu Modal
 To open the menu modal, press `F1`. You can change the key in the Menu Modal.

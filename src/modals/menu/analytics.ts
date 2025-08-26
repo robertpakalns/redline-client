@@ -24,6 +24,8 @@ Chart.register(
   BarController,
 );
 
+let pieCharts: Record<string, Chart<"pie">> = {};
+
 const generateColors = (
   arr: string[],
   i: number,
@@ -39,6 +41,7 @@ const createPieChart = (
   cont: HTMLElement,
   obj: object,
   label: string,
+  key: string,
   labelCallback: (tooltipItem: TooltipItem<"pie">) => string | void | string[],
 ): void => {
   const labels = Object.keys(obj);
@@ -46,19 +49,26 @@ const createPieChart = (
 
   const colors = labels.map((_, i) => generateColors(labels, i));
 
+  if (pieCharts[key]) {
+    const chart = pieCharts[key];
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = data as number[];
+    chart.data.datasets[0].backgroundColor = colors.map((c) => c.bg);
+    chart.data.datasets[0].borderColor = colors.map((c) => c.border);
+    chart.update();
+    return;
+  }
+
   const chartCont = createEl("div", {}, "chartBlock") as HTMLElement;
   const canvas = createEl("canvas", {}, "pie-chart") as HTMLCanvasElement;
-
   const labelCont = createEl("h1", {}, "", [label]);
 
   chartCont.append(labelCont, canvas);
   cont.appendChild(chartCont);
+
   const ctx = canvas?.getContext("2d");
 
-  const existingChart = Chart.getChart(ctx!);
-  if (existingChart) existingChart.destroy();
-
-  new Chart(ctx!, {
+  pieCharts[key] = new Chart(ctx!, {
     type: "pie",
     data: {
       labels: labels,
@@ -164,7 +174,11 @@ const setValues = (
     totalGamesPlayed.toString();
 };
 
+// let processed = false;
 const createAnalyticsSection = async (cont: HTMLElement) => {
+  // if (processed) return;
+  // processed = true;
+
   const data = getAllData();
 
   setValues(
@@ -176,27 +190,25 @@ const createAnalyticsSection = async (cont: HTMLElement) => {
   // Last week activity
   lastWeekChart(data.weekData);
 
-  // Time spent on proxies
   createPieChart(
     cont,
     data.timeSpentPerHost,
     "Time Spent on Proxies",
+    "proxies",
     (el: any) => formatDuration(el.raw),
   );
-
-  // Time spent on regions
   createPieChart(
     cont,
     data.timeSpentPerRegion,
     "Time Spent on Regions",
+    "regions",
     (el: any) => formatDuration(el.raw),
   );
-
-  // Played matches on regions
   createPieChart(
     cont,
     data.entriesPerRegion,
     "Played matches on Regions",
+    "matches",
     (el: any) => el.raw,
   );
 
