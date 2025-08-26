@@ -45,7 +45,11 @@
     height: 600px;
     overflow-y: auto;
     border-radius: 1rem;
-    background: linear-gradient(-30deg, rgba(0, 0, 20, 0.7) 0%, rgba(20, 0, 0, 0.7) 100%);
+    background: linear-gradient(
+        -30deg,
+        rgba(0, 0, 20, 0.7) 0%,
+        rgba(20, 0, 0, 0.7) 100%
+    );
     font-size: 0.9rem;
     color: white;
     user-select: none;
@@ -92,7 +96,7 @@
 
         &:checked::before {
             left: 25px;
-            background: linear-gradient(45deg, #4CAF50, #006504);
+            background: linear-gradient(45deg, #4caf50, #006504);
         }
     }
 
@@ -158,7 +162,7 @@
     a {
         cursor: pointer;
         text-decoration: none;
-        color: #00A1E4;
+        color: #00a1e4;
     }
 
     thead {
@@ -307,7 +311,8 @@ label:disabled {
 /* Menu */
 #menuWrapper {
     display: flex;
-    height: 100%
+    height: 100%;
+    overflow-x: hidden;
 }
 
 #menuSideBar {
@@ -350,6 +355,7 @@ label:disabled {
     height: 100%;
     display: none;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #menuHeader {
@@ -386,16 +392,16 @@ label:disabled {
         appearance: none;
         width: 10px;
         height: 10px;
-        border: 2px solid #4CAF50;
+        border: 2px solid #4caf50;
         border-radius: 10px;
         transition: 0.3s ease;
 
         &:hover {
-            box-shadow: 0 0 5px #4CAF50;
+            box-shadow: 0 0 5px #4caf50;
         }
 
         &:checked {
-            background-color: #4CAF50;
+            background-color: #4caf50;
         }
     }
 }
@@ -481,7 +487,7 @@ label:disabled {
     flex-direction: column;
     overflow: auto;
 
-    &>button {
+    & > button {
         padding: 10px;
     }
 }

@@ -123,7 +123,7 @@ export const changeSocLinks = (cont: HTMLElement): void => {
     downloadButton.querySelector(".text-soc")!.children,
   ) as HTMLLinkElement[];
   texts[0].innerText = "REDLINE";
-  texts[1].innerText = "DOWNLOAD";
+  texts[1].innerText = "TRICKO PAGE";
 
   btns[1].replaceWith(downloadButton);
 };
