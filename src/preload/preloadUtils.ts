@@ -7,16 +7,16 @@ import { shell } from "electron";
 const config = new Config();
 
 // Go back to Kirka from Auth page
-export const backToKirka = (): void => {
-  const authDomains = new Set<string>([
-    "www.facebook.com",
-    "accounts.google.com",
-    "appleid.apple.com",
-    "www.twitch.tv",
-    "discord.com",
-    "id.vk.com",
-  ]);
+const authDomains = new Set<string>([
+  "www.facebook.com",
+  "accounts.google.com",
+  "appleid.apple.com",
+  "www.twitch.tv",
+  "discord.com",
+  "id.vk.com",
+]);
 
+export const backToKirka = (): void => {
   if (authDomains.has(window.location.host)) {
     const _back = createEl("div", {}, "backToKirka", ["Back to Kirka"]);
     _back.addEventListener(

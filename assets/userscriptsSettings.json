@@ -1,10 +1,10 @@
 [
-    {
-        "name": "Enable Userscripts",
-        "description": "Allows the userscripts from the scripts folder execute",
-        "type": "checkbox",
-        "config": "",
-        "section": "userscripts",
-        "requires": "refresh"
-    }
+  {
+    "name": "Enable Userscripts",
+    "description": "Allows the userscripts from the scripts folder execute",
+    "type": "checkbox",
+    "config": "",
+    "section": "userscripts",
+    "requires": "refresh"
+  }
 ]

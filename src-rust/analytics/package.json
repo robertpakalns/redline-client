@@ -1,5 +1,5 @@
 {
   "napi": {
-    "name": "analytics"
+    "binaryName": "analytics"
   }
 }
