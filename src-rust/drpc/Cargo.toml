@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 discord-rich-presence = "0.2.5"
 napi = "2.16.17"
 napi-derive = "2.16.13"
-url-parse = "1.0.10"
+url_parser = { path = "../url_parser" }
 
 [build-dependencies]
 napi-build = "2.2.2"

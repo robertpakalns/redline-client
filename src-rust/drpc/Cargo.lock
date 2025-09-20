@@ -63,7 +63,7 @@ dependencies = [
  "napi",
  "napi-build",
  "napi-derive",
- "url-parse",
+ "url_parser",
 ]
 
 [[package]]
@@ -304,13 +304,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
 
 [[package]]
-name = "url-parse"
-version = "1.0.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8f18735cfbba59a63b3da83b440e0f2973455fefb39afc90487747a3cebd1b3"
-dependencies = [
- "regex",
-]
+name = "url_parser"
+version = "0.0.0"
 
 [[package]]
 name = "uuid"

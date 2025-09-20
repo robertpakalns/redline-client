@@ -10,7 +10,7 @@ use std::{
     thread::{sleep, spawn},
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
-use url_parse::core::Parser;
+use url_parser::parse_url;
 
 struct Drpc {
     client: DiscordIpcClient,
@@ -106,11 +106,7 @@ pub fn init(join_btn: bool, initial_url: String) {
 }
 
 fn set_status_internal(drpc: &mut Drpc, url: &str) -> Result<()> {
-    let parsed_url = Parser::new(None).parse(&url).map_err(napi_err)?;
-    let host = parsed_url
-        .host_str()
-        .ok_or_else(|| napi_err("Invalid host"))?;
-    let path = format!("/{}", parsed_url.path.unwrap_or_default().join("/"));
+    let (host, _, path, _, _) = parse_url(&url).map_err(napi_err).unwrap();
 
     drpc.state = if path.starts_with("/games") {
         let server = path

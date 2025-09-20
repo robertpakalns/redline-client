@@ -1,4 +1,3 @@
-// use chrono::{DateTime, Local, Utc};
 use napi::{Error, Result};
 use napi_derive::napi;
 use rusqlite::{Connection, params};
@@ -11,7 +10,7 @@ use std::{
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 use time::OffsetDateTime;
-use url_parse::core::Parser;
+use url_parser::parse_url;
 
 #[derive(Clone)]
 struct LastEntry {
@@ -79,12 +78,8 @@ pub fn set_entry(url: String) {
 
     spawn(move || {
         let conn = establish_connection().unwrap();
-        let parsed_url = Parser::new(None).parse(&url).map_err(napi_err).unwrap();
-        let host = parsed_url
-            .host_str()
-            .ok_or_else(|| napi_err("Invalid host"))
-            .unwrap();
-        let path = format!("/{}", parsed_url.path.unwrap_or_default().join("/"));
+
+        let (host, _, path, _, _) = parse_url(&url).map_err(napi_err).unwrap();
         let instant_now = Instant::now();
 
         let mut last_entry_lock = last_entry.lock().unwrap();
@@ -258,17 +253,9 @@ fn prepare_data() -> Result<AnalyticsReport> {
         }
         *time_spent_per_host.entry(entry.host.clone()).or_insert(0) += entry.duration;
 
-        // let dt_utc = DateTime::<Utc>::from_timestamp_millis(entry.timestamp)
-        //     .unwrap_or_else(|| DateTime::<Utc>::from_timestamp_millis(0).unwrap());
-        // let local_date = dt_utc.with_timezone(&Local).date_naive().to_string();
-
-        // let (total, game) = daily_map.entry(local_date).or_insert((0, 0));
-        //
-        //
         let dt_utc = OffsetDateTime::from_unix_timestamp_nanos(entry.timestamp as i128 * 1_000_000)
             .map_err(|e| napi_err(format!("Invalid timestamp: {}", e)))?;
 
-        // Get local date (fallback to UTC if local offset can't be determined)
         let date_str = dt_utc.date().to_string(); // Format: "YYYY-MM-DD"
 
         let (total, game) = daily_map.entry(date_str).or_insert((0, 0));

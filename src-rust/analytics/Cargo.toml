@@ -12,7 +12,7 @@ napi = "2.16.17"
 napi-derive = "2.16.13"
 rusqlite = { version = "0.37.0", features = ["bundled"] }
 time = "0.3.41"
-url-parse = "1.0.10"
+url_parser = { path = "../url_parser" }
 
 [build-dependencies]
 napi-build = "2.2.2"
