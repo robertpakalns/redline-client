@@ -1,9 +1,11 @@
-import packageJson from "../../../package.json" with { type: "json" };
-import { fromRoot, createEl, popup } from "../../utils/functions.js";
+import { createEl, popup } from "../../utils/functions.js";
 import { configDir } from "../../utils/config.js";
+import packageJson from "../../../package.json";
 import { shell, ipcRenderer } from "electron";
 import Modal from "../modal.js";
 import { join } from "path";
+
+import menuModalHTML from "../../../assets/html/menu.html?raw";
 
 import createCustomizationSection from "./customization.js";
 import createUserscriptsSection from "./userscripts.js";
@@ -13,12 +15,10 @@ import createAnalyticsSection from "./analytics.js";
 import createSettingsSection from "./settings.js";
 
 class MenuModal extends Modal {
-  modalHTMLPath: string | null = null;
-  modal: HTMLElement | null = null;
+  modalHTMLString = menuModalHTML;
 
   constructor() {
     super();
-    this.modalHTMLPath = fromRoot("../assets/html/menu.html");
   }
 
   init() {

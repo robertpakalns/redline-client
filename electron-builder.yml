@@ -9,7 +9,7 @@ electronLanguages:
   - en-US
 
 files:
-  - "ts-dist/**/*"
+  - "js-dist/**/*"
   - "assets/**/*"
   - "src-rust/**/*.node"
   - "!**/locales/*"

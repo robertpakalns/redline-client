@@ -1,11 +1,9 @@
-import { createRequire } from "module"
-import { dirname, join } from "path"
-import { fileURLToPath } from "url"
-import triplet from "../triplet.js"
+import { createRequire } from "module";
+import triplet from "../triplet.js";
+import { fromRoot } from "../../src/utils/functions.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const modulePath = join(__dirname, `../../../src-rust/analytics/analytics.${triplet()}.node`)
-const require = createRequire(import.meta.url)
+const modulePath = fromRoot(`./src-rust/analytics/analytics.${triplet()}.node`);
+const r = createRequire(import.meta.url);
 
-const { setEntry, setLastEntry, getAllData } = require(modulePath)
-export { setEntry, setLastEntry, getAllData }
+const { setEntry, setLastEntry, getAllData } = r(modulePath);
+export { setEntry, setLastEntry, getAllData };

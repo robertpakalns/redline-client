@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const config = new Config();
 
 // Project root path
-const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../../");
+const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../");
 export const fromRoot = (path: string): string => join(__root, path);
 
 // Kirka.io Domains
@@ -42,7 +42,6 @@ export const getIcon = (): NativeImage | undefined => {
   );
   return cachedIcon;
 };
-console.log(getIcon());
 
 // DOM
 export const createEl = (

@@ -36,7 +36,7 @@ const createWindow = (initialURL: string): void => {
     icon: getIcon(),
     show: false,
     webPreferences: {
-      preload: fromRoot("src/preload/preload.js"),
+      preload: fromRoot("js-dist/preload.js"),
       nodeIntegration: true,
       webSecurity: false,
     },
@@ -56,9 +56,6 @@ const createWindow = (initialURL: string): void => {
       else hwnd = handleBuffer.readUInt32LE(0);
 
       enject.startHook(hwnd);
-
-      // @ts-ignore
-      await import("./index.win32-x62-msvc.node");
     }
 
     mainWindow!.show();

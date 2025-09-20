@@ -115,7 +115,7 @@ export const changeSocLinks = (cont: HTMLElement): void => {
   downloadButton.className = "card-cont soc-group";
   downloadButton
     .querySelector("svg use")!
-    .setAttribute("href", "redline://?path=assets/icons/download.svg");
+    .setAttribute("href", "redline://?path=assets/icons/tricko.svg");
   downloadButton.onclick = () =>
     shell.openExternal("https://tricko.pro/redline");
 
