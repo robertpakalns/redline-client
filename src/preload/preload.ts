@@ -15,12 +15,14 @@ import {
   createKDRatio,
   changeSocLinks,
 } from "./preloadUtils.js";
-import { manageFriendsPage } from "./friends.js";
-import { fromRoot, createEl, domains } from "../utils/functions.js";
 import { Config, defaultConfig } from "../utils/config.js";
+import { createEl, domains } from "../utils/functions.js";
 import { ipcRenderer, contextBridge } from "electron";
+import { manageFriendsPage } from "./friends.js";
 import MenuModal from "../modals/menu/script.js";
-import { readFileSync } from "fs";
+
+import modalStylesString from "../../assets/css/modalStyles.css?raw";
+import clientStylesString from "../../assets/css/clientStyles.css?raw";
 
 const config = new Config();
 
@@ -37,16 +39,13 @@ contextBridge.exposeInMainWorld("appconsole", window.console);
 
 const appendStyles = () => {
   const modalStyles = createEl("style");
-  modalStyles.innerHTML = readFileSync(
-    fromRoot("../assets/css/modalStyles.css"),
-    "utf8",
-  );
+  modalStyles.innerHTML = modalStylesString;
 
   const fontURL = "redline://?path=assets/fonts/Roboto.ttf";
 
   const clientStyles = createEl("style");
   clientStyles.innerHTML =
-    readFileSync(fromRoot("../assets/css/clientStyles.css"), "utf8") +
+    clientStylesString +
     `
         @font-face { font-family: "Roboto"; src: url(${fontURL}) format("truetype") }
         .clientModalHint { display: ${config.get("interface.modalHint") ? "block" : "none"} }`;

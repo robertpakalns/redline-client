@@ -3,7 +3,7 @@ import triplet from "../triplet.js";
 import { fromRoot } from "../../src/utils/functions.js";
 
 const modulePath = fromRoot(`./src-rust/drpc/drpc.${triplet()}.node`);
-const require = createRequire(import.meta.url);
+const r = createRequire(import.meta.url);
 
-const { init, setStatus } = require(modulePath);
+const { init, setStatus } = r(modulePath);
 export { init, setStatus };

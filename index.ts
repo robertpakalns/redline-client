@@ -38,7 +38,7 @@ const createWindow = (initialURL: string): void => {
     webPreferences: {
       preload: fromRoot("js-dist/preload.js"),
       nodeIntegration: true,
-      webSecurity: false,
+      webSecurity: true,
     },
   });
 

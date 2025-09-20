@@ -1,5 +1,5 @@
-import packageJson from "../../package.json" with { type: "json" };
 import { createEl, getHost, isNum } from "../utils/functions.js";
+import packageJson from "../../package.json";
 import { Config } from "../utils/config.js";
 import { type, release, arch } from "os";
 import { shell } from "electron";
@@ -102,30 +102,31 @@ export const changeSocLinks = (cont: HTMLElement): void => {
   const discordButton = btns[0].cloneNode(true) as HTMLButtonElement;
   discordButton.id = "redline-discord";
   discordButton.className = "card-cont soc-group";
-  discordButton
-    .querySelector("svg use")!
-    .setAttribute("href", "redline://?path=assets/icons/discord.svg");
+  const discordButtonImg = createEl("img", {
+    src: "redline://?path=assets/icons/discord.svg",
+  });
+  discordButton.querySelector("svg")!.replaceWith(discordButtonImg);
   discordButton.onclick = () =>
     shell.openExternal("https://discord.gg/cTE6CVuGen");
 
   btns[0].replaceWith(discordButton);
 
-  const downloadButton = btns[1].cloneNode(true) as HTMLButtonElement;
-  downloadButton.id = "redline-download";
-  downloadButton.className = "card-cont soc-group";
-  downloadButton
-    .querySelector("svg use")!
-    .setAttribute("href", "redline://?path=assets/icons/tricko.svg");
-  downloadButton.onclick = () =>
-    shell.openExternal("https://tricko.pro/redline");
+  const trickoButton = btns[1].cloneNode(true) as HTMLButtonElement;
+  trickoButton.id = "redline-download";
+  trickoButton.className = "card-cont soc-group";
+  const trickoButtonImg = createEl("img", {
+    src: "redline://?path=assets/icons/tricko.svg",
+  });
+  trickoButton.querySelector("svg")!.replaceWith(trickoButtonImg);
+  trickoButton.onclick = () => shell.openExternal("https://tricko.pro/redline");
 
   const texts = Array.from(
-    downloadButton.querySelector(".text-soc")!.children,
+    trickoButton.querySelector(".text-soc")!.children,
   ) as HTMLLinkElement[];
   texts[0].innerText = "REDLINE";
   texts[1].innerText = "TRICKO PAGE";
 
-  btns[1].replaceWith(downloadButton);
+  btns[1].replaceWith(trickoButton);
 };
 
 export const createKDRatio = (cont: HTMLElement): void => {

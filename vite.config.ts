@@ -24,6 +24,7 @@ export default defineConfig({
         "module",
         "url",
         "@juice-client/node-enject",
+        "chart.js",
       ],
 
       output: {
