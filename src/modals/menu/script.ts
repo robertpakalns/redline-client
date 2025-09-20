@@ -1,11 +1,11 @@
 import { createEl, popup } from "../../utils/functions.js";
 import { configDir } from "../../utils/config.js";
-import packageJson from "../../../package.json";
 import { shell, ipcRenderer } from "electron";
 import Modal from "../modal.js";
 import { join } from "path";
 
 import menuModalHTML from "../../../assets/html/menu.html?raw";
+import packageJson from "../../../package.json";
 
 import createCustomizationSection from "./customization.js";
 import createUserscriptsSection from "./userscripts.js";
@@ -38,12 +38,13 @@ class MenuModal extends Modal {
     ) as HTMLImageElement;
     redlineIcon!.src = "redline://?path=assets/icons/icon.png";
 
-    // Open settings by default
-    const defaultSection = this.modal?.querySelector(
-      "#menuMainContent > div[name='settingsSection']",
+    // Open by default
+    this.modal!.querySelector(".mainContentBlock:first-child")!.classList.add(
+      "active",
     );
-    createSettingsSection(defaultSection as HTMLElement);
-    defaultSection?.classList.add("active");
+    this.modal!.querySelector(".sideBarItem:first-child")!.classList.add(
+      "active",
+    );
 
     for (const item of Array.from(this.modal!.querySelectorAll(".sideBarItem")))
       item.addEventListener("click", (e) => {
