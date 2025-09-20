@@ -1,8 +1,6 @@
-import { createEl, popup } from "../../utils/functions.js";
-import { configDir } from "../../utils/config.js";
+import { createEl, popup } from "../../preload/preloadFunctions.js";
 import { shell, ipcRenderer } from "electron";
 import Modal from "../modal.js";
-import { join } from "path";
 
 import menuModalHTML from "../../../assets/html/menu.html?raw";
 import packageJson from "../../../package.json";
@@ -45,6 +43,11 @@ class MenuModal extends Modal {
     this.modal!.querySelector(".sideBarItem:first-child")!.classList.add(
       "active",
     );
+
+    const defaultSection = this.modal?.querySelector(
+      "#menuMainContent > div[name='settingsSection']",
+    );
+    createSettingsSection(defaultSection as HTMLElement);
 
     for (const item of Array.from(this.modal!.querySelectorAll(".sideBarItem")))
       item.addEventListener("click", (e) => {
@@ -122,8 +125,8 @@ class MenuModal extends Modal {
     for (const [key, value] of Object.entries(openFromShell))
       this.modal
         ?.querySelector(`#${key}`)
-        ?.addEventListener("click", () =>
-          shell.openPath(join(configDir, value)),
+        ?.addEventListener("click", async () =>
+          shell.openPath(await ipcRenderer.invoke("from-config-dir", value)),
         );
   }
 }

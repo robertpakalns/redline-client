@@ -5,10 +5,11 @@ import {
   errorModal,
 } from "./src/utils/dialogs.js";
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js";
-import { Config, configPath } from "./src/utils/config.js";
+import { Config, configPath, configDir } from "./src/utils/config.js";
 import { app, BrowserWindow, ipcMain } from "electron";
 import { writeFileSync, readFileSync } from "fs";
 import electronUpdater from "electron-updater";
+import { join } from "path";
 
 // JavaScript modules
 import { userscripts } from "./src/utils/userscripts.js";
@@ -29,6 +30,30 @@ const handleURL = (url: string): void => {
   drpc.setStatus(lastURL);
   analytics.setEntry(lastURL);
 };
+
+ipcMain.handle("config-get", (_, key: string) => config.get(key));
+ipcMain.handle("config-set", (_, key: string, value: boolean) => {
+  config.set(key, value);
+  return true;
+});
+ipcMain.handle("from-config-dir", (_, name: string): string =>
+  join(configDir, name),
+);
+ipcMain.handle(
+  "read-userscripts-config",
+  async (): Promise<string> =>
+    readFileSync(join(configDir, "userscripts.json"), "utf8"),
+);
+ipcMain.handle(
+  "write-userscripts-config",
+  async (_, content: string): Promise<boolean> => {
+    writeFileSync(
+      join(configDir, "userscripts.json"),
+      JSON.stringify(content, null, 2),
+    );
+    return true;
+  },
+);
 
 const createWindow = (initialURL: string): void => {
   mainWindow = new BrowserWindow({

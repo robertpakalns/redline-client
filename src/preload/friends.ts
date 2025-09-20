@@ -1,4 +1,4 @@
-import { createEl } from "../utils/functions.js";
+import { createEl } from "../preload/preloadFunctions.js";
 import { setFriendBadges } from "./badges.js";
 
 const filterFriends = (cont: HTMLElement, search: string): void => {

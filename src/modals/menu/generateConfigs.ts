@@ -1,5 +1,5 @@
-import settingsJson from "../../../assets/settings.json" with { type: "json" };
-import { createEl, popup } from "../../utils/functions.js";
+import { createEl, popup } from "../../preload/preloadFunctions.js";
+import settingsJson from "../../../assets/settings.json";
 import { Config } from "../../utils/config.js";
 import { ipcRenderer } from "electron";
 

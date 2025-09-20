@@ -1,123 +1,166 @@
-import settingsJson from "../../../assets/userscriptsSettings.json" with { type: "json" }
-import { appendConfig, Setting, sendNotification } from "./generateConfigs.js"
-import { userScriptsPath, ScriptMeta } from "../../utils/userscripts.js"
-import { createEl } from "../../utils/functions.js"
-import { readFileSync, writeFileSync } from "fs"
-import { configDir } from "../../utils/config.js"
-import { shell } from "electron"
-import { join } from "path"
+import { appendConfig, Setting, sendNotification } from "./generateConfigs.js";
+import settingsJson from "../../../assets/userscriptsSettings.json";
+import { createEl } from "../../preload/preloadFunctions";
+import { ScriptMeta } from "../../utils/userscripts.js";
+import { shell, ipcRenderer } from "electron";
 
-const data = settingsJson as Setting[]
+const data = settingsJson as Setting[];
 
-const testCont = (className: string, children: (HTMLElement | string | null | undefined)[]): HTMLElement | null => {
-    const valid = children.filter(Boolean)
-    return valid.length ? createEl("div", {}, className, valid as (HTMLElement | string)[]) : null
-}
+const testCont = (
+  className: string,
+  children: (HTMLElement | string | null | undefined)[],
+): HTMLElement | null => {
+  const valid = children.filter(Boolean);
+  return valid.length
+    ? createEl("div", {}, className, valid as (HTMLElement | string)[])
+    : null;
+};
 
-const appendUserscriptConfig = (meta: ScriptMeta, configCont: HTMLElement, sh: string, parentCont: HTMLElement): void => {
-    const name = createEl("div", {}, "name", [meta.name])
-    const description = meta.description ? createEl("div", {}, "subText", [meta.description]) : null
-    const authors = meta.authors ? createEl("div", {}, "subText", [`by ${meta.authors}`]) : null
-    const category = meta.category ? createEl("div", {}, "category", [meta.category]) : null
+const appendUserscriptConfig = (
+  meta: ScriptMeta,
+  configCont: HTMLElement,
+  sh: string,
+  parentCont: HTMLElement,
+): void => {
+  const name = createEl("div", {}, "name", [meta.name]);
+  const description = meta.description
+    ? createEl("div", {}, "subText", [meta.description])
+    : null;
+  const authors = meta.authors
+    ? createEl("div", {}, "subText", [`by ${meta.authors}`])
+    : null;
+  const category = meta.category
+    ? createEl("div", {}, "category", [meta.category])
+    : null;
 
-    const open = createEl("a", {}, "", ["Open"])
-    open.addEventListener("click", () => shell.openPath(join(configDir, sh, meta.file)))
+  const open = createEl("a", {}, "", ["Open"]);
+  open.addEventListener("click", async () =>
+    shell.openPath(
+      await ipcRenderer.invoke("from-config-dir", `${sh}/${meta.file}`),
+    ),
+  );
 
-    const requires = createEl("div", {}, "refresh", ["Requires page refresh"])
+  const requires = createEl("div", {}, "refresh", ["Requires page refresh"]);
 
-    const upCont = testCont("upCont", [name, requires, category])
-    const downCont = testCont("downCont", [description, authors, open])
+  const upCont = testCont("upCont", [name, requires, category]);
+  const downCont = testCont("downCont", [description, authors, open]);
 
-    const leftCont = testCont("leftCont", [upCont, downCont])
-    const cont = createEl("div", {}, "configCont", [leftCont!, configCont])
+  const leftCont = testCont("leftCont", [upCont, downCont]);
+  const cont = createEl("div", {}, "configCont", [leftCont!, configCont]);
 
-    parentCont?.appendChild(cont)
-}
+  parentCont?.appendChild(cont);
+};
 
+let loaded = false;
+const createUserscriptsSection = async () => {
+  if (loaded) return;
+  loaded = true;
 
-let loaded = false
-const createUserscriptsSection = () => {
-    if (loaded) return
-    loaded = true
+  const writeConfig = async (): Promise<void> => {
+    await ipcRenderer.invoke("write-userscripts-config", userScriptsConfig);
+  };
 
-    const userScriptsConfig = JSON.parse(readFileSync(userScriptsPath, "utf8"))
-    const { enable: userScriptsEnabled, scripts, styles } = userScriptsConfig
+  const userScriptsConfig = JSON.parse(
+    await ipcRenderer.invoke("read-userscripts-config"),
+  );
+  const { enable: userScriptsEnabled, scripts, styles } = userScriptsConfig;
 
-    const userscriptsInit = (arr: ScriptMeta[]): void => {
-        const cont = document.querySelector(`#userscriptsCont`) as HTMLElement
+  const userscriptsInit = (arr: ScriptMeta[]): void => {
+    const cont = document.querySelector(`#userscriptsCont`) as HTMLElement;
 
-        if (arr.length === 0) {
-            cont!.innerText = "No .js files found"
-            return
-        }
-
-        for (const el of arr) {
-            const _checkbox = createEl("input", { type: "checkbox", checked: el.enabled })
-            _checkbox.addEventListener("change", e => {
-                el.enabled = (e.target as HTMLInputElement).checked
-                writeFileSync(userScriptsPath, JSON.stringify(userScriptsConfig, null, 2))
-                sendNotification("refresh")
-            })
-
-            appendUserscriptConfig(el, _checkbox, "scripts", cont)
-        }
+    if (arr.length === 0) {
+      cont!.innerText = "No .js files found";
+      return;
     }
 
-    const userstylesInit = (obj: Record<string, boolean>): void => {
-        const cont = document.querySelector(`#userstylesCont`) as HTMLElement
+    for (const el of arr) {
+      const _checkbox = createEl("input", {
+        type: "checkbox",
+        checked: el.enabled,
+      });
+      _checkbox.addEventListener("change", async (e) => {
+        el.enabled = (e.target as HTMLInputElement).checked;
+        await writeConfig();
+        sendNotification("refresh");
+      });
 
-        if (Object.keys(obj).length === 0) {
-            cont!.innerText = "No .css files found"
-            return
-        }
+      appendUserscriptConfig(el, _checkbox, "scripts", cont);
+    }
+  };
 
-        if (cont?.children.length !== 0) return
+  const userstylesInit = (obj: Record<string, boolean>): void => {
+    const cont = document.querySelector(`#userstylesCont`) as HTMLElement;
 
-        for (const key in obj) {
-            const meta: ScriptMeta = {
-                file: key,
-                name: key,
-                description: "",
-                authors: "",
-                category: "",
-                enabled: obj[key]
-            }
-
-            const checkbox = createEl("input", { type: "checkbox", checked: obj[key] })
-            checkbox.addEventListener("change", e => {
-                obj[key] = (e.target as HTMLInputElement).checked
-                writeFileSync(userScriptsPath, JSON.stringify(userScriptsConfig, null, 2))
-                sendNotification("refresh")
-            })
-
-            appendUserscriptConfig(meta, checkbox, "styles", cont)
-        }
+    if (Object.keys(obj).length === 0) {
+      cont!.innerText = "No .css files found";
+      return;
     }
 
-    userscriptsInit(scripts)
-    userstylesInit(styles)
+    if (cont?.children.length !== 0) return;
 
-    const userscriptsEnabled = createEl("input", { type: "checkbox" }, "", []) as HTMLInputElement
+    for (const key in obj) {
+      const meta: ScriptMeta = {
+        file: key,
+        name: key,
+        description: "",
+        authors: "",
+        category: "",
+        enabled: obj[key],
+      };
 
-    userscriptsEnabled!.checked = userScriptsEnabled
-    userscriptsEnabled!.addEventListener("change", e => {
-        toggleUserScripts()
-        userScriptsConfig.enable = (e.target as HTMLInputElement).checked
-        writeFileSync(userScriptsPath, JSON.stringify(userScriptsConfig, null, 2))
-        sendNotification("refresh")
-    })
+      const checkbox = createEl("input", {
+        type: "checkbox",
+        checked: obj[key],
+      });
+      checkbox.addEventListener("change", async (e) => {
+        obj[key] = (e.target as HTMLInputElement).checked;
+        await writeConfig();
+        sendNotification("refresh");
+      });
 
-    appendConfig(data[0], userscriptsEnabled)
-
-    const toggleUserScripts = () => {
-        const checked = userscriptsEnabled?.checked
-        document.querySelector("#userscriptsCont")?.classList.toggle("disabled", !checked)
-        document.querySelector("#userstylesCont")?.classList.toggle("disabled", !checked)
-        for (const item of Array.from(document.querySelector("#userscriptsCont")!.querySelectorAll("input"))) item.disabled = !checked
-        for (const item of Array.from(document.querySelector("#userstylesCont")!.querySelectorAll("input"))) item.disabled = !checked
+      appendUserscriptConfig(meta, checkbox, "styles", cont);
     }
+  };
 
-    toggleUserScripts()
-}
+  userscriptsInit(scripts);
+  userstylesInit(styles);
 
-export default createUserscriptsSection
+  const userscriptsEnabled = createEl(
+    "input",
+    { type: "checkbox" },
+    "",
+    [],
+  ) as HTMLInputElement;
+
+  userscriptsEnabled!.checked = userScriptsEnabled;
+  userscriptsEnabled!.addEventListener("change", async (e) => {
+    toggleUserScripts();
+    userScriptsConfig.enable = (e.target as HTMLInputElement).checked;
+    await writeConfig();
+    sendNotification("refresh");
+  });
+
+  appendConfig(data[0], userscriptsEnabled);
+
+  const toggleUserScripts = () => {
+    const checked = userscriptsEnabled?.checked;
+    document
+      .querySelector("#userscriptsCont")
+      ?.classList.toggle("disabled", !checked);
+    document
+      .querySelector("#userstylesCont")
+      ?.classList.toggle("disabled", !checked);
+    for (const item of Array.from(
+      document.querySelector("#userscriptsCont")!.querySelectorAll("input"),
+    ))
+      item.disabled = !checked;
+    for (const item of Array.from(
+      document.querySelector("#userstylesCont")!.querySelectorAll("input"),
+    ))
+      item.disabled = !checked;
+  };
+
+  toggleUserScripts();
+};
+
+export default createUserscriptsSection;

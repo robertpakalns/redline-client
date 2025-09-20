@@ -1,10 +1,22 @@
-import { createEl, getHost, isNum } from "../utils/functions.js";
+import { createEl, isNum } from "../preload/preloadFunctions.js";
+import { shell, ipcRenderer } from "electron";
 import packageJson from "../../package.json";
-import { Config } from "../utils/config.js";
 import { type, release, arch } from "os";
-import { shell } from "electron";
 
-const config = new Config();
+// Kirka.io Domains
+export const domains = new Set<string>([
+  "kirka.io",
+  "cloudyfrogs.com",
+  "snipers.io",
+  "ask101math.com",
+  "fpsiogame.com",
+  "cloudconverts.com",
+]);
+
+const getHostRenderer = async (): Promise<string> => {
+  const host = (await config.get("client.domain")) as string;
+  return domains.has(host) ? host : "voxiom.io";
+};
 
 // Go back to Kirka from Auth page
 const authDomains = new Set<string>([
@@ -16,12 +28,19 @@ const authDomains = new Set<string>([
   "id.vk.com",
 ]);
 
+// Configs
+export const config = {
+  get: (key: string) => ipcRenderer.invoke("config-get", key),
+  set: (key: string, value: string | boolean) =>
+    ipcRenderer.invoke("config-set", key, value),
+};
+
 export const backToKirka = (): void => {
   if (authDomains.has(window.location.host)) {
     const _back = createEl("div", {}, "backToKirka", ["Back to Kirka"]);
     _back.addEventListener(
       "click",
-      () => (window.location.href = `https://${getHost()}`),
+      async () => (window.location.href = `https://${await getHostRenderer()}`),
     );
     document.body.appendChild(_back);
   }
@@ -129,7 +148,7 @@ export const changeSocLinks = (cont: HTMLElement): void => {
   btns[1].replaceWith(trickoButton);
 };
 
-export const createKDRatio = (cont: HTMLElement): void => {
+export const createKDRatio = async (cont: HTMLElement): Promise<void> => {
   if (!cont) return;
 
   const [kills, deaths] = Array.from(cont.children);
@@ -144,7 +163,7 @@ export const createKDRatio = (cont: HTMLElement): void => {
     _kd.textContent = "";
     _kd.append(_kdValue, _kdText);
     _kd.classList.add("kd-ratio");
-    if (config.get("interface.kdRatio")) _kd.classList.add("open");
+    if (await config.get("interface.kdRatio")) _kd.classList.add("open");
     cont.appendChild(_kd);
     return;
   }

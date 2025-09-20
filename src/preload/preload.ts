@@ -16,8 +16,9 @@ import {
   changeSocLinks,
 } from "./preloadUtils.js";
 import { Config, defaultConfig } from "../utils/config.js";
-import { createEl, domains } from "../utils/functions.js";
+import { createEl } from "../preload/preloadFunctions.js";
 import { ipcRenderer, contextBridge } from "electron";
+import { domains } from "../preload/preloadUtils.js";
 import { manageFriendsPage } from "./friends.js";
 import MenuModal from "../modals/menu/script.js";
 
@@ -120,7 +121,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Observers
-  const appObserver = new MutationObserver(() => {
+  const appObserver = new MutationObserver(async () => {
     appObserver.disconnect();
 
     const logoCont = app.querySelector("img.logo#logo") as HTMLImageElement;
@@ -164,7 +165,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     const kdrCont: HTMLElement | null = app.querySelector(".kill-death");
     if (kdrCont && !kdrCont.dataset.kdrObserved) {
       kdrCont.dataset.kdrObserved = "true";
-      createKDRatio(kdrCont);
+      await createKDRatio(kdrCont);
 
       kdrObserver.observe(kdrCont, {
         childList: true,
@@ -177,13 +178,13 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
   appObserver.observe(app, { childList: true, subtree: true });
 
-  const kdrObserver = new MutationObserver(() => {
+  const kdrObserver = new MutationObserver(async () => {
     kdrObserver.disconnect();
 
     const kdrCont = app.querySelector(".kill-death") as HTMLElement;
     if (!kdrCont) return;
 
-    createKDRatio(kdrCont);
+    await createKDRatio(kdrCont);
 
     kdrObserver.observe(kdrCont, {
       childList: true,

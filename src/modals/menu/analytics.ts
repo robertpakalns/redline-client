@@ -10,7 +10,11 @@ import {
   BarController,
 } from "chart.js";
 import { getAllData } from "../../../src-rust/analytics/index.js";
-import { createEl, formatDuration, output } from "../../utils/functions.js";
+import {
+  createEl,
+  formatDuration,
+  output,
+} from "../../preload/preloadFunctions.js";
 import type { TooltipItem } from "chart.js";
 
 Chart.register(

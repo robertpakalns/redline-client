@@ -1,4 +1,4 @@
-import { createEl } from "../utils/functions.js";
+import { createEl } from "../preload/preloadFunctions.js";
 
 const linkedBadge = (): HTMLElement =>
   createEl(
