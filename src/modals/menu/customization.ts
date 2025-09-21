@@ -1,4 +1,4 @@
-import { createEl, restartMessage } from "../../preload/preloadFunctions.js";
+import { createEl } from "../../preload/preloadFunctions.js";
 import { config } from "../../preload/preloadUtils.js";
 import { ipcRenderer } from "electron";
 
@@ -63,8 +63,8 @@ const createCustomizationSection = async (cont: HTMLElement): Promise<void> => {
     _inputChild.addEventListener("keydown", async (e) => {
       e.preventDefault();
       _inputChild.value = e.code;
+      ipcRenderer.send("change-keybind", name, e.code);
       await config.set(`keybinding.content.${name}`, e.code);
-      restartMessage();
     });
 
     const _name = createEl("td", { textContent: name });
@@ -95,7 +95,10 @@ const createCustomizationSection = async (cont: HTMLElement): Promise<void> => {
   };
 
   toggleKeybinding();
-  _enableKeybinding.addEventListener("change", toggleKeybinding);
+  _enableKeybinding.addEventListener("change", () => {
+    ipcRenderer.send("toggle-keybind-enable", _enableKeybinding.checked);
+    toggleKeybinding();
+  });
 };
 
 export default createCustomizationSection;

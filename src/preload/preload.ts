@@ -89,13 +89,13 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // Modal hint
   const menuModalKey = await ipcRenderer.invoke("get-menu-modal-key");
-  const _hint = createEl("div", {}, "clientModalHint", [
+  const _hint = createEl("div", { id: "clientModalHint" }, "", [
     `Press ${menuModalKey} to open menu`,
   ]);
 
   if (
     app.querySelector("#left-icons") &&
-    !app.querySelector("#left-icons")?.querySelector(".clientModalHint")
+    !app.querySelector("#left-icons")?.querySelector("#clientModalHint")
   )
     app.querySelector("#left-icons")?.appendChild(_hint);
 
@@ -148,7 +148,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     if (
       app.querySelector("#left-icons") &&
-      !app.querySelector("#left-icons")?.querySelector(".clientModalHint")
+      !app.querySelector("#left-icons")?.querySelector("#clientModalHint")
     )
       app.querySelector("#left-icons")?.appendChild(_hint);
 
@@ -254,4 +254,8 @@ ipcRenderer.on("toggle-window", (_, modal) => {
     document.getElementById(modal)?.classList.toggle("open");
     document.exitPointerLock();
   }
+});
+ipcRenderer.on("new-menu-modal-key", (_, key: string): void => {
+  document.getElementById("clientModalHint").textContent =
+    `Press ${key} to open menu`;
 });

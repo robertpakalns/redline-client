@@ -54,8 +54,7 @@
     "description": "Setting multiple options to the same key might lead to unpredictable behavior",
     "type": "checkbox",
     "config": "keybinding.enable",
-    "section": "customization",
-    "requires": "restart"
+    "section": "customization"
   },
   {
     "name": "Enable Resource Swapper",
