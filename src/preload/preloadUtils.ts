@@ -1,7 +1,5 @@
 import { createEl, isNum } from "../preload/preloadFunctions.js";
 import { shell, ipcRenderer } from "electron";
-import packageJson from "../../package.json";
-import { type, release, arch } from "os";
 
 // Kirka.io Domains
 export const domains = new Set<string>([
@@ -47,16 +45,19 @@ export const backToKirka = (): void => {
 };
 
 // In-game console versions
-const versions = {
-  CHROMIUM: `v${process.versions.chrome}`,
-  ELECTRON: `v${process.versions.electron}`,
-  NODE: `v${process.versions.node}`,
-  REDLINE_CLIENT: `v${packageJson.version}`,
-  OS: `${type()} ${release()} (${arch()})`,
-};
+let versionsCache: Record<string, string> | null = null;
 
-export const setVersions = (cont: HTMLElement, toggle: boolean) => {
+export async function getVersions(): Promise<Record<string, string>> {
+  if (!versionsCache) {
+    const raw = await ipcRenderer.invoke("get-hardware-data");
+    versionsCache = JSON.parse(raw);
+  }
+  return versionsCache;
+}
+
+export const setVersions = async (cont: HTMLElement, toggle: boolean) => {
   if (!cont) return;
+  const versions = await getVersions();
 
   for (const [key, value] of Object.entries(versions)) {
     const el = cont.querySelector(`#${key}`) as HTMLElement;

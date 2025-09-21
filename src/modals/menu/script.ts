@@ -3,7 +3,6 @@ import { shell, ipcRenderer } from "electron";
 import Modal from "../modal.js";
 
 import menuModalHTML from "../../../assets/html/menu.html?raw";
-import packageJson from "../../../package.json";
 
 import createCustomizationSection from "./customization.js";
 import createUserscriptsSection from "./userscripts.js";
@@ -24,11 +23,11 @@ class MenuModal extends Modal {
     this.modal!.id = "menuModal";
   }
 
-  work() {
+  async work() {
     generateConfigs();
 
     const _version = this.modal?.querySelector("#clientVersion") as HTMLElement;
-    _version!.textContent = `v${packageJson.version}`;
+    _version!.textContent = await ipcRenderer.invoke("get-app-version");
 
     const sidebar = document.getElementById("menuSideBar");
     const redlineIcon = sidebar!.querySelector(

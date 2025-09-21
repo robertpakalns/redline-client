@@ -1,9 +1,7 @@
 import { createEl, popup } from "../../preload/preloadFunctions.js";
 import settingsJson from "../../../assets/settings.json";
-import { Config } from "../../utils/config.js";
+import { config } from "../../preload/preloadUtils.js";
 import { ipcRenderer } from "electron";
-
-const config = new Config();
 
 type RequiresType = "restart" | "refresh" | null;
 
@@ -60,7 +58,7 @@ export const appendConfig = (data: Setting, configCont: HTMLElement): void => {
   parentCont?.appendChild(cont);
 };
 
-export const generateConfigs = (): void => {
+export const generateConfigs = async (): Promise<void> => {
   for (const el of data) {
     let configCont;
     if (el.type === "checkbox") {
@@ -70,15 +68,15 @@ export const generateConfigs = (): void => {
         "",
         [],
       ) as HTMLInputElement;
-      configCont.checked = config.get(el.config) as boolean;
-      configCont.addEventListener("change", (e) => {
-        config.set(el.config, (e.target as HTMLInputElement).checked);
+      configCont.checked = (await config.get(el.config)) as boolean;
+      configCont.addEventListener("change", async (e) => {
+        await config.set(el.config, (e.target as HTMLInputElement).checked);
         sendNotification(el.requires as RequiresType);
       });
     } else if (el.type === "select") {
       configCont = createEl("select", {}, "", []) as HTMLSelectElement;
-      configCont.addEventListener("change", (e) => {
-        config.set(el.config, (e.target as HTMLOptionElement).value);
+      configCont.addEventListener("change", async (e) => {
+        await config.set(el.config, (e.target as HTMLOptionElement).value);
         sendNotification(el.requires as RequiresType);
       });
 
@@ -88,7 +86,7 @@ export const generateConfigs = (): void => {
           configCont.appendChild(option);
         }
 
-        configCont!.value = config.get(el.config) as string;
+        configCont!.value = (await config.get(el.config)) as string;
       }
     } else {
       configCont = createEl("div", {}, "", []);

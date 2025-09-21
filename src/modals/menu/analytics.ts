@@ -9,13 +9,13 @@ import {
   BarElement,
   BarController,
 } from "chart.js";
-import { getAllData } from "../../../src-rust/analytics/index.js";
 import {
   createEl,
   formatDuration,
   output,
 } from "../../preload/preloadFunctions.js";
 import type { TooltipItem } from "chart.js";
+import { ipcRenderer } from "electron";
 
 Chart.register(
   PieController,
@@ -178,12 +178,8 @@ const setValues = (
     totalGamesPlayed.toString();
 };
 
-// let processed = false;
 const createAnalyticsSection = async (cont: HTMLElement) => {
-  // if (processed) return;
-  // processed = true;
-
-  const data = getAllData();
+  const data = JSON.parse(await ipcRenderer.invoke("get-analytics-data"));
 
   setValues(
     data.totalTimeSpent,

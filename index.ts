@@ -4,11 +4,18 @@ import {
   saveDialogModal,
   errorModal,
 } from "./src/utils/dialogs.js";
+import {
+  Config,
+  configPath,
+  configDir,
+  defaultConfig,
+} from "./src/utils/config.js";
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js";
-import { Config, configPath, configDir } from "./src/utils/config.js";
 import { app, BrowserWindow, ipcMain } from "electron";
 import { writeFileSync, readFileSync } from "fs";
 import electronUpdater from "electron-updater";
+import packageJson from "./package.json";
+import { type, release, arch } from "os";
 import { join } from "path";
 
 // JavaScript modules
@@ -54,6 +61,24 @@ ipcMain.handle(
     return true;
   },
 );
+ipcMain.handle("get-hardware-data", (): string =>
+  JSON.stringify({
+    CHROMIUM: `v${process.versions.chrome}`,
+    ELECTRON: `v${process.versions.electron}`,
+    NODE: `v${process.versions.node}`,
+    REDLINE_CLIENT: `v${packageJson.version}`,
+    OS: `${type()} ${release()} (${arch()})`,
+  }),
+);
+ipcMain.handle("get-analytics-data", (): string =>
+  JSON.stringify(analytics.getAllData()),
+);
+ipcMain.handle("get-menu-modal-key", (): string =>
+  (config.get("keybinding.enable") ?? true)
+    ? (config.get("keybinding.content.MenuModal") as string)
+    : defaultConfig.keybinding.content.MenuModal,
+);
+ipcMain.handle("get-app-version", (): string => `v${packageJson.version}`);
 
 const createWindow = (initialURL: string): void => {
   mainWindow = new BrowserWindow({
@@ -62,7 +87,7 @@ const createWindow = (initialURL: string): void => {
     show: false,
     webPreferences: {
       preload: fromRoot("js-dist/preload.js"),
-      nodeIntegration: true,
+      nodeIntegration: false,
       webSecurity: true,
     },
   });

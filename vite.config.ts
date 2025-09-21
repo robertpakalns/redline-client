@@ -7,10 +7,10 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: {
-        main: resolve(__dirname, "index.ts"),
-        preload: resolve(__dirname, "src/preload/preload.ts"),
+        main: resolve("index.ts"),
+        preload: resolve("src/preload/preload.ts"),
       },
-      formats: ["es"],
+      formats: ["cjs"],
       fileName: (format, name) => `${name}.${format}.js`,
     },
     rollupOptions: {
@@ -24,11 +24,11 @@ export default defineConfig({
         "module",
         "url",
         "@juice-client/node-enject",
-        "chart.js",
+        // "chart.js",
       ],
-
       output: {
         entryFileNames: "[name].js",
+        manualChunks: undefined,
       },
     },
   },

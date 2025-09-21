@@ -15,30 +15,19 @@ import {
   createKDRatio,
   changeSocLinks,
 } from "./preloadUtils.js";
-import { Config, defaultConfig } from "../utils/config.js";
+import { domains, config } from "../preload/preloadUtils.js";
 import { createEl } from "../preload/preloadFunctions.js";
 import { ipcRenderer, contextBridge } from "electron";
-import { domains } from "../preload/preloadUtils.js";
 import { manageFriendsPage } from "./friends.js";
 import MenuModal from "../modals/menu/script.js";
 
 import modalStylesString from "../../assets/css/modalStyles.css?raw";
 import clientStylesString from "../../assets/css/clientStyles.css?raw";
 
-const config = new Config();
-
-const { enable: enableKeybinding, content } = config.get("keybinding") as {
-  enable: boolean;
-  content: Record<string, string>;
-};
-const keybinding = enableKeybinding
-  ? content
-  : defaultConfig.keybinding.content;
-
 // With contextIsolation: true, window.appconsole is an alternative for window.console
 contextBridge.exposeInMainWorld("appconsole", window.console);
 
-const appendStyles = () => {
+const appendStyles = async (): Promise<void> => {
   const modalStyles = createEl("style");
   modalStyles.innerHTML = modalStylesString;
 
@@ -49,7 +38,7 @@ const appendStyles = () => {
     clientStylesString +
     `
         @font-face { font-family: "Roboto"; src: url(${fontURL}) format("truetype") }
-        .clientModalHint { display: ${config.get("interface.modalHint") ? "block" : "none"} }`;
+        .clientModalHint { display: ${(await config.get("interface.modalHint")) ? "block" : "none"} }`;
 
   const fastCSSStyles = createEl("style", { id: "fastCSSStyles" });
   const fastCSSLink = createEl("link", {
@@ -57,7 +46,7 @@ const appendStyles = () => {
     rel: "stylesheet",
   }) as HTMLAnchorElement;
 
-  const { enable, url, value } = config.get("fastCSS") as {
+  const { enable, url, value } = (await config.get("fastCSS")) as {
     enable: boolean;
     url: string;
     value: string;
@@ -99,8 +88,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (socCont) changeSocLinks(socCont);
 
   // Modal hint
+  const menuModalKey = await ipcRenderer.invoke("get-menu-modal-key");
   const _hint = createEl("div", {}, "clientModalHint", [
-    `Press ${keybinding.MenuModal} to open menu`,
+    `Press ${menuModalKey} to open menu`,
   ]);
 
   if (
