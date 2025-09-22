@@ -24,6 +24,8 @@ struct Drpc {
 
 static INSTANCE: LazyLock<Mutex<Option<Arc<Mutex<Drpc>>>>> = LazyLock::new(|| Mutex::new(None));
 
+static VERSION: LazyLock<Mutex<String>> = LazyLock::new(|| Mutex::new(String::new()));
+
 static STATIC_LINKS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     HashMap::from([
         ("/", "Viewing main lobby"),
@@ -63,8 +65,10 @@ fn napi_err<E: std::fmt::Display>(e: E) -> Error {
 }
 
 #[napi]
-pub fn init(join_btn: bool, initial_url: String) {
+pub fn init(join_btn: bool, initial_url: String, version: String) {
     let client_id = "1385893715519864933";
+
+    *VERSION.lock().unwrap() = version;
 
     let mut instance = INSTANCE.lock().unwrap();
     if instance.is_some() {
@@ -175,13 +179,18 @@ fn update_activity(drpc: &mut Drpc) {
             "https://discord.gg/cTE6CVuGen",
         ));
     }
+    let version_text = format!("Redline Client v{}", VERSION.lock().unwrap().clone());
 
     let act = Activity::new()
         .state(&drpc.state)
         .details(&drpc.details)
         .timestamps(Timestamps::new().start(drpc.start_ts))
         .buttons(buttons)
-        .assets(Assets::new().large_image("redline"));
+        .assets(
+            Assets::new()
+                .large_image("redline")
+                .large_text(&version_text),
+        );
 
     drpc.client.set_activity(act).map_err(napi_err).unwrap();
 }

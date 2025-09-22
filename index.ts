@@ -168,6 +168,7 @@ app.on("ready", () => {
   drpc.init(
     config.get("discord.joinButton") as boolean,
     deeplinkURL || `https://${getHost()}`,
+    packageJson.version,
   );
 
   createWindow(deeplinkURL || `https://${getHost()}`);
