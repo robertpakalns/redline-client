@@ -1,6 +1,6 @@
 {
   "name": "redline-client",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "Redline Client",
   "author": "robertpakalns",
   "main": "js-dist/main.js",

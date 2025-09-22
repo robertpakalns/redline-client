@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
+import { writeFile, mkdir, access } from "fs/promises";
+import { readFileSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
 
@@ -72,9 +73,17 @@ export const defaultConfig: IConfig = {
 
 export const configDir: string = join(homedir(), "Documents/RedlineClient");
 export const configPath: string = join(configDir, "config.json");
-if (!existsSync(configDir)) mkdirSync(configDir, { recursive: true });
-if (!existsSync(configPath))
-  writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
+
+const prepareConfig = async (): Promise<void> => {
+  await mkdir(configDir, { recursive: true });
+
+  try {
+    await access(configPath);
+  } catch {
+    await writeFile(configPath, JSON.stringify(defaultConfig, null, 2));
+  }
+};
+prepareConfig();
 
 export class Config {
   private static instance: IConfig | null = null;
@@ -86,19 +95,19 @@ export class Config {
     else {
       try {
         this.config = JSON.parse(readFileSync(Config.file, "utf8"));
-        this.fillConfig();
-        this.cleanConfig();
+        this.fillConfig().catch(() => {});
+        this.cleanConfig().catch(() => {});
         Config.instance = this.config;
       } catch {
         this.config = defaultConfig;
         Config.instance = defaultConfig;
-        this.writeConfig();
+        this.writeConfig().catch(() => {});
       }
     }
   }
 
-  writeConfig(obj: IConfig = this.config) {
-    writeFileSync(Config.file, JSON.stringify(obj, null, 2));
+  async writeConfig(obj: IConfig = this.config): Promise<void> {
+    await writeFile(Config.file, JSON.stringify(obj, null, 2));
   }
 
   get(key: string): ConfigType {
@@ -127,16 +136,16 @@ export class Config {
     this.writeConfig();
   }
 
-  default(): void {
+  async default(): Promise<void> {
     this.config = defaultConfig;
-    this.writeConfig();
+    await this.writeConfig();
   }
 
   // Fills the config with default values if missing
-  private fillConfig(
+  private async fillConfig(
     source: Record<string, any> = defaultConfig,
     target: Record<string, any> = this.config,
-  ): void {
+  ): Promise<void> {
     const originalConfig = JSON.stringify(target);
 
     for (const key in source) {
@@ -150,14 +159,14 @@ export class Config {
     }
 
     if (originalConfig !== JSON.stringify(target))
-      this.writeConfig(target as IConfig);
+      await this.writeConfig(target as IConfig);
   }
 
   // Cleans the config from unregistered values
-  private cleanConfig(
+  private async cleanConfig(
     source: Record<string, any> = defaultConfig,
     target: Record<string, any> = this.config,
-  ): void {
+  ): Promise<void> {
     const originalConfig = JSON.stringify(target);
 
     for (const key in target) {
@@ -167,6 +176,6 @@ export class Config {
     }
 
     if (originalConfig !== JSON.stringify(target))
-      this.writeConfig(target as IConfig);
+      await this.writeConfig(target as IConfig);
   }
 }

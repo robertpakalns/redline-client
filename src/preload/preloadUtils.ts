@@ -103,13 +103,6 @@ export const setTrickoLink = (cont: HTMLElement): void => {
   bottomCont.prepend(copiedNode);
 };
 
-// Change logo on the main menu
-// Credits: PVT
-export const changeLogo = (cont: HTMLImageElement): void => {
-  if (!cont) return;
-  cont.src = "redline://?path=assets/logo.png";
-};
-
 export const changeSocLinks = (cont: HTMLElement): void => {
   const btns = cont.querySelectorAll(".card-cont.soc-group");
   if (

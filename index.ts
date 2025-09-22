@@ -12,7 +12,7 @@ import {
 } from "./src/utils/config.js";
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js";
 import { app, BrowserWindow, ipcMain } from "electron";
-import { writeFileSync, readFileSync } from "fs";
+import { writeFile, readFile } from "fs/promises";
 import electronUpdater from "electron-updater";
 import packageJson from "./package.json";
 import { type, release, arch } from "os";
@@ -49,12 +49,12 @@ ipcMain.handle("from-config-dir", (_, name: string): string =>
 ipcMain.handle(
   "read-userscripts-config",
   async (): Promise<string> =>
-    readFileSync(join(configDir, "userscripts.json"), "utf8"),
+    await readFile(join(configDir, "userscripts.json"), "utf8"),
 );
 ipcMain.handle(
   "write-userscripts-config",
   async (_, content: string): Promise<boolean> => {
-    writeFileSync(
+    await writeFile(
       join(configDir, "userscripts.json"),
       JSON.stringify(content, null, 2),
     );
@@ -202,12 +202,14 @@ app.on("ready", () => {
 
   // Import/export settings
   ipcMain.on("import-client-settings", () =>
-    openDialogModal((file) =>
-      writeFileSync(Config.file, readFileSync(file, "utf8")),
+    openDialogModal(async (file) =>
+      writeFile(Config.file, await readFile(file, "utf8")),
     ),
   );
   ipcMain.on("export-client-settings", () =>
-    saveDialogModal((file) => writeFileSync(file, readFileSync(configPath))),
+    saveDialogModal(async (file) =>
+      writeFile(file, await readFile(configPath)),
+    ),
   );
 
   // Save last URL

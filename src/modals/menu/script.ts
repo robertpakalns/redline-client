@@ -29,12 +29,6 @@ class MenuModal extends Modal {
     const _version = this.modal?.querySelector("#clientVersion") as HTMLElement;
     _version!.textContent = await ipcRenderer.invoke("get-app-version");
 
-    const sidebar = document.getElementById("menuSideBar");
-    const redlineIcon = sidebar!.querySelector(
-      "#redlineIcon",
-    ) as HTMLImageElement;
-    redlineIcon!.src = "redline://?path=assets/icons/icon.png";
-
     // Open by default
     this.modal!.querySelector(".mainContentBlock:first-child")!.classList.add(
       "active",

@@ -11,7 +11,6 @@ import {
   backToKirka,
   setVersions,
   setTrickoLink,
-  changeLogo,
   createKDRatio,
   changeSocLinks,
 } from "./preloadUtils.js";
@@ -31,14 +30,10 @@ const appendStyles = async (): Promise<void> => {
   const modalStyles = createEl("style");
   modalStyles.innerHTML = modalStylesString;
 
-  const fontURL = "redline://?path=assets/fonts/Roboto.ttf";
-
   const clientStyles = createEl("style");
   clientStyles.innerHTML =
     clientStylesString +
-    `
-        @font-face { font-family: "Roboto"; src: url(${fontURL}) format("truetype") }
-        .clientModalHint { display: ${(await config.get("interface.modalHint")) ? "block" : "none"} }`;
+    `.clientModalHint { display: ${(await config.get("interface.modalHint")) ? "block" : "none"} }`;
 
   const fastCSSStyles = createEl("style", { id: "fastCSSStyles" });
   const fastCSSLink = createEl("link", {
@@ -81,9 +76,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   await getUser();
   await getBadges();
 
-  const logoCont = app.querySelector("img.logo#logo") as HTMLImageElement;
-  if (logoCont) changeLogo(logoCont);
-
   const socCont = app.querySelector(".settings-and-socicons") as HTMLElement;
   if (socCont) changeSocLinks(socCont);
 
@@ -113,9 +105,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   // Observers
   const appObserver = new MutationObserver(async () => {
     appObserver.disconnect();
-
-    const logoCont = app.querySelector("img.logo#logo") as HTMLImageElement;
-    if (logoCont) changeLogo(logoCont);
 
     const socCont = app.querySelector(".settings-and-socicons") as HTMLElement;
     if (socCont) changeSocLinks(socCont);

@@ -1,3 +1,14 @@
+@font-face {
+    font-family: "Roboto";
+    src: url(redline://?path=assets/fonts/Roboto.ttf) format("truetype");
+}
+
+/* Change logo on the main menu */
+/* Credits: PVT */
+img.logo#logo {
+    content: url("redline://?path=assets/logo.png");
+}
+
 .backToKirka {
     position: absolute;
     bottom: 0;

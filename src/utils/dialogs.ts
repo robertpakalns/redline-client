@@ -3,8 +3,8 @@ import { dialog } from "electron";
 
 type Callback = (filePath: string) => void;
 
-export const confirmAction = (message: string, callback: () => void) => {
-  const result = dialog.showMessageBoxSync({
+export const confirmAction = async (message: string, callback: () => void) => {
+  const result = await dialog.showMessageBox({
     type: "question",
     buttons: ["Yes", "No"],
     defaultId: 1,
@@ -12,7 +12,7 @@ export const confirmAction = (message: string, callback: () => void) => {
     title: "Redline Client | Confirm",
     message,
   });
-  if (result === 0) callback();
+  if (result.response === 0) callback();
 };
 
 const f = { filters: [{ name: "JSON Files", extensions: ["json"] }] };

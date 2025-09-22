@@ -19,12 +19,12 @@ export default defineConfig({
         "electron",
         "electron-updater",
         "fs",
+        "fs/promises",
         "os",
         "path",
         "module",
         "url",
         "@juice-client/node-enject",
-        // "chart.js",
       ],
       output: {
         entryFileNames: "[name].js",
