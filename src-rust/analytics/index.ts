@@ -1,9 +1,9 @@
-import { createRequire } from "module";
-import triplet from "../triplet.js";
-import { fromRoot } from "../../src/utils/functions.js";
+import { loadModule } from "../triplet.js";
 
-const modulePath = fromRoot(`./src-rust/analytics/analytics.${triplet()}.node`);
-const r = createRequire(import.meta.url);
+const { setEntry, setLastEntry, getAllData } = loadModule<{
+  setEntry: Function;
+  setLastEntry: Function;
+  getAllData: Function;
+}>("analytics");
 
-const { setEntry, setLastEntry, getAllData } = r(modulePath);
 export { setEntry, setLastEntry, getAllData };

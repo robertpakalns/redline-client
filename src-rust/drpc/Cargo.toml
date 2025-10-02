@@ -1,6 +1,5 @@
 [package]
 name = "drpc"
-version = "0.1.0"
 edition = "2024"
 
 [lib]
@@ -8,9 +7,10 @@ crate-type = ["cdylib"]
 
 [dependencies]
 discord-rich-presence = "0.2.5"
-napi = "2.16.17"
-napi-derive = "2.16.13"
-url_parser = { path = "../url_parser" }
+
+napi = { workspace = true }
+napi-derive = { workspace = true }
+url_parser = { workspace = true }
 
 [build-dependencies]
-napi-build = "2.2.2"
+napi-build = { workspace = true }

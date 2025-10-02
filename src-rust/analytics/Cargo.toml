@@ -1,6 +1,5 @@
 [package]
 name = "analytics"
-version = "0.1.0"
 edition = "2024"
 
 [lib]
@@ -8,11 +7,12 @@ crate-type = ["cdylib"]
 
 [dependencies]
 dirs = "6.0.0"
-napi = "2.16.17"
-napi-derive = "2.16.13"
 rusqlite = { version = "0.37.0", features = ["bundled"] }
 time = "0.3.41"
-url_parser = { path = "../url_parser" }
+
+napi = { workspace = true }
+napi-derive = { workspace = true }
+url_parser = { workspace = true }
 
 [build-dependencies]
-napi-build = "2.2.2"
+napi-build = { workspace = true }

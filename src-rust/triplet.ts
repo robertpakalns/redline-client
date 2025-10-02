@@ -1,3 +1,5 @@
+import { fromRoot } from "../src/utils/functions.js";
+import { createRequire } from "module";
 import { arch, platform } from "os";
 
 type Platform = "win32" | "darwin" | "linux";
@@ -9,15 +11,18 @@ const triplets: Record<Platform, Partial<Record<Arch, string>>> = {
   linux: { x64: "linux-x64-gnu", arm64: "linux-arm64-gnu" },
 };
 
-const triplet = (): string => {
+export const triplet = (): string => {
   const p = platform() as Platform;
   const a = arch() as Arch;
 
   const result = triplets[p]?.[a];
-  if (!result)
+  if (!result) {
     throw new Error(`Unsupported architecture ${a} on platform ${p}`);
-
+  }
   return result;
 };
 
-export default triplet;
+export const loadModule = <T = any>(name: string): T =>
+  createRequire(import.meta.url)(
+    fromRoot(`./src-rust/${name}/${name}.${triplet()}.node`),
+  ) as T;

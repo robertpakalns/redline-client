@@ -1,0 +1,15 @@
+[workspace]
+members = [
+  # NAPI modules
+  "analytics",
+  "drpc",
+  # Utilities
+  "url_parser",
+]
+resolver = "2"
+
+[workspace.dependencies]
+napi = "2.16.17"
+napi-derive = "2.16.13"
+napi-build = "2.2.2"
+url_parser = { path = "url_parser" }

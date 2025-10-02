@@ -2,5 +2,6 @@ node_modules
 dist
 js-dist
 
-*.node
+src-rust/**/*.node
 src-rust/target
+src-rust/**/*.d.ts

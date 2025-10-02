@@ -50,6 +50,7 @@ pub fn parse_url(url: &str) -> Result<(String, Option<u16>, String, String, Stri
     Ok((host.into(), port, path, query.into(), fragment.into()))
 }
 
+// Tests; use "cargo test" to run the tests
 #[cfg(test)]
 mod tests {
     use super::parse_url;

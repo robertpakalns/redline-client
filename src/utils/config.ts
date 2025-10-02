@@ -42,7 +42,7 @@ export const defaultConfig: IConfig = {
   client: {
     firstJoin: true,
     adblocker: true,
-    fpsUncap: true,
+    fpsUncap: false,
     fullscreen: false,
     swapper: false,
     domain: "kirka.io",
