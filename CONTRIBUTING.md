@@ -14,10 +14,10 @@ npm install --ignore-scripts
 
 # napi should be installed via npm as @napi-rs/cli
 cd src-rust/analytics
-npx napi build --release --platform --js false
+npx napi build --release --platform --no-js
 
 cd ../drpc
-npx napi build --release --platform --js false
+npx napi build --release --platform --no-js
 
 cd ../../
 ```
@@ -26,7 +26,7 @@ Redline Client compiles two `.node` files per plugin:
 - macOS: `x86_64-apple-darwin` and `aarch64-apple-darwin`
 - Linux: `x86_64-unknown-linux-gnu` and `aarch64-unknown-linux-gnu`
 
-To build the client locally, you will need only one `.node` file for each plugin (`npx napi build --release --platform --js false`).
+To build the client locally, you will need only one `.node` file for each plugin (`npx napi build --release --platform --no-js`).
 
 5. Build Electron Client:
 ```bash

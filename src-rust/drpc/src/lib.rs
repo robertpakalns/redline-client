@@ -76,7 +76,7 @@ pub fn init(join_btn: bool, initial_url: String, version: String) {
     }
 
     let drpc = Arc::new(Mutex::new(Drpc {
-        client: DiscordIpcClient::new(&client_id).map_err(napi_err).unwrap(),
+        client: DiscordIpcClient::new(&client_id),
         start_ts: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
