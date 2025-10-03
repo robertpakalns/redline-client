@@ -131,11 +131,47 @@ img.logo#logo {
     }
 }
 
+#team-section div.player-cont div.nickname {
+    width: max-content;
+}
+
 /* Badges */
+.badgesCont {
+    display: inline-flex;
+    margin: 5px;
+    gap: 7px;
+}
+
 .redlineBadge {
-    margin-left: 7px;
-    max-height: 25px;
-    max-width: 25px;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+
+    img {
+        max-height: 25px;
+        max-width: 25px;
+        display: block;
+    }
+
+    &::after {
+        content: attr(data-text);
+        position: absolute;
+        bottom: 115%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        padding: 5px 8px;
+        border-radius: 5px;
+        white-space: nowrap;
+        transition: opacity 0.2s;
+        z-index: 10;
+        font-size: 1rem;
+        opacity: 0;
+    }
+
+    &:hover::after {
+        opacity: 1;
+    }
 }
 
 /* Search Friends */

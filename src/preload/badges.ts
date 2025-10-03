@@ -1,11 +1,18 @@
 import { createEl } from "../preload/preloadFunctions.js";
 
-const linkedBadge = (): HTMLElement =>
-  createEl(
-    "img",
-    { src: "redline://?path=assets/icons/badges/linked.png" },
-    "redlineBadge",
+const linkedBadge = (linkedTime: string): HTMLElement => {
+  const img = createEl("img", {
+    src: "redline://?path=assets/icons/badges/linked.png",
+  });
+
+  const span = createEl("span", {}, "redlineBadge", [img]);
+  span.setAttribute(
+    "data-text",
+    `This user linked at ${new Date(linkedTime).toLocaleDateString()}`,
   );
+
+  return span;
+};
 
 const addBadges = (cont: HTMLElement, shortId: string): void => {
   if (!cont) return;
@@ -13,7 +20,11 @@ const addBadges = (cont: HTMLElement, shortId: string): void => {
   let user = badgesMap.get(shortId);
   if (!user) return;
 
-  cont.appendChild(linkedBadge());
+  const badgesCont = createEl("div", {}, "badgesCont", [
+    linkedBadge(user.linked_at),
+  ]);
+
+  cont.appendChild(badgesCont);
 };
 
 let badgesMap: Map<string, any> = new Map();
@@ -39,7 +50,7 @@ export const getUser = async () => {
 };
 
 export const profileMenuBadge = (cont: HTMLElement): void => {
-  if (cont.querySelector(".redlineBadge")) return;
+  if (cont.querySelector(".badgesCont")) return;
 
   const shortIdCont = cont.querySelector(".v-popover .value")!;
   if (!shortIdCont) return;
@@ -54,7 +65,7 @@ export const mainMenuBadge = (cont: HTMLElement): void => {
   const divs = cont.querySelectorAll("div");
 
   for (const el of Array.from(divs)) {
-    if (cont.querySelector(".redlineBadge")) continue;
+    if (cont.querySelector(".badgesCont")) continue;
 
     const nameCont = el.querySelector(".nickname") as HTMLElement;
     addBadges(nameCont, shortIdCache);
@@ -76,10 +87,10 @@ export const gameTDMBadges = (cont: HTMLElement): void => {
 
       const shortId = shortIdCont.textContent?.replace("#", "");
       const playerLeft = el.querySelector(".player-left") as HTMLElement;
-      if (!playerLeft) continue;
+      if (!playerLeft || !shortId) continue;
 
-      const oldBadge = playerLeft.querySelector(".redlineBadge");
-      const user = shortId ? badgesMap.get(shortId) : null;
+      const oldBadge = playerLeft.querySelector(".badgesCont") as HTMLElement;
+      const user = badgesMap.get(shortId);
 
       if (user) {
         if (!oldBadge) addBadges(playerLeft, shortId);
@@ -101,7 +112,7 @@ export const gameDMBadges = (cont: HTMLElement): void => {
     const playerLeft = el.querySelector(".player-left") as HTMLElement;
     if (!playerLeft) continue;
 
-    const oldBadge = playerLeft.querySelector(".redlineBadge");
+    const oldBadge = playerLeft.querySelector(".badgesCont");
     const user = shortId ? badgesMap.get(shortId) : null;
 
     if (user) {
@@ -121,7 +132,7 @@ export const escGameBadges = (cont: HTMLElement): void => {
     if (!shortIdEl || !nicknameEl) continue;
 
     const shortId = shortIdEl.textContent?.replace("#", "");
-    const oldBadge = nicknameEl.querySelector(".redlineBadge");
+    const oldBadge = nicknameEl.querySelector(".badgesCont");
 
     const user = shortId ? badgesMap.get(shortId) : null;
 
@@ -140,7 +151,7 @@ export const setFriendBadges = (cont: HTMLElement, c: string): void => {
   const friends = subCont.querySelectorAll(".friend");
 
   for (const el of Array.from(friends)) {
-    if (el.querySelector(".redlineBadge")) continue;
+    if (el.querySelector(".badgesCont")) continue;
 
     const shortIdCont = el.querySelector(".friend-id") as HTMLElement;
     if (!shortIdCont) continue;
