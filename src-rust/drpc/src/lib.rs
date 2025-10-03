@@ -2,14 +2,25 @@ use napi::{Error, Result};
 use napi_derive::napi;
 use std::{
     collections::HashMap,
-    fs::{File, OpenOptions},
     io::{Read, Write},
     process,
     sync::{Arc, LazyLock, Mutex},
     thread::{sleep, spawn},
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+
+#[cfg(windows)]
+use std::fs::{File, OpenOptions};
+
+#[cfg(unix)]
+use std::os::unix::net::UnixStream;
+
 use url_parser::parse_url;
+
+#[cfg(windows)]
+type Pipe = File;
+#[cfg(unix)]
+type Pipe = UnixStream;
 
 struct Drpc {
     start_ts: u64,
@@ -17,7 +28,12 @@ struct Drpc {
     state: String,
     details: String,
     join_url: String,
+
+    #[cfg(windows)]
     pipe: File,
+    #[cfg(unix)]
+    pipe: UnixStream,
+
     pid: u32,
     version_text: String,
 }
@@ -69,7 +85,7 @@ fn napi_err<E: std::fmt::Display>(e: E) -> Error {
     Error::from_reason(e.to_string())
 }
 
-fn send_packet(pipe: &mut File, opcode: u32, json: &str) -> std::io::Result<()> {
+fn send_packet(pipe: &mut Pipe, opcode: u32, json: &str) -> std::io::Result<()> {
     let mut p = Vec::new();
     p.extend_from_slice(&opcode.to_le_bytes());
     p.extend_from_slice(&(json.len() as u32).to_le_bytes());
@@ -77,17 +93,32 @@ fn send_packet(pipe: &mut File, opcode: u32, json: &str) -> std::io::Result<()> 
     pipe.write_all(&p)
 }
 
-fn connect_to_discord(client_id: &str) -> std::io::Result<File> {
-    for i in 0..=10 {
-        let pipe_path = format!(r"\\?\pipe\discord-ipc-{}", i);
-        if let Ok(mut pipe) = OpenOptions::new().read(true).write(true).open(&pipe_path) {
-            let handshake = format!(r#"{{ "v": 1, "client_id": "{client_id}" }}"#);
-            send_packet(&mut pipe, 0, &handshake)?;
+fn connect_to_discord(client_id: &str) -> std::io::Result<Pipe> {
+    #[cfg(windows)]
+    {
+        for i in 0..=10 {
+            let pipe_path = format!(r"\\?\pipe\discord-ipc-{}", i);
+            if let Ok(mut pipe) = OpenOptions::new().read(true).write(true).open(&pipe_path) {
+                let handshake = format!(r#"{{ "v": 1, "client_id": "{client_id}" }}"#);
+                send_packet(&mut pipe, 0, &handshake)?;
+                let mut buf = [0u8; 1024];
+                let _ = pipe.read(&mut buf);
+                return Ok(pipe);
+            }
+        }
+    }
 
-            let mut buf = [0u8; 1024];
-            let _ = pipe.read(&mut buf);
-
-            return Ok(pipe);
+    #[cfg(unix)]
+    {
+        for i in 0..=10 {
+            let pipe_path = format!("/tmp/discord-ipc-{}", i);
+            if let Ok(mut pipe) = UnixStream::connect(&pipe_path) {
+                let handshake = format!(r#"{{ "v": 1, "client_id": "{client_id}" }}"#);
+                send_packet(&mut pipe, 0, &handshake)?;
+                let mut buf = [0u8; 1024];
+                let _ = pipe.read(&mut buf);
+                return Ok(pipe);
+            }
         }
     }
 
@@ -115,7 +146,6 @@ pub fn init(join_btn: bool, initial_url: String, version: String) {
         state: "Playing Kirka.io".to_string(),
         details: String::new(),
         join_url: "redline://".to_string(),
-
         pid: process::id(),
         version_text: format!("Redline Client v{}", version),
     }));
