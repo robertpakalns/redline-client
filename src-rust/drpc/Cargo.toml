@@ -6,8 +6,6 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-discord-rich-presence = "1.0.0"
-
 napi = { workspace = true }
 napi-derive = { workspace = true }
 url_parser = { workspace = true }

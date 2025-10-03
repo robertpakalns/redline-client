@@ -1,11 +1,10 @@
-use discord_rich_presence::{
-    DiscordIpc, DiscordIpcClient,
-    activity::{Activity, Assets, Button, Timestamps},
-};
 use napi::{Error, Result};
 use napi_derive::napi;
 use std::{
     collections::HashMap,
+    fs::{File, OpenOptions},
+    io::{Read, Write},
+    process,
     sync::{Arc, LazyLock, Mutex},
     thread::{sleep, spawn},
     time::{Duration, SystemTime, UNIX_EPOCH},
@@ -13,18 +12,17 @@ use std::{
 use url_parser::parse_url;
 
 struct Drpc {
-    client: DiscordIpcClient,
-    start_ts: i64,
+    start_ts: u64,
     join_btn: bool,
-    protocol: String,
     state: String,
     details: String,
     join_url: String,
+    pipe: File,
+    pid: u32,
+    version_text: String,
 }
 
 static INSTANCE: LazyLock<Mutex<Option<Arc<Mutex<Drpc>>>>> = LazyLock::new(|| Mutex::new(None));
-
-static VERSION: LazyLock<Mutex<String>> = LazyLock::new(|| Mutex::new(String::new()));
 
 static STATIC_LINKS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     HashMap::from([
@@ -60,49 +58,79 @@ static STATIC_LINKS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::n
     ])
 });
 
+fn get_timestamp() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs()
+}
+
 fn napi_err<E: std::fmt::Display>(e: E) -> Error {
     Error::from_reason(e.to_string())
+}
+
+fn send_packet(pipe: &mut File, opcode: u32, json: &str) -> std::io::Result<()> {
+    let mut p = Vec::new();
+    p.extend_from_slice(&opcode.to_le_bytes());
+    p.extend_from_slice(&(json.len() as u32).to_le_bytes());
+    p.extend_from_slice(json.as_bytes());
+    pipe.write_all(&p)
+}
+
+fn connect_to_discord(client_id: &str) -> std::io::Result<File> {
+    for i in 0..=10 {
+        let pipe_path = format!(r"\\?\pipe\discord-ipc-{}", i);
+        if let Ok(mut pipe) = OpenOptions::new().read(true).write(true).open(&pipe_path) {
+            let handshake = format!(r#"{{ "v": 1, "client_id": "{client_id}" }}"#);
+            send_packet(&mut pipe, 0, &handshake)?;
+
+            let mut buf = [0u8; 1024];
+            let _ = pipe.read(&mut buf);
+
+            return Ok(pipe);
+        }
+    }
+
+    Err(std::io::Error::new(
+        std::io::ErrorKind::NotFound,
+        "Discord IPC not found",
+    ))
 }
 
 #[napi]
 pub fn init(join_btn: bool, initial_url: String, version: String) {
     let client_id = "1385893715519864933";
 
-    *VERSION.lock().unwrap() = version;
-
     let mut instance = INSTANCE.lock().unwrap();
     if instance.is_some() {
         return;
     }
 
+    let pipe = connect_to_discord(client_id).unwrap();
+
     let drpc = Arc::new(Mutex::new(Drpc {
-        client: DiscordIpcClient::new(&client_id),
-        start_ts: SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64,
+        pipe,
+        start_ts: get_timestamp(),
         join_btn,
-        protocol: "redline://".to_string(),
         state: "Playing Kirka.io".to_string(),
         details: String::new(),
         join_url: "redline://".to_string(),
-    }));
 
-    let drpc_thread = drpc.clone();
+        pid: process::id(),
+        version_text: format!("Redline Client v{}", version),
+    }));
 
     {
         let mut drpc_lock = drpc.lock().unwrap();
         set_status_internal(&mut drpc_lock, &initial_url).unwrap();
+        update_activity(&mut drpc_lock);
     }
 
+    let drpc_thread = drpc.clone();
     spawn(move || {
-        drpc_thread.lock().unwrap().client.connect().unwrap();
-
-        update_activity(&mut drpc_thread.lock().unwrap());
-
         loop {
-            update_activity(&mut drpc_thread.lock().unwrap());
             sleep(Duration::from_secs(15));
+            update_activity(&mut drpc_thread.lock().unwrap());
         }
     });
 
@@ -142,9 +170,9 @@ fn set_status_internal(drpc: &mut Drpc, url: &str) -> Result<()> {
 
     drpc.details = host.to_string();
     drpc.join_url = if path == "/" {
-        drpc.protocol.clone()
+        "redline://".to_string()
     } else {
-        format!("{}?url={}", drpc.protocol, path)
+        format!("redline://?url={}", path)
     };
 
     Ok(())
@@ -153,44 +181,65 @@ fn set_status_internal(drpc: &mut Drpc, url: &str) -> Result<()> {
 #[napi]
 pub fn set_status(url: String) -> Result<()> {
     let instance = INSTANCE.lock().unwrap();
-    let drpc = instance
+    let mut drpc = instance
         .as_ref()
-        .ok_or_else(|| napi_err("DRPC not initialized."))?;
-    let drpc_clone = drpc.clone();
+        .ok_or_else(|| napi_err("DRPC not initialized."))?
+        .lock()
+        .unwrap();
 
-    spawn(move || {
-        set_status_internal(&mut drpc_clone.lock().unwrap(), &url).ok();
-    });
-
+    set_status_internal(&mut drpc, &url)?;
     Ok(())
 }
 
 fn update_activity(drpc: &mut Drpc) {
-    let mut buttons = vec![Button::new(
-        "Download Client",
-        "https://github.com/robertpakalns/redline-client/releases/latest",
+    let mut buttons = vec![(
+        "Download Client".to_string(),
+        "https://tricko.pro/redline".to_string(),
     )];
 
     if drpc.join_btn {
-        buttons.insert(0, Button::new("Join Game", &drpc.join_url));
+        buttons.insert(0, ("Join Game".to_string(), drpc.join_url.clone()));
     } else {
-        buttons.push(Button::new(
-            "Community Server",
-            "https://discord.gg/cTE6CVuGen",
+        buttons.push((
+            "Community Server".to_string(),
+            "https://discord.gg/cTE6CVuGen".to_string(),
         ));
     }
-    let version_text = format!("Redline Client v{}", VERSION.lock().unwrap().clone());
 
-    let act = Activity::new()
-        .state(&drpc.state)
-        .details(&drpc.details)
-        .timestamps(Timestamps::new().start(drpc.start_ts))
-        .buttons(buttons)
-        .assets(
-            Assets::new()
-                .large_image("redline")
-                .large_text(&version_text),
-        );
+    let mut buttons_json = String::new();
+    for (i, (label, url)) in buttons.iter().enumerate() {
+        if i > 0 {
+            buttons_json.push(',');
+        }
+        buttons_json.push_str(&format!(r#"{{"label":"{label}","url":"{url}"}}"#));
+    }
 
-    drpc.client.set_activity(act).map_err(napi_err).unwrap();
+    let json = format!(
+        r#"{{
+            "cmd": "SET_ACTIVITY",
+            "args": {{
+                "pid": {},
+                "activity": {{
+                    "state": "{}",
+                    "details": "{}",
+                    "timestamps": {{ "start": {} }},
+                    "assets": {{
+                        "large_image": "redline",
+                        "large_text": "{}"
+                    }},
+                    "buttons": [{}]
+                }}
+            }},
+            "nonce": "{}"
+        }}"#,
+        drpc.pid,
+        drpc.state,
+        drpc.details,
+        drpc.start_ts,
+        drpc.version_text,
+        buttons_json,
+        get_timestamp(),
+    );
+
+    send_packet(&mut drpc.pipe, 1, &json).unwrap();
 }
