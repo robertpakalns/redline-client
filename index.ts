@@ -165,6 +165,8 @@ app.on("ready", () => {
     deeplinkURL = queryPath ? `https://${getHost()}/${cleanPath}${hash}` : null;
   }
 
+  analytics.setTimeOffset(-new Date().getTimezoneOffset());
+
   drpc.init(
     config.get("discord.joinButton") as boolean,
     deeplinkURL || `https://${getHost()}`,

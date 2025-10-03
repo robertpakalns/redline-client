@@ -9,8 +9,12 @@ use std::{
     thread::spawn,
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
-use time::OffsetDateTime;
+
 use url_parser::parse_url;
+
+mod format_date;
+
+use format_date::get_yyyymmdd;
 
 #[derive(Clone)]
 struct LastEntry {
@@ -22,6 +26,7 @@ struct LastEntry {
 
 static LAST_ENTRY: LazyLock<Mutex<Option<LastEntry>>> = LazyLock::new(|| Mutex::new(None));
 static UNREGISTERED_DOMAIN_DURATION: LazyLock<Mutex<i64>> = LazyLock::new(|| Mutex::new(0));
+pub static TIME_OFFSET_MINUTES: LazyLock<Mutex<i32>> = LazyLock::new(|| Mutex::new(0));
 
 static ALLOWED_DOMAINS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
@@ -68,6 +73,11 @@ fn establish_connection() -> Result<Connection> {
     )
     .map_err(napi_err)?;
     Ok(conn)
+}
+
+#[napi]
+pub fn set_time_offset(offset: i32) {
+    *TIME_OFFSET_MINUTES.lock().unwrap() = offset;
 }
 
 #[napi]
@@ -253,10 +263,8 @@ fn prepare_data() -> Result<AnalyticsReport> {
         }
         *time_spent_per_host.entry(entry.host.clone()).or_insert(0) += entry.duration;
 
-        let dt_utc = OffsetDateTime::from_unix_timestamp_nanos(entry.timestamp as i128 * 1_000_000)
-            .map_err(|e| napi_err(format!("Invalid timestamp: {}", e)))?;
-
-        let date_str = dt_utc.date().to_string(); // Format: "YYYY-MM-DD"
+        let date_str = get_yyyymmdd(entry.timestamp, *TIME_OFFSET_MINUTES.lock().unwrap())
+            .map_err(napi_err)?; // Format: "YYYY-MM-DD"
 
         let (total, game) = daily_map.entry(date_str).or_insert((0, 0));
 
