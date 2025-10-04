@@ -15,7 +15,6 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        "discord-rpc",
         "electron",
         "electron-updater",
         "fs",

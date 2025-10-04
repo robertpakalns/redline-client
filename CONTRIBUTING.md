@@ -1,3 +1,20 @@
+# 📝 About Project
+
+## ⚙️ Engine
+Redline Client uses one of the latest Electron versions, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the [`@juice-client/node-enject`](https://www.npmjs.com/package/@juice-client/node-enject) workaround, which resolves the problem on Windows.
+More information about dependencies:
+* [`package.json`](https://github.com/robertpakalns/redline-client/blob/main/package.json).
+* [`Cargo.toml`](https://github.com/robertpakalns/redline-client/blob/main/src-rust/Cargo.toml).
+
+## Build Technologies
+* **Electron's `nodeIntegration: false`** prevents Node.js API from being accessible directly in the renderer process.
+* **Vite** generates 2 separate scripts: one for the main process and one for the renderer process. This creates optimized bundles and a clear separation of main and renderer scripts.
+* **TypeScript** ensures type safety and fewer runtime errors.
+* **napi-rs** compiles Node modules which are used in the client.
+
+## 🔗 Deeplink
+Redline Client uses `redline:` protocol to open the client. For example, `redline://?url=path/to/page` opens the client with the page `https://kirka.io/path/to/page`. [Example with Voxtulate Client](https://github.com/robertpakalns/VoxtulateClient/wiki/Deeplinks).
+
 # 🚀 Build Project Locally
 1. Prerequisites:
 - [Node.js](https://nodejs.org)
