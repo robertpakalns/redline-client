@@ -139,7 +139,7 @@ img.logo#logo {
 .badgesCont {
     display: inline-flex;
     margin: 5px;
-    gap: 7px;
+    gap: 5px;
 }
 
 .redlineBadge {

@@ -24,12 +24,12 @@
     "requires": "restart"
   },
   {
-    "name": "Discord RPC Join Button",
+    "id": "drpcJoinButton",
+    "name": "Toggle Discord RPC Join Button",
     "description": "Allows players to join your game from your Discord profile",
     "type": "checkbox",
     "config": "discord.joinButton",
-    "section": "settings",
-    "requires": "restart"
+    "section": "settings"
   },
   {
     "id": "modalHint",

@@ -137,7 +137,13 @@ pub fn init(join_btn: bool, initial_url: String, version: String) {
         return;
     }
 
-    let pipe = connect_to_discord(client_id).unwrap();
+    let pipe = match connect_to_discord(client_id) {
+        Ok(pipe) => pipe,
+        Err(_) => {
+            // Skip if not connected
+            return;
+        }
+    };
 
     let drpc = Arc::new(Mutex::new(Drpc {
         pipe,
@@ -211,11 +217,13 @@ fn set_status_internal(drpc: &mut Drpc, url: &str) -> Result<()> {
 #[napi]
 pub fn set_status(url: String) -> Result<()> {
     let instance = INSTANCE.lock().unwrap();
-    let mut drpc = instance
-        .as_ref()
-        .ok_or_else(|| napi_err("DRPC not initialized."))?
-        .lock()
-        .unwrap();
+
+    let Some(drpc_arc) = instance.as_ref() else {
+        // Skip if not connected
+        return Ok(());
+    };
+
+    let mut drpc = drpc_arc.lock().unwrap();
 
     set_status_internal(&mut drpc, &url)?;
     Ok(())
@@ -272,4 +280,17 @@ fn update_activity(drpc: &mut Drpc) {
     );
 
     send_packet(&mut drpc.pipe, 1, &json).unwrap();
+}
+
+#[napi]
+pub fn set_join_button(enable: bool) -> Result<()> {
+    let instance = INSTANCE.lock().unwrap();
+
+    let Some(drpc_arc) = instance.as_ref() else {
+        return Ok(());
+    };
+
+    drpc_arc.lock().unwrap().join_btn = enable;
+
+    Ok(())
 }

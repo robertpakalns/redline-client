@@ -99,6 +99,7 @@ export const generateConfigs = async (): Promise<void> => {
   const toggleObject = {
     modalHint: "toggle-menu-modal",
     toggleKDRatio: "toggle-kd-ratio",
+    drpcJoinButton: "toggle-drpc-join-button",
   };
   for (const [id, event] of Object.entries(toggleObject)) {
     document.querySelector(`#${id}`)?.addEventListener("change", (e) => {
