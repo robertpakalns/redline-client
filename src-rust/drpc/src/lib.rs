@@ -4,7 +4,10 @@ use std::{
     collections::HashMap,
     io::{Read, Write},
     process,
-    sync::{Arc, LazyLock, Mutex},
+    sync::{
+        Arc, LazyLock, Mutex,
+        atomic::{AtomicBool, AtomicU64, Ordering},
+    },
     thread::{sleep, spawn},
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
@@ -128,6 +131,37 @@ fn connect_to_discord(client_id: &str) -> std::io::Result<Pipe> {
     ))
 }
 
+static LAST_UPDATE: AtomicU64 = AtomicU64::new(0);
+static TO_BE_UPDATED: AtomicBool = AtomicBool::new(false);
+
+fn spawn_activity_updater(drpc_arc: Arc<Mutex<Drpc>>) {
+    spawn(move || {
+        loop {
+            sleep(Duration::from_millis(500));
+
+            let now = get_timestamp();
+            let last = LAST_UPDATE.load(Ordering::Relaxed);
+
+            // Ping every 20 second
+            if now.saturating_sub(last) >= 20 {
+                let mut drpc = drpc_arc.lock().unwrap();
+                update_activity(&mut drpc);
+                LAST_UPDATE.store(now, Ordering::Relaxed);
+                TO_BE_UPDATED.store(false, Ordering::Relaxed);
+                continue;
+            }
+
+            // Update every 2 seconds on user interaction
+            if TO_BE_UPDATED.load(Ordering::Relaxed) && now.saturating_sub(last) >= 2 {
+                let mut drpc = drpc_arc.lock().unwrap();
+                update_activity(&mut drpc);
+                LAST_UPDATE.store(now, Ordering::Relaxed);
+                TO_BE_UPDATED.store(false, Ordering::Relaxed);
+            }
+        }
+    });
+}
+
 #[napi]
 pub fn init(join_btn: bool, initial_url: String, version: String) {
     let client_id = "1385893715519864933";
@@ -162,13 +196,7 @@ pub fn init(join_btn: bool, initial_url: String, version: String) {
         update_activity(&mut drpc_lock);
     }
 
-    let drpc_thread = drpc.clone();
-    spawn(move || {
-        loop {
-            sleep(Duration::from_secs(15));
-            update_activity(&mut drpc_thread.lock().unwrap());
-        }
-    });
+    spawn_activity_updater(drpc.clone());
 
     *instance = Some(drpc);
 }
@@ -226,6 +254,9 @@ pub fn set_status(url: String) -> Result<()> {
     let mut drpc = drpc_arc.lock().unwrap();
 
     set_status_internal(&mut drpc, &url)?;
+
+    TO_BE_UPDATED.store(true, Ordering::Relaxed);
+
     Ok(())
 }
 
@@ -291,6 +322,8 @@ pub fn set_join_button(enable: bool) -> Result<()> {
     };
 
     drpc_arc.lock().unwrap().join_btn = enable;
+
+    TO_BE_UPDATED.store(true, Ordering::Relaxed);
 
     Ok(())
 }
