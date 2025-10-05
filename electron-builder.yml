@@ -53,8 +53,6 @@ nsis:
   runAfterFinish: true
   uninstallDisplayName: "${productName}"
   shortcutName: "${productName}"
-  differentialPackage: false
 
 dmg:
-  writeUpdateInfo: false
   background: "assets/background.tiff"

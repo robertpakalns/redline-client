@@ -1,5 +1,5 @@
 import { createEl, isNum } from "../preload/preloadFunctions.js";
-import { shell, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 
 // Kirka.io Domains
 export const domains = new Set<string>([
@@ -94,10 +94,10 @@ export const setTrickoLink = (cont: HTMLElement): void => {
 
   copiedNode.classList.add("playerTrickoLink");
   copiedNode.textContent = "TRICKO";
-  copiedNode.addEventListener("click", () => {
+  copiedNode.addEventListener("click", async () => {
     const playerID = encodeURIComponent(idCont.innerHTML.replace("#", ""));
     const trickoLink = `https://tricko.pro/kirka/player/${playerID}`;
-    shell.openExternal(trickoLink);
+    await ipcRenderer.invoke("shell-open-external", trickoLink);
   });
 
   bottomCont.prepend(copiedNode);
@@ -120,7 +120,7 @@ export const changeSocLinks = (cont: HTMLElement): void => {
   });
   discordButton.querySelector("svg")!.replaceWith(discordButtonImg);
   discordButton.onclick = () =>
-    shell.openExternal("https://discord.gg/cTE6CVuGen");
+    ipcRenderer.invoke("shell-open-external", "https://discord.gg/cTE6CVuGen");
 
   btns[0].replaceWith(discordButton);
 
@@ -131,7 +131,8 @@ export const changeSocLinks = (cont: HTMLElement): void => {
     src: "redline://?path=assets/icons/tricko.svg",
   });
   trickoButton.querySelector("svg")!.replaceWith(trickoButtonImg);
-  trickoButton.onclick = () => shell.openExternal("https://tricko.pro/redline");
+  trickoButton.onclick = () =>
+    ipcRenderer.invoke("shell-open-external", "https://tricko.pro/redline");
 
   const texts = Array.from(
     trickoButton.querySelector(".text-soc")!.children,

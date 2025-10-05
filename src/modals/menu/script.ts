@@ -1,5 +1,5 @@
 import { createEl, popup } from "../../preload/preloadFunctions.js";
-import { shell, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 import Modal from "../modal.js";
 
 import menuModalHTML from "../../../assets/html/menu.html?raw";
@@ -79,9 +79,9 @@ class MenuModal extends Modal {
     for (const el of Array.from(
       this.modal!.querySelectorAll(".url"),
     ) as HTMLAnchorElement[])
-      el.addEventListener("click", (e) => {
+      el.addEventListener("click", async (e) => {
         e.preventDefault();
-        shell.openPath(el.href);
+        await ipcRenderer.invoke("shell-open-external", el.href);
       });
 
     for (const el of Array.from(this.modal!.querySelectorAll(".copy")))
@@ -118,8 +118,13 @@ class MenuModal extends Modal {
     for (const [key, value] of Object.entries(openFromShell))
       this.modal
         ?.querySelector(`#${key}`)
-        ?.addEventListener("click", async () =>
-          shell.openPath(await ipcRenderer.invoke("from-config-dir", value)),
+        ?.addEventListener(
+          "click",
+          async () =>
+            await ipcRenderer.invoke(
+              "shell-open-path",
+              await ipcRenderer.invoke("from-config-dir", value),
+            ),
         );
   }
 }

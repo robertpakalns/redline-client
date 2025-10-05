@@ -16,7 +16,7 @@ use std::{
 use std::fs::{File, OpenOptions};
 
 #[cfg(unix)]
-use std::os::unix::net::UnixStream;
+use std::{env, os::unix::net::UnixStream};
 
 use url_parser::parse_url;
 
@@ -113,13 +113,36 @@ fn connect_to_discord(client_id: &str) -> std::io::Result<Pipe> {
 
     #[cfg(unix)]
     {
+        let mut paths = vec![];
+
+        if let Ok(xdg) = env::var("XDG_RUNTIME_DIR") {
+            for i in 0..=10 {
+                paths.push(format!("{}/discord-ipc-{}", xdg, i));
+            }
+        }
+
         for i in 0..=10 {
-            let pipe_path = format!("/tmp/discord-ipc-{}", i);
+            paths.push(format!("/tmp/discord-ipc-{}", i));
+        }
+
+        let temp_dir = env::temp_dir();
+        for i in 0..=10 {
+            paths.push(
+                temp_dir
+                    .join(format!("discord-ipc-{}", i))
+                    .to_string_lossy()
+                    .to_string(),
+            );
+        }
+
+        for pipe_path in paths {
             if let Ok(mut pipe) = UnixStream::connect(&pipe_path) {
-                let handshake = format!(r#"{{ "v": 1, "client_id": "{client_id}" }}"#);
+                let handshake = format!(r#"{{"v": 1, "client_id": "{client_id}"}}"#);
                 send_packet(&mut pipe, 0, &handshake)?;
+
                 let mut buf = [0u8; 1024];
                 let _ = pipe.read(&mut buf);
+
                 return Ok(pipe);
             }
         }

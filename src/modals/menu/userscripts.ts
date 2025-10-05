@@ -2,7 +2,7 @@ import { appendConfig, Setting, sendNotification } from "./generateConfigs.js";
 import settingsJson from "../../../assets/userscriptsSettings.json";
 import { createEl } from "../../preload/preloadFunctions";
 import { ScriptMeta } from "../../utils/userscripts.js";
-import { shell, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 
 const data = settingsJson as Setting[];
 
@@ -34,10 +34,13 @@ const appendUserscriptConfig = (
     : null;
 
   const open = createEl("a", {}, "", ["Open"]);
-  open.addEventListener("click", async () =>
-    shell.openPath(
-      await ipcRenderer.invoke("from-config-dir", `${sh}/${meta.file}`),
-    ),
+  open.addEventListener(
+    "click",
+    async () =>
+      await ipcRenderer.invoke(
+        "shell-open-path",
+        await ipcRenderer.invoke("from-config-dir", `${sh}/${meta.file}`),
+      ),
   );
 
   const requires = createEl("div", {}, "refresh", ["Requires page refresh"]);

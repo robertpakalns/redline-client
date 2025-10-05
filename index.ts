@@ -11,7 +11,7 @@ import {
   defaultConfig,
 } from "./src/utils/config.js";
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { writeFile, readFile } from "fs/promises";
 import electronUpdater from "electron-updater";
 import packageJson from "./package.json";
@@ -38,6 +38,10 @@ const handleURL = (url: string): void => {
   analytics.setEntry(lastURL);
 };
 
+ipcMain.handle("shell-open-path", (_, path: string) => shell.openPath(path));
+ipcMain.handle("shell-open-external", (_, url: string) =>
+  shell.openExternal(url),
+);
 ipcMain.handle("config-get", (_, key: string) => config.get(key));
 ipcMain.handle("config-set", (_, key: string, value: boolean) => {
   config.set(key, value);
