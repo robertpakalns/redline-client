@@ -1,17 +1,22 @@
 [package]
 name = "analytics"
-edition = "2024"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+description = "Analytics utility, storing data in an SQLite database"
+repository.workspace = true
+license-file.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-dirs = "6.0.0"
-rusqlite = { version = "0.37.0", features = ["bundled"] }
+dirs.workspace = true
+napi.workspace = true
+napi-derive.workspace = true
+rusqlite.workspace = true
 
-napi = { workspace = true }
-napi-derive = { workspace = true }
-url_parser = { workspace = true }
+url_parser.workspace = true
 
 [build-dependencies]
-napi-build = { workspace = true }
+napi-build.workspace = true

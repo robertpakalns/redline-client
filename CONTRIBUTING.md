@@ -12,9 +12,6 @@ More information about dependencies:
 * **TypeScript** ensures type safety and fewer runtime errors.
 * **napi-rs** compiles Node modules which are used in the client.
 
-## 🔗 Deeplink
-Redline Client uses `redline:` protocol to open the client. For example, `redline://?url=path/to/page` opens the client with the page `https://kirka.io/path/to/page`. [Example with Voxtulate Client](https://github.com/robertpakalns/VoxtulateClient/wiki/Deeplinks).
-
 # 🚀 Build Project Locally
 1. Prerequisites:
 - [Node.js](https://nodejs.org)
@@ -30,13 +27,8 @@ cd redline-client
 npm install --ignore-scripts
 
 # napi should be installed via npm as @napi-rs/cli
-cd src-rust/analytics
-npx napi build --release --platform --no-js
-
-cd ../drpc
-npx napi build --release --platform --no-js
-
-cd ../../
+npx napi build --release --platform --no-js --cwd src-rust/analytics
+npx napi build --release --platform --no-js --cwd src-rust/drpc
 ```
 Redline Client compiles two `.node` files per plugin:
 - Windows: `x86_64-pc-windows-msvc` and `i686-pc-windows-msvc`

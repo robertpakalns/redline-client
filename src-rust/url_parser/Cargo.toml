@@ -1,3 +1,8 @@
 [package]
 name = "url_parser"
-edition = "2024"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+description = "Simple, dependency-free URL parser"
+repository.workspace = true
+license-file.workspace = true

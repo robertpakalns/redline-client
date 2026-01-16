@@ -1,4 +1,4 @@
 {
   "include": ["src", "vite-env.d.ts"],
-  "exclude": ["node_modules", "src-rust/target"]
+  "exclude": ["node_modules", "src-rust/target"],
 }

@@ -82,6 +82,9 @@ To use the swapper:
 4. Reload the client to apply changes
 5. [Example with Voxtulate Client (Extended Swapper)](https://github.com/robertpakalns/VoxtulateClient/wiki/Resource-Swapper)
 
+## 🔗 Deeplink
+Redline Client uses `redline:` protocol to open the client. For example, `redline://?url=path/to/page` opens the client with the page `https://kirka.io/path/to/page`. [Example with Voxtulate Client](https://github.com/robertpakalns/VoxtulateClient/wiki/Deeplinks).
+
 ## 🧑‍💻 Credits
 * xip for Kirka.io
 * Voxtulate Client (robertpakalns) for core features

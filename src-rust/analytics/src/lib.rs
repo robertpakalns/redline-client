@@ -12,10 +12,6 @@ use std::{
 
 use url_parser::parse_url;
 
-mod format_date;
-
-use format_date::get_yyyymmdd;
-
 #[derive(Clone)]
 struct LastEntry {
     id: i64,
@@ -26,7 +22,7 @@ struct LastEntry {
 
 static LAST_ENTRY: LazyLock<Mutex<Option<LastEntry>>> = LazyLock::new(|| Mutex::new(None));
 static UNREGISTERED_DOMAIN_DURATION: LazyLock<Mutex<i64>> = LazyLock::new(|| Mutex::new(0));
-pub static TIME_OFFSET_MINUTES: LazyLock<Mutex<i32>> = LazyLock::new(|| Mutex::new(0));
+pub static TIME_OFFSET_MILLIS: LazyLock<Mutex<i64>> = LazyLock::new(|| Mutex::new(0));
 
 static ALLOWED_DOMAINS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
@@ -76,8 +72,8 @@ fn establish_connection() -> Result<Connection> {
 }
 
 #[napi]
-pub fn set_time_offset(offset: i32) {
-    *TIME_OFFSET_MINUTES.lock().unwrap() = offset;
+pub fn set_time_offset(offset: i64) {
+    *TIME_OFFSET_MILLIS.lock().unwrap() = offset * 60 * 60;
 }
 
 #[napi]
@@ -200,7 +196,7 @@ pub struct Entry {
 
 #[napi(object)]
 pub struct DailyAnalytics {
-    pub date: String,
+    pub date: i64,
     pub total_time_spent: i64,
     pub game_time_spent: i64,
 }
@@ -249,7 +245,7 @@ fn prepare_data() -> Result<AnalyticsReport> {
     let mut total_time_spent = 0;
     let mut total_game_time_spent = 0;
     let mut time_spent_per_host: HashMap<String, i64> = HashMap::new();
-    let mut daily_map: HashMap<String, (i64, i64)> = HashMap::new();
+    let mut daily_map: HashMap<i64, (i64, i64)> = HashMap::new();
     let mut entries_per_region: HashMap<String, i64> = HashMap::new();
     let mut time_spent_per_region: HashMap<String, i64> = HashMap::new();
     let mut region_id_tracker: HashMap<String, HashSet<String>> = HashMap::new();
@@ -263,10 +259,13 @@ fn prepare_data() -> Result<AnalyticsReport> {
         }
         *time_spent_per_host.entry(entry.host.clone()).or_insert(0) += entry.duration;
 
-        let date_str = get_yyyymmdd(entry.timestamp, *TIME_OFFSET_MINUTES.lock().unwrap())
-            .map_err(napi_err)?; // Format: "YYYY-MM-DD"
+        // let date_str =
+        //     get_yyyymmdd(entry.timestamp, *TIME_OFFSET_MILLIS.lock().unwrap()).map_err(napi_err)?; // Format: "YYYY-MM-DD"
 
-        let (total, game) = daily_map.entry(date_str).or_insert((0, 0));
+        const MILLIS_PER_DAY: i64 = 86_400_000;
+        let day = (entry.timestamp + *TIME_OFFSET_MILLIS.lock().unwrap()) / MILLIS_PER_DAY;
+
+        let (total, game) = daily_map.entry(day).or_insert((0, 0));
 
         *total += entry.duration;
         if entry.path.starts_with("/games/") {

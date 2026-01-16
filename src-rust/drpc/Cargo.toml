@@ -1,14 +1,20 @@
 [package]
 name = "drpc"
-edition = "2024"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+description = "Simple, dependency-free utility to connect to Discord RPC"
+repository.workspace = true
+license-file.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-napi = { workspace = true }
-napi-derive = { workspace = true }
-url_parser = { workspace = true }
+napi.workspace = true
+napi-derive.workspace = true
+
+url_parser.workspace = true
 
 [build-dependencies]
-napi-build = { workspace = true }
+napi-build.workspace = true

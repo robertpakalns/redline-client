@@ -30,6 +30,11 @@ Chart.register(
 
 let pieCharts: Record<string, Chart<"pie">> = {};
 
+const dayToLocaleString = (day: number): string => {
+  const date = new Date(day * 24 * 60 * 60 * 1000);
+  return date.toLocaleDateString();
+};
+
 const generateColors = (
   arr: string[],
   i: number,
@@ -103,7 +108,7 @@ const createPieChart = (
 };
 
 const lastWeekChart = (data: object[]): void => {
-  const labels = data.map((el: any) => el.date).reverse();
+  const labels = data.map((el: any) => dayToLocaleString(el.date)).reverse();
   const gameTimes = data.map((el: any) => el.gameTimeSpent);
   const totalTimes = data.map((el: any) => el.totalTimeSpent);
 
