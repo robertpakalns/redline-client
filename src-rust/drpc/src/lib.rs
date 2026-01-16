@@ -43,6 +43,7 @@ struct Drpc {
 
 static INSTANCE: LazyLock<Mutex<Option<Arc<Mutex<Drpc>>>>> = LazyLock::new(|| Mutex::new(None));
 
+const CLIENT_ID: &'static str = "1385893715519864933";
 static STATIC_LINKS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     HashMap::from([
         ("/", "Viewing main lobby"),
@@ -96,13 +97,13 @@ fn send_packet(pipe: &mut Pipe, opcode: u32, json: &str) -> std::io::Result<()> 
     pipe.write_all(&p)
 }
 
-fn connect_to_discord(client_id: &str) -> std::io::Result<Pipe> {
+fn connect_to_discord() -> std::io::Result<Pipe> {
     #[cfg(windows)]
     {
         for i in 0..=10 {
             let pipe_path = format!(r"\\?\pipe\discord-ipc-{}", i);
             if let Ok(mut pipe) = OpenOptions::new().read(true).write(true).open(&pipe_path) {
-                let handshake = format!(r#"{{ "v": 1, "client_id": "{client_id}" }}"#);
+                let handshake = format!(r#"{{ "v": 1, "client_id": "{CLIENT_ID}" }}"#);
                 send_packet(&mut pipe, 0, &handshake)?;
                 let mut buf = [0u8; 1024];
                 let _ = pipe.read(&mut buf);
@@ -137,7 +138,7 @@ fn connect_to_discord(client_id: &str) -> std::io::Result<Pipe> {
 
         for pipe_path in paths {
             if let Ok(mut pipe) = UnixStream::connect(&pipe_path) {
-                let handshake = format!(r#"{{"v": 1, "client_id": "{client_id}"}}"#);
+                let handshake = format!(r#"{{"v": 1, "client_id": "{CLIENT_ID}"}}"#);
                 send_packet(&mut pipe, 0, &handshake)?;
 
                 let mut buf = [0u8; 1024];
@@ -187,14 +188,12 @@ fn spawn_activity_updater(drpc_arc: Arc<Mutex<Drpc>>) {
 
 #[napi]
 pub fn init(join_btn: bool, initial_url: String, version: String) {
-    let client_id = "1385893715519864933";
-
     let mut instance = INSTANCE.lock().unwrap();
     if instance.is_some() {
         return;
     }
 
-    let pipe = match connect_to_discord(client_id) {
+    let pipe = match connect_to_discord() {
         Ok(pipe) => pipe,
         Err(_) => {
             // Skip if not connected
@@ -337,16 +336,14 @@ fn update_activity(drpc: &mut Drpc) {
 }
 
 #[napi]
-pub fn set_join_button(enable: bool) -> Result<()> {
+pub fn set_join_button(enable: bool) {
     let instance = INSTANCE.lock().unwrap();
 
     let Some(drpc_arc) = instance.as_ref() else {
-        return Ok(());
+        return;
     };
 
     drpc_arc.lock().unwrap().join_btn = enable;
 
     TO_BE_UPDATED.store(true, Ordering::Relaxed);
-
-    Ok(())
 }

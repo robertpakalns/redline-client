@@ -1,18 +1,21 @@
-use napi::{Error, Result};
+use napi::Error;
 use napi_derive::napi;
 use rusqlite::{Connection, params};
 use std::{
     collections::{HashMap, HashSet},
     io::ErrorKind::NotFound,
     path::PathBuf,
-    sync::{LazyLock, Mutex, mpsc},
+    sync::{
+        LazyLock, Mutex,
+        atomic::{AtomicI64, Ordering},
+        mpsc,
+    },
     thread::spawn,
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 
 use url_parser::parse_url;
 
-#[derive(Clone)]
 struct LastEntry {
     id: i64,
     host: String,
@@ -21,19 +24,18 @@ struct LastEntry {
 }
 
 static LAST_ENTRY: LazyLock<Mutex<Option<LastEntry>>> = LazyLock::new(|| Mutex::new(None));
-static UNREGISTERED_DOMAIN_DURATION: LazyLock<Mutex<i64>> = LazyLock::new(|| Mutex::new(0));
-pub static TIME_OFFSET_MILLIS: LazyLock<Mutex<i64>> = LazyLock::new(|| Mutex::new(0));
+static UNREGISTERED_DOMAIN_DURATION: AtomicI64 = AtomicI64::new(0);
+static TIME_OFFSET_MILLIS: AtomicI64 = AtomicI64::new(0);
 
-static ALLOWED_DOMAINS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "kirka.io",
-        "cloudyfrogs.com",
-        "snipers.io",
-        "ask101math.com",
-        "fpsiogame.com",
-        "cloudconverts.com",
-    ])
-});
+const MILLIS_PER_DAY: i64 = 86_400_000;
+const ALLOWED_DOMAINS: [&'static str; 6] = [
+    "kirka.io",
+    "cloudyfrogs.com",
+    "snipers.io",
+    "ask101math.com",
+    "fpsiogame.com",
+    "cloudconverts.com",
+];
 
 fn napi_err<E: std::fmt::Display>(e: E) -> Error {
     Error::from_reason(e.to_string())
@@ -55,7 +57,7 @@ fn get_db_path() -> std::io::Result<PathBuf> {
     Ok(path)
 }
 
-fn establish_connection() -> Result<Connection> {
+fn establish_connection() -> napi::Result<Connection> {
     let path = get_db_path().map_err(napi_err)?;
     let conn = Connection::open(path).map_err(napi_err)?;
     conn.execute_batch(
@@ -73,28 +75,26 @@ fn establish_connection() -> Result<Connection> {
 
 #[napi]
 pub fn set_time_offset(offset: i64) {
-    *TIME_OFFSET_MILLIS.lock().unwrap() = offset * 60 * 60;
+    TIME_OFFSET_MILLIS.store(offset * 60 * 60 * 1000, Ordering::Relaxed);
 }
 
 #[napi]
 pub fn set_entry(url: String) {
     let url = url.clone();
     let last_entry = &*LAST_ENTRY;
-    let unregistered_duration = &*UNREGISTERED_DOMAIN_DURATION;
 
     spawn(move || {
         let conn = establish_connection().unwrap();
-
-        let (host, _, path, _, _) = parse_url(&url).map_err(napi_err).unwrap();
         let instant_now = Instant::now();
 
+        let (host, _, path, _, _) = parse_url(&url).map_err(napi_err).unwrap();
+
         let mut last_entry_lock = last_entry.lock().unwrap();
-        let mut unregistered_lock = unregistered_duration.lock().unwrap();
 
         if let Some(ref last) = *last_entry_lock {
             let duration = instant_now.duration_since(last.instant).as_millis() as i64;
 
-            if ALLOWED_DOMAINS.contains(host.as_str()) {
+            if ALLOWED_DOMAINS.contains(&host.as_str()) {
                 if last.host == host && last.path == path {
                     *last_entry_lock = Some(LastEntry {
                         id: last.id,
@@ -105,7 +105,8 @@ pub fn set_entry(url: String) {
                     return;
                 }
 
-                let total_duration = duration + *unregistered_lock;
+                let total_duration =
+                    duration + UNREGISTERED_DOMAIN_DURATION.load(Ordering::Relaxed);
 
                 conn.execute(
                     "UPDATE entries SET duration = ?1 WHERE id = ?2",
@@ -114,7 +115,7 @@ pub fn set_entry(url: String) {
                 .map_err(napi_err)
                 .unwrap();
 
-                *unregistered_lock = 0;
+                UNREGISTERED_DOMAIN_DURATION.store(0, Ordering::Relaxed);
 
                 conn.execute(
                     "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, 0, ?3)",
@@ -132,7 +133,7 @@ pub fn set_entry(url: String) {
                     instant: instant_now,
                 });
             } else {
-                *unregistered_lock += duration;
+                UNREGISTERED_DOMAIN_DURATION.fetch_add(duration, Ordering::Relaxed);
                 *last_entry_lock = Some(LastEntry {
                     id: last.id,
                     host: last.host.clone(),
@@ -140,7 +141,7 @@ pub fn set_entry(url: String) {
                     instant: instant_now,
                 });
             }
-        } else if ALLOWED_DOMAINS.contains(host.as_str()) {
+        } else if ALLOWED_DOMAINS.contains(&host.as_str()) {
             conn.execute(
                 "INSERT INTO entries (host, path, duration, timestamp) VALUES (?1, ?2, 0, ?3)",
                 params![host, path, get_timestamp()],
@@ -157,7 +158,7 @@ pub fn set_entry(url: String) {
                 instant: instant_now,
             });
         } else {
-            *unregistered_lock = 0;
+            UNREGISTERED_DOMAIN_DURATION.store(0, Ordering::Relaxed);
         }
     });
 }
@@ -213,7 +214,7 @@ pub struct AnalyticsReport {
 }
 
 #[napi]
-pub fn get_all_data() -> Result<AnalyticsReport> {
+pub fn get_all_data() -> napi::Result<AnalyticsReport> {
     let (tx, rx) = mpsc::channel();
 
     spawn(move || {
@@ -224,7 +225,7 @@ pub fn get_all_data() -> Result<AnalyticsReport> {
     rx.recv().unwrap()
 }
 
-fn prepare_data() -> Result<AnalyticsReport> {
+fn prepare_data() -> napi::Result<AnalyticsReport> {
     let conn = establish_connection()?;
 
     let mut stmt = conn
@@ -254,16 +255,9 @@ fn prepare_data() -> Result<AnalyticsReport> {
     for entry_result in entry_iter {
         let entry = entry_result.map_err(napi_err)?;
         total_time_spent += entry.duration;
-        if entry.path.starts_with("/games/") {
-            total_game_time_spent += entry.duration;
-        }
         *time_spent_per_host.entry(entry.host.clone()).or_insert(0) += entry.duration;
 
-        // let date_str =
-        //     get_yyyymmdd(entry.timestamp, *TIME_OFFSET_MILLIS.lock().unwrap()).map_err(napi_err)?; // Format: "YYYY-MM-DD"
-
-        const MILLIS_PER_DAY: i64 = 86_400_000;
-        let day = (entry.timestamp + *TIME_OFFSET_MILLIS.lock().unwrap()) / MILLIS_PER_DAY;
+        let day = (entry.timestamp + TIME_OFFSET_MILLIS.load(Ordering::Relaxed)) / MILLIS_PER_DAY;
 
         let (total, game) = daily_map.entry(day).or_insert((0, 0));
 
