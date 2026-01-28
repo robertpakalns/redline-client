@@ -4,7 +4,6 @@ import { ipcRenderer } from "electron";
 // Kirka.io Domains
 export const domains = new Set<string>([
   "kirka.io",
-  "cloudyfrogs.com",
   "snipers.io",
   "ask101math.com",
   "fpsiogame.com",

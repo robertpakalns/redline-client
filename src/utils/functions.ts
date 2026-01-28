@@ -12,7 +12,6 @@ export const fromRoot = (path: string): string => join(__root, path);
 // Kirka.io Domains
 export const domains = new Set<string>([
   "kirka.io",
-  "cloudyfrogs.com",
   "snipers.io",
   "ask101math.com",
   "fpsiogame.com",
