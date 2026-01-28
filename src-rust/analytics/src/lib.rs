@@ -30,7 +30,6 @@ static TIME_OFFSET_MILLIS: AtomicI64 = AtomicI64::new(0);
 const MILLIS_PER_DAY: i64 = 86_400_000;
 const ALLOWED_DOMAINS: [&'static str; 6] = [
     "kirka.io",
-    "cloudyfrogs.com",
     "snipers.io",
     "ask101math.com",
     "fpsiogame.com",
