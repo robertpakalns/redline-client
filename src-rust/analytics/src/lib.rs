@@ -28,7 +28,7 @@ static UNREGISTERED_DOMAIN_DURATION: AtomicI64 = AtomicI64::new(0);
 static TIME_OFFSET_MILLIS: AtomicI64 = AtomicI64::new(0);
 
 const MILLIS_PER_DAY: i64 = 86_400_000;
-const ALLOWED_DOMAINS: [&'static str; 6] = [
+const ALLOWED_DOMAINS: [&'static str; 5] = [
     "kirka.io",
     "snipers.io",
     "ask101math.com",
