@@ -23,7 +23,7 @@ export default defineConfig({
         "path",
         "module",
         "url",
-        "@juice-client/node-enject",
+        "node-enject",
       ],
       output: {
         entryFileNames: "[name].js",

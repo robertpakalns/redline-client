@@ -1,7 +1,7 @@
 # 📝 About Project
 
 ## ⚙️ Engine
-Redline Client uses one of the latest Electron versions, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the [`@juice-client/node-enject`](https://www.npmjs.com/package/@juice-client/node-enject) workaround, which resolves the problem on Windows.
+Redline Client uses one of the latest Electron versions, which supports the latest web standards. However, this Electron version is known for a bug that freezes any active WebSocket connection when run with the `--disable-frame-rate-limit` flag. To prevent this issue, the client uses the [`node-enject`](https://www.npmjs.com/package/node-enject) workaround, which resolves the problem on Windows.
 More information about dependencies:
 * [`package.json`](https://github.com/robertpakalns/redline-client/blob/main/package.json).
 * [`Cargo.toml`](https://github.com/robertpakalns/redline-client/blob/main/src-rust/Cargo.toml).
