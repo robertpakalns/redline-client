@@ -16,7 +16,6 @@
     "vite": "^8.3.5"
   },
   "dependencies": {
-    "chart.js": "^4.6.1",
     "electron-updater": "^6.8.11"
   },
   "optionalDependencies": {
