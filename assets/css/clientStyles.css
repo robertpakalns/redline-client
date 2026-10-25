@@ -196,23 +196,7 @@ img.logo#logo {
     }
 }
 
-.pie-slice,
-.chart-hover {
-    fill: hsla(var(--hue), 50%, 50%, 0.6);
-    stroke: hsla(var(--hue), 50%, 50%, 1);
-    stroke-width: 2;
-    vector-effect: non-scaling-stroke;
-    transition:
-        fill 0.15s,
-        stroke 0.15s;
-    cursor: pointer;
-}
-
-.chart-hover:hover {
-    fill: #ffffff80;
-    stroke: white;
-}
-
+/* Charts */
 .pie {
     width: 100%;
     max-width: 300px;
@@ -238,29 +222,6 @@ img.logo#logo {
     opacity: 0.8;
 }
 
-.chart-legend {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 8px;
-    font-size: 12px;
-}
-
-.legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: hsla(var(--hue), 50%, 50%, 0.6);
-    border: 1px solid hsla(var(--hue), 50%, 50%, 1);
-}
-
 #chart-tooltip {
     position: fixed;
     display: none;
@@ -272,4 +233,5 @@ img.logo#logo {
     font-size: 12px;
     white-space: nowrap;
     z-index: 1000000;
+    font-family: "Roboto", sans-serif;
 }
