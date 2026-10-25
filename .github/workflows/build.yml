@@ -10,7 +10,7 @@ jobs:
           - os: ubuntu-latest
             targets: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
           - os: windows-latest
-            targets: [x86_64-pc-windows-msvc, i686-pc-windows-msvc]
+            targets: [x86_64-pc-windows-msvc, aarch64-pc-windows-msvc]
           - os: macos-latest
             targets: [x86_64-apple-darwin, aarch64-apple-darwin]
 
@@ -18,16 +18,15 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: "npm"
+          bun-version: latest
 
       - id: get_version
         shell: bash
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        run: echo "version=$(bun -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       - shell: bash
         run: |
@@ -37,13 +36,13 @@ jobs:
             exit 1
           fi
 
-      - run: npm i --ignore-scripts
+      - run: bun install --ignore-scripts
       - if: matrix.os == 'macos-latest'
-        run: npm i dmg-license # macOS only
+        run: bun install dmg-license # macOS only
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - shell: bash 
+      - shell: bash
         run: |
           for target in ${{ join(matrix.targets, ' ') }}; do
             rustup target add "$target"
@@ -72,12 +71,12 @@ jobs:
         shell: bash
         run: |
           for target in ${{ join(matrix.targets, ' ') }}; do
-              cd analytics && npx napi build --target "$target" --release --platform --js false
-              cd ../drpc && npx napi build --target "$target" --release --platform --js false
+              cd analytics && bunx napi build --target "$target" --release --platform --js false
+              cd ../drpc && bunx napi build --target "$target" --release --platform --js false
               cd ..
           done
 
-      - uses: softprops/action-gh-release@v2.0.6
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
           name: Release ${{ steps.get_version.outputs.version }}
@@ -85,6 +84,6 @@ jobs:
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: npm run build
+      - run: bun run build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
