@@ -141,28 +141,3 @@ export const changeSocLinks = (cont: HTMLElement): void => {
 
   btns[1].replaceWith(trickoButton);
 };
-
-export const createKDRatio = async (cont: HTMLElement): Promise<void> => {
-  if (!cont) return;
-
-  const [kills, deaths] = Array.from(cont.children);
-
-  const val = isNum(kills.textContent ?? "", deaths.textContent ?? "");
-
-  if (!cont.querySelector(".kd-ratio")) {
-    const _kdText = createEl("div", {}, "kd-text", ["K/D"]);
-    const _kdValue = createEl("div", {}, "kd-value", [val.toString()]);
-
-    const _kd = kills.cloneNode(true) as HTMLElement;
-    _kd.textContent = "";
-    _kd.append(_kdValue, _kdText);
-    _kd.classList.add("kd-ratio");
-    if (await config.get("interface.kdRatio")) _kd.classList.add("open");
-    cont.appendChild(_kd);
-    return;
-  }
-
-  const kdValue = cont.querySelector(".kd-value");
-  if (!kdValue) return;
-  kdValue.textContent = val.toString();
-};

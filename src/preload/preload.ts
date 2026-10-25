@@ -11,7 +11,6 @@ import {
   backToKirka,
   setVersions,
   setTrickoLink,
-  createKDRatio,
   changeSocLinks,
 } from "./preloadUtils.js";
 import { domains, config } from "../preload/preloadUtils.js";
@@ -96,12 +95,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     (_, toggle) => (_hint.style.display = toggle ? "block" : "none"),
   );
 
-  // K/D ratio
-  ipcRenderer.on("toggle-kd-ratio", () => {
-    const cont = document.querySelector(".kd-ratio");
-    if (cont) cont.classList.toggle("open");
-  });
-
   // Observers
   const appObserver = new MutationObserver(async () => {
     appObserver.disconnect();
@@ -141,36 +134,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     )
       app.querySelector("#left-icons")?.appendChild(_hint);
 
-    const kdrCont: HTMLElement | null = app.querySelector(".kill-death");
-    if (kdrCont && !kdrCont.dataset.kdrObserved) {
-      kdrCont.dataset.kdrObserved = "true";
-      await createKDRatio(kdrCont);
-
-      kdrObserver.observe(kdrCont, {
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-    }
-
     appObserver.observe(app, { childList: true, subtree: true });
   });
   appObserver.observe(app, { childList: true, subtree: true });
-
-  const kdrObserver = new MutationObserver(async () => {
-    kdrObserver.disconnect();
-
-    const kdrCont = app.querySelector(".kill-death") as HTMLElement;
-    if (!kdrCont) return;
-
-    await createKDRatio(kdrCont);
-
-    kdrObserver.observe(kdrCont, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-  });
 
   const overlay = document.getElementById("overlay") as HTMLElement;
   let lastVersionState: boolean | null = null;
@@ -245,6 +211,6 @@ ipcRenderer.on("toggle-window", (_, modal) => {
   }
 });
 ipcRenderer.on("new-menu-modal-key", (_, key: string): void => {
-  document.getElementById("clientModalHint").textContent =
+  document.getElementById("clientModalHint")!.textContent =
     `Press ${key} to open menu`;
 });

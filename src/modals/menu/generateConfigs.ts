@@ -98,7 +98,6 @@ export const generateConfigs = async (): Promise<void> => {
   // Toggle
   const toggleObject = {
     modalHint: "toggle-menu-modal",
-    toggleKDRatio: "toggle-kd-ratio",
     drpcJoinButton: "toggle-drpc-join-button",
   };
   for (const [id, event] of Object.entries(toggleObject)) {

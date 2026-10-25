@@ -40,14 +40,6 @@
     "section": "settings"
   },
   {
-    "id": "toggleKDRatio",
-    "name": "Toggle K/D Ratio",
-    "description": "K/D ratio will be shown in-game near kills and deaths",
-    "type": "checkbox",
-    "config": "interface.kdRatio",
-    "section": "settings"
-  },
-  {
     "name": "Proxy Domain",
     "description": "Choose a proxy domain in case kirka.io is blocked in your region",
     "type": "select",

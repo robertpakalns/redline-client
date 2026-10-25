@@ -204,7 +204,7 @@ app.on("ready", () => {
   );
 
   // Forward messages
-  for (const e of ["toggle-menu-modal", "change-fast-css", "toggle-kd-ratio"])
+  for (const e of ["toggle-menu-modal", "change-fast-css"])
     ipcMain.on(e, (_, ...a) => webContents.send(e, ...a));
 
   ipcMain.on("toggle-drpc-join-button", (_, toggle) =>

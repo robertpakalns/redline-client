@@ -14,7 +14,6 @@ export interface IConfig {
   };
   interface: {
     modalHint: boolean;
-    kdRatio: boolean;
   };
   discord: {
     joinButton: boolean;
@@ -49,7 +48,6 @@ export const defaultConfig: IConfig = {
   },
   interface: {
     modalHint: true,
-    kdRatio: true,
   },
   discord: {
     joinButton: true,
