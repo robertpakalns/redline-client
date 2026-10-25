@@ -12,12 +12,15 @@ const dayToLocaleString = (day: number): string => {
   return date.toLocaleDateString();
 };
 
-const hueOf = (i: number, count: number): number => (i * 360) / count;
-
-const colorsFor = (hue: number) => ({
-  fill: `hsla(${hue}, 50%, 50%, 0.6)`,
-  stroke: `hsla(${hue}, 50%, 50%, 1)`,
-});
+// Deterministic color for a given index
+const colorForIndex = (i: number): { fill: string; stroke: string } => {
+  const hue = (i * 137.508) % 360;
+  const lightness = [45, 65, 55][i % 3];
+  return {
+    fill: `hsla(${hue}, 65%, ${lightness}%, 0.7)`,
+    stroke: `hsla(${hue}, 65%, ${lightness}%, 1)`,
+  };
+};
 
 const svgEl = (
   tag: string,
@@ -49,11 +52,12 @@ const getTooltip = (): HTMLDivElement => {
   return tip;
 };
 
-const attachTooltip = (el: SVGElement, text: string, hue: number): void => {
+const attachTooltip = (el: SVGElement, text: string, i: number): void => {
   const tip = getTooltip();
-  const base = colorsFor(hue);
+  const base = colorForIndex(i);
 
   el.setAttribute("vector-effect", "non-scaling-stroke");
+  el.setAttribute("stroke-linejoin", "round");
   el.style.fill = base.fill;
   el.style.stroke = base.stroke;
   el.style.strokeWidth = "2px";
@@ -78,7 +82,7 @@ const attachTooltip = (el: SVGElement, text: string, hue: number): void => {
   });
 };
 
-const buildLegend = (items: { label: string; hue: number }[]): HTMLElement => {
+const buildLegend = (labels: string[]): HTMLElement => {
   const legend = document.createElement("div");
   Object.assign(legend.style, {
     display: "flex",
@@ -89,7 +93,7 @@ const buildLegend = (items: { label: string; hue: number }[]): HTMLElement => {
     fontSize: "12px",
   });
 
-  for (const { label, hue } of items) {
+  labels.forEach((label, index) => {
     const item = document.createElement("span");
     Object.assign(item.style, {
       display: "inline-flex",
@@ -97,7 +101,7 @@ const buildLegend = (items: { label: string; hue: number }[]): HTMLElement => {
       gap: "6px",
     });
 
-    const c = colorsFor(hue);
+    const c = colorForIndex(index);
     const dot = document.createElement("span");
     Object.assign(dot.style, {
       width: "10px",
@@ -109,7 +113,7 @@ const buildLegend = (items: { label: string; hue: number }[]): HTMLElement => {
 
     item.append(dot, label);
     legend.appendChild(item);
-  }
+  });
   return legend;
 };
 
@@ -149,7 +153,6 @@ const createPieChart = (
   let angle = -Math.PI / 2;
 
   entries.forEach(([name, value], i) => {
-    const hue = hueOf(i, entries.length);
     let el: SVGElement;
 
     if (entries.length === 1) {
@@ -167,19 +170,11 @@ const createPieChart = (
       angle = end;
     }
 
-    attachTooltip(el, `${name}: ${format(value)}`, hue);
+    attachTooltip(el, `${name}: ${format(value)}`, i);
     svg.appendChild(el);
   });
 
-  body.append(
-    svg,
-    buildLegend(
-      entries.map(([name], i) => ({
-        label: name,
-        hue: hueOf(i, entries.length),
-      })),
-    ),
-  );
+  body.append(svg, buildLegend(entries.map(([name]) => name)));
 };
 
 const niceMax = (v: number): number => {
@@ -227,13 +222,11 @@ const lastWeekChart = (data: any[]): void => {
       label: "In Client",
       values: days.map((d) => d.totalTimeSpent as number),
       widthRatio: 0.8,
-      hue: hueOf(1, 2),
     },
     {
       label: "In-Game",
       values: days.map((d) => d.gameTimeSpent as number),
       widthRatio: 0.6,
-      hue: hueOf(0, 2),
     },
   ];
 
@@ -284,9 +277,10 @@ const lastWeekChart = (data: any[]): void => {
   days.forEach((_, j) => {
     const cx = m.left + colWidth * (j + 0.5);
 
-    layers.forEach((layer) => {
+    for (let index = layers.length - 1; index >= 0; index--) {
+      const layer = layers[index];
       const value = layer.values[j];
-      if (value <= 0) return;
+      if (value <= 0) continue;
 
       const barWidth = colWidth * 0.8 * layer.widthRatio;
       const top = m.top + plotH - (value / max) * plotH;
@@ -300,10 +294,10 @@ const lastWeekChart = (data: any[]): void => {
       attachTooltip(
         bar,
         `${labels[j]} · ${layer.label}: ${formatDuration(value)}`,
-        layer.hue,
+        index,
       );
       svg.appendChild(bar);
-    });
+    }
 
     const xLabel = svgEl("text", {
       x: cx,
@@ -315,13 +309,7 @@ const lastWeekChart = (data: any[]): void => {
     svg.appendChild(xLabel);
   });
 
-  container.append(
-    svg,
-    buildLegend([
-      { label: "In-Game", hue: hueOf(0, 2) },
-      { label: "In Client", hue: hueOf(1, 2) },
-    ]),
-  );
+  container.append(svg, buildLegend(layers.map((l) => l.label)));
 };
 
 const setValues = (
@@ -373,9 +361,10 @@ const createAnalyticsSection = async (cont: HTMLElement) => {
     (n) => String(n),
   );
 
-  document
-    .getElementById("updateAnalyticsData")
-    ?.addEventListener("click", () => createAnalyticsSection(cont));
+  const button = document.getElementById("updateAnalyticsData");
+  if (button) {
+    button.onclick = () => createAnalyticsSection(cont);
+  }
 };
 
 export default createAnalyticsSection;
