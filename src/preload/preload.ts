@@ -1,6 +1,5 @@
 import {
   getBadges,
-  getUser,
   mainMenuBadge,
   profileMenuBadge,
   gameTDMBadges,
@@ -72,7 +71,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   const app: HTMLElement | null = document.getElementById("app");
   if (!app) return;
 
-  await getUser();
   await getBadges();
 
   const socCont = app.querySelector(".settings-and-socicons") as HTMLElement;

@@ -36,19 +36,6 @@ export const getBadges = async () => {
   badgesMap = new Map(data.map((u: any) => [u.short_id, u]));
 };
 
-let userCache: Object = {};
-let shortIdCache: string = "";
-export const getUser = async () => {
-  userCache = await fetch(`https://api.kirka.io/api/user`, {
-    headers: {
-      // The client only uses the token to fetch the account
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  }).then((r) => r.json());
-
-  shortIdCache = (userCache as any).shortId;
-};
-
 export const profileMenuBadge = (cont: HTMLElement): void => {
   if (cont.querySelector(".badgesCont")) return;
 
@@ -64,11 +51,15 @@ export const profileMenuBadge = (cont: HTMLElement): void => {
 export const mainMenuBadge = (cont: HTMLElement): void => {
   const divs = cont.querySelectorAll("div");
 
+  const shortId = document
+    .querySelector("#auth-user .username")
+    ?.textContent.split("#")[1];
+
   for (const el of Array.from(divs)) {
     if (cont.querySelector(".badgesCont")) continue;
 
     const nameCont = el.querySelector(".nickname") as HTMLElement;
-    addBadges(nameCont, shortIdCache);
+    addBadges(nameCont, shortId!);
   }
 };
 
