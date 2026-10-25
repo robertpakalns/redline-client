@@ -66,7 +66,12 @@ const getTooltip = (): HTMLDivElement => {
   return tip;
 };
 
-const attachTooltip = (el: SVGElement, text: string, i: number): void => {
+const attachTooltip = (
+  el: SVGElement,
+  text: string,
+  i: number,
+  edges: SVGElement[] = [],
+): void => {
   const tip = getTooltip();
   const base = colorForIndex(i);
 
@@ -79,7 +84,12 @@ const attachTooltip = (el: SVGElement, text: string, i: number): void => {
 
   el.addEventListener("mouseenter", () => {
     el.style.fill = "#ffffff80";
-    el.style.stroke = "white";
+    if (edges.length) {
+      // Pie slice: highlight only the borders shared with neighbors.
+      edges.forEach((e) => (e.style.stroke = "white"));
+    } else {
+      el.style.stroke = "white";
+    }
     tip.textContent = text;
     tip.style.display = "block";
   });
@@ -91,9 +101,28 @@ const attachTooltip = (el: SVGElement, text: string, i: number): void => {
 
   el.addEventListener("mouseleave", () => {
     el.style.fill = base.fill;
-    el.style.stroke = base.stroke;
+    if (edges.length) {
+      edges.forEach((e) => (e.style.stroke = "none"));
+    } else {
+      el.style.stroke = base.stroke;
+    }
     tip.style.display = "none";
   });
+};
+
+const radialEdge = (a: number): SVGElement => {
+  const line = svgEl("line", {
+    x1: 0,
+    y1: 0,
+    x2: Math.cos(a),
+    y2: Math.sin(a),
+  });
+  line.setAttribute("vector-effect", "non-scaling-stroke");
+  line.setAttribute("stroke-linecap", "round");
+  line.style.strokeWidth = "2px";
+  line.style.stroke = "none";
+  line.style.pointerEvents = "none";
+  return line;
 };
 
 const buildLegend = (
@@ -174,30 +203,42 @@ const createPieChart = (
     class: "pie",
     overflow: "visible",
   });
-  let angle = -Math.PI / 2;
 
-  for (const [name, value] of entries) {
+  const starts: number[] = [];
+  let angle = -Math.PI / 2;
+  for (const [, value] of entries) {
+    starts.push(angle);
+    angle += (value / total) * 2 * Math.PI;
+  }
+
+  const boundaries = entries.length > 1 ? starts.map((a) => radialEdge(a)) : [];
+  svg.append(...boundaries);
+
+  entries.forEach(([name, value], i) => {
     const index = registry.get(name)!;
     let el: SVGElement;
+    let edges: SVGElement[] = [];
 
     if (entries.length === 1) {
       el = svgEl("circle", { cx: 0, cy: 0, r: 1 });
     } else {
+      const start = starts[i];
       const slice = (value / total) * 2 * Math.PI;
-      const end = angle + slice;
-      const [x1, y1] = [Math.cos(angle), Math.sin(angle)];
+      const end = start + slice;
+      const [x1, y1] = [Math.cos(start), Math.sin(start)];
       const [x2, y2] = [Math.cos(end), Math.sin(end)];
       const large = slice > Math.PI ? 1 : 0;
 
       el = svgEl("path", {
         d: `M0,0 L${x1},${y1} A1,1 0 ${large},1 ${x2},${y2} Z`,
       });
-      angle = end;
+
+      edges = [boundaries[i], boundaries[(i + 1) % entries.length]];
     }
 
-    attachTooltip(el, `${name}: ${format(value)}`, index);
-    svg.appendChild(el);
-  }
+    attachTooltip(el, `${name}: ${format(value)}`, index, edges);
+    svg.insertBefore(el, boundaries[0] ?? null);
+  });
 
   body.append(
     svg,
@@ -307,8 +348,11 @@ const lastWeekChart = (data: any[]): void => {
   days.forEach((_, j) => {
     const cx = m.left + colWidth * (j + 0.5);
 
-    for (let index = layers.length - 1; index >= 0; index--) {
-      const layer = layers[index];
+    const drawOrder = layers
+      .map((layer, index) => ({ layer, index }))
+      .sort((a, b) => b.layer.widthRatio - a.layer.widthRatio);
+
+    for (const { layer, index } of drawOrder) {
       const value = layer.values[j];
       if (value <= 0) continue;
 
