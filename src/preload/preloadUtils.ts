@@ -12,7 +12,7 @@ export const domains = new Set<string>([
 
 const getHostRenderer = async (): Promise<string> => {
   const host = (await config.get("client.domain")) as string;
-  return domains.has(host) ? host : "voxiom.io";
+  return domains.has(host) ? host : "kirka.io";
 };
 
 // Go back to Kirka from Auth page
@@ -51,7 +51,7 @@ export async function getVersions(): Promise<Record<string, string>> {
     const raw = await ipcRenderer.invoke("get-hardware-data");
     versionsCache = JSON.parse(raw);
   }
-  return versionsCache;
+  return versionsCache!;
 }
 
 export const setVersions = async (cont: HTMLElement, toggle: boolean) => {

@@ -32,7 +32,6 @@ export const errorModal = (code: number): void => {
   if (code === -105)
     dialog.showErrorBox(
       "Connection Error: ERR_NAME_NOT_RESOLVED",
-      "The Kirka.io proxy domain is unavailable.\n" +
-        "Please change it manually in config.json.",
+      "This Kirka.io proxy domain is unavailable.\nPlease change it manually in config.json.",
     );
 };
