@@ -7,6 +7,8 @@ import { ipcRenderer } from "electron";
 
 const pieBlocks = new Map<string, HTMLElement>();
 
+const pieIndexes = new Map<string, Map<string, number>>();
+
 const dayToLocaleString = (day: number): string => {
   const date = new Date(day * 24 * 60 * 60 * 1000);
   return date.toLocaleDateString();
@@ -20,6 +22,18 @@ const colorForIndex = (i: number): { fill: string; stroke: string } => {
     fill: `hsla(${hue}, 65%, ${lightness}%, 0.7)`,
     stroke: `hsla(${hue}, 65%, ${lightness}%, 1)`,
   };
+};
+
+const stableIndexes = (key: string, names: string[]): Map<string, number> => {
+  let registry = pieIndexes.get(key);
+  if (!registry) {
+    registry = new Map();
+    pieIndexes.set(key, registry);
+  }
+  for (const name of [...names].sort()) {
+    if (!registry.has(name)) registry.set(name, registry.size);
+  }
+  return registry;
 };
 
 const svgEl = (
@@ -82,7 +96,9 @@ const attachTooltip = (el: SVGElement, text: string, i: number): void => {
   });
 };
 
-const buildLegend = (labels: string[]): HTMLElement => {
+const buildLegend = (
+  items: { label: string; index: number }[],
+): HTMLElement => {
   const legend = document.createElement("div");
   Object.assign(legend.style, {
     display: "flex",
@@ -93,7 +109,7 @@ const buildLegend = (labels: string[]): HTMLElement => {
     fontSize: "12px",
   });
 
-  labels.forEach((label, index) => {
+  for (const { label, index } of items) {
     const item = document.createElement("span");
     Object.assign(item.style, {
       display: "inline-flex",
@@ -113,7 +129,7 @@ const buildLegend = (labels: string[]): HTMLElement => {
 
     item.append(dot, label);
     legend.appendChild(item);
-  });
+  }
   return legend;
 };
 
@@ -137,13 +153,21 @@ const createPieChart = (
   body.className = "chart-body";
   block.appendChild(body);
 
-  const entries = Object.entries(obj).filter(([, v]) => v > 0);
-  const total = entries.reduce((s, [, v]) => s + v, 0);
+  const nonZero = Object.entries(obj).filter(([, v]) => v > 0);
+  const total = nonZero.reduce((s, [, v]) => s + v, 0);
 
   if (total === 0) {
     body.textContent = "No data";
     return;
   }
+
+  const registry = stableIndexes(
+    key,
+    nonZero.map(([name]) => name),
+  );
+  const entries = nonZero.sort(
+    ([a], [b]) => registry.get(a)! - registry.get(b)!,
+  );
 
   const svg = svgEl("svg", {
     viewBox: "-1.05 -1.05 2.1 2.1",
@@ -152,7 +176,8 @@ const createPieChart = (
   });
   let angle = -Math.PI / 2;
 
-  entries.forEach(([name, value], i) => {
+  for (const [name, value] of entries) {
+    const index = registry.get(name)!;
     let el: SVGElement;
 
     if (entries.length === 1) {
@@ -170,11 +195,16 @@ const createPieChart = (
       angle = end;
     }
 
-    attachTooltip(el, `${name}: ${format(value)}`, i);
+    attachTooltip(el, `${name}: ${format(value)}`, index);
     svg.appendChild(el);
-  });
+  }
 
-  body.append(svg, buildLegend(entries.map(([name]) => name)));
+  body.append(
+    svg,
+    buildLegend(
+      entries.map(([name]) => ({ label: name, index: registry.get(name)! })),
+    ),
+  );
 };
 
 const niceMax = (v: number): number => {
@@ -309,7 +339,10 @@ const lastWeekChart = (data: any[]): void => {
     svg.appendChild(xLabel);
   });
 
-  container.append(svg, buildLegend(layers.map((l) => l.label)));
+  container.append(
+    svg,
+    buildLegend(layers.map((l, index) => ({ label: l.label, index }))),
+  );
 };
 
 const setValues = (
