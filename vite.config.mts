@@ -11,9 +11,9 @@ export default defineConfig({
         preload: resolve("src/preload/preload.ts"),
       },
       formats: ["cjs"],
-      fileName: (format, name) => `${name}.${format}.js`,
+      fileName: (_format, name) => `${name}.js`,
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: [
         "electron",
         "electron-updater",
@@ -26,7 +26,6 @@ export default defineConfig({
         "node-enject",
       ],
       output: {
-        entryFileNames: "[name].js",
         manualChunks: undefined,
       },
     },

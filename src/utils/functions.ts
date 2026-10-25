@@ -1,12 +1,11 @@
 import { nativeImage, NativeImage } from "electron";
 import { Config, ConfigType } from "./config.js";
-import { resolve, dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { resolve, join } from "path";
 
 const config = new Config();
 
 // Project root path
-const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../");
+const __root = resolve(__dirname, "../");
 export const fromRoot = (path: string): string => join(__root, path);
 
 // Kirka.io Domains

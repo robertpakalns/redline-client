@@ -23,6 +23,6 @@ export const triplet = (): string => {
 };
 
 export const loadModule = <T = any>(name: string): T =>
-  createRequire(import.meta.url)(
+  createRequire(__filename)(
     fromRoot(`./src-rust/${name}/${name}.${triplet()}.node`),
   ) as T;
