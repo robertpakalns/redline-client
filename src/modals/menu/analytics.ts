@@ -125,6 +125,22 @@ const radialEdge = (a: number): SVGElement => {
   return line;
 };
 
+const arcEdge = (start: number, end: number): SVGElement => {
+  const large = end - start > Math.PI ? 1 : 0;
+  const arc = svgEl("path", {
+    d: `M${Math.cos(start)},${Math.sin(start)} A1,1 0 ${large},1 ${Math.cos(end)},${Math.sin(end)}`,
+  });
+
+  arc.setAttribute("vector-effect", "non-scaling-stroke");
+  arc.setAttribute("stroke-linecap", "round");
+  arc.style.fill = "none";
+  arc.style.strokeWidth = "2px";
+  arc.style.stroke = "none";
+  arc.style.pointerEvents = "none";
+
+  return arc;
+};
+
 const buildLegend = (
   items: { label: string; index: number }[],
 ): HTMLElement => {
@@ -233,7 +249,10 @@ const createPieChart = (
         d: `M0,0 L${x1},${y1} A1,1 0 ${large},1 ${x2},${y2} Z`,
       });
 
-      edges = [boundaries[i], boundaries[(i + 1) % entries.length]];
+      const arc = arcEdge(start, end);
+      svg.appendChild(arc);
+
+      edges = [boundaries[i], boundaries[(i + 1) % entries.length], arc];
     }
 
     attachTooltip(el, `${name}: ${format(value)}`, index, edges);
