@@ -140,7 +140,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   let lastVersionState: boolean | null = null;
   const consoleObserver = new MutationObserver((mut) => {
     // Ping always has textContent
-    let isNonEmpty = mut[3].target.textContent !== "";
+    let isNonEmpty = mut[5].target.textContent !== "";
     if (isNonEmpty === lastVersionState) return;
 
     lastVersionState = isNonEmpty;
