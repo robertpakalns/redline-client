@@ -11,7 +11,7 @@ import {
   defaultConfig,
 } from "./src/utils/config.js";
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js";
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, ipcMain, shell, protocol } from "electron";
 import { writeFile, readFile } from "fs/promises";
 import electronUpdater from "electron-updater";
 import packageJson from "./package.json";
@@ -26,6 +26,20 @@ import swapper from "./src/utils/swapper.js";
 // Rust modules
 import analytics from "./src-rust/analytics/index.js";
 import drpc from "./src-rust/drpc/index.js";
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "redline",
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+      bypassCSP: true,
+      stream: true,
+    },
+  },
+]);
 
 const { autoUpdater } = electronUpdater;
 const config = new Config();
