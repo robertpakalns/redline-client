@@ -16,7 +16,7 @@ export const popup = (color: string, text: string): void => {
   document.getElementById("clientPopup")?.remove();
 
   const _bell: HTMLElement = createEl("img", {
-    src: "redline://?path=assets/icons/bell.svg",
+    src: "redline://local?path=assets/icons/bell.svg",
   });
   const _popup: HTMLElement = createEl("div", { id: "clientPopup" }, "", [
     _bell,
@@ -24,7 +24,7 @@ export const popup = (color: string, text: string): void => {
   ]);
   _popup.style.background = color;
 
-  const audio = new Audio("redline://?path=assets/sounds/pop.mp3");
+  const audio = new Audio("redline://local?path=assets/sounds/pop.mp3");
   audio.volume = 0.3;
   audio.play();
 

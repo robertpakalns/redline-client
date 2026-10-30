@@ -115,7 +115,7 @@ export const changeSocLinks = (cont: HTMLElement): void => {
   discordButton.id = "redline-discord";
   discordButton.className = "card-cont soc-group";
   const discordButtonImg = createEl("img", {
-    src: "redline://?path=assets/icons/discord.svg",
+    src: "redline://local?path=assets/icons/discord.svg",
   });
   discordButton.querySelector("svg")!.replaceWith(discordButtonImg);
   discordButton.onclick = () =>
@@ -127,7 +127,7 @@ export const changeSocLinks = (cont: HTMLElement): void => {
   trickoButton.id = "redline-download";
   trickoButton.className = "card-cont soc-group";
   const trickoButtonImg = createEl("img", {
-    src: "redline://?path=assets/icons/tricko.svg",
+    src: "redline://local?path=assets/icons/tricko.svg",
   });
   trickoButton.querySelector("svg")!.replaceWith(trickoButtonImg);
   trickoButton.onclick = () =>

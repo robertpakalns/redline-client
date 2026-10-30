@@ -1,12 +1,12 @@
 @font-face {
     font-family: "Roboto";
-    src: url(redline://?path=assets/fonts/Roboto.ttf) format("truetype");
+    src: url(redline://local?path=assets/fonts/Roboto.ttf) format("truetype");
 }
 
 /* Change logo on the main menu */
 /* Credits: PVT */
 img.logo#logo {
-    content: url("redline://?path=assets/logo.png");
+    content: url("redline://local?path=assets/logo.png");
 }
 
 .backToKirka {
@@ -58,8 +58,8 @@ img.logo#logo {
 
 #redline-discord,
 #redline-download {
-    background: url(redline://?path=assets/icons/icon.svg) no-repeat center /
-        cover !important;
+    background: url(redline://local?path=assets/icons/icon.svg) no-repeat
+        center / cover !important;
     background-origin: border-box !important;
     background-clip: border-box !important;
     border-top: 6px solid #d0322b !important;

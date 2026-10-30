@@ -2,7 +2,7 @@ import { createEl } from "../preload/preloadFunctions.js";
 
 const linkedBadge = (linkedTime: string): HTMLElement => {
   const img = createEl("img", {
-    src: "redline://?path=assets/icons/badges/linked.png",
+    src: "redline://local?path=assets/icons/badges/linked.png",
   });
 
   const span = createEl("span", {}, "redlineBadge", [img]);
