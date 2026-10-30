@@ -1,4 +1,3 @@
-// build.ts
 import { resolve as resolvePath } from "path";
 import { build, type BunPlugin } from "bun";
 import { rm, mkdir } from "fs/promises";
@@ -21,18 +20,21 @@ const rawPlugin: BunPlugin = {
   },
 };
 
-await rm(outdir, { recursive: true, force: true });
 await mkdir(outdir, { recursive: true });
 
+await Promise.all([
+  rm(`${outdir}/main.js`, { force: true }),
+  rm(`${outdir}/preload.js`, { force: true }),
+]);
+
 const common = {
-  target: "node" as const,
+  target: "node",
   external: ["electron", "electron-updater"],
   minify: true,
   plugins: [rawPlugin],
 };
 
-// Main process: ESM -> main.js
-const mainResult = await build({
+const mainBundle = await build({
   ...common,
   entrypoints: ["./index.ts"],
   outdir,
@@ -40,8 +42,7 @@ const mainResult = await build({
   naming: "main.js",
 });
 
-// Preload: CommonJS -> preload.cjs
-const preloadResult = await build({
+const preloadBundle = await build({
   ...common,
   entrypoints: ["./src/preload/preload.ts"],
   outdir,
@@ -49,11 +50,11 @@ const preloadResult = await build({
   naming: "preload.js",
 });
 
-const results = [mainResult, preloadResult];
-const failed = results.some((result) => !result.success);
+const bundles = [mainBundle, preloadBundle];
+const failed = bundles.some((result) => !result.success);
 
 if (failed) {
-  for (const result of results) {
+  for (const result of bundles) {
     for (const log of result.logs) {
       console.error(log);
     }
@@ -61,5 +62,3 @@ if (failed) {
 
   process.exit(1);
 }
-
-console.log("Build successful.");
