@@ -14,15 +14,19 @@ import {
 } from "./preloadUtils.js";
 import { domains, config } from "../preload/preloadUtils.js";
 import { createEl } from "../preload/preloadFunctions.js";
-import { ipcRenderer, contextBridge } from "electron";
+import { ipcRenderer, contextBridge, webFrame } from "electron";
 import { manageFriendsPage } from "./friends.js";
 import MenuModal from "../modals/menu/script.js";
 
 import modalStylesString from "../../assets/css/modalStyles.css?raw";
 import clientStylesString from "../../assets/css/clientStyles.css?raw";
 
+import rafYieldRaw from "./freezeBugFix.ts?raw";
+
 // With contextIsolation: true, window.appconsole is an alternative for window.console
 contextBridge.exposeInMainWorld("appconsole", window.console);
+
+webFrame.executeJavaScript(rafYieldRaw);
 
 const appendStyles = async (): Promise<void> => {
   const modalStyles = createEl("style");

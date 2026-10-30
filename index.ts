@@ -102,31 +102,11 @@ const createWindow = (initialURL: string): void => {
   mainWindow = new BrowserWindow({
     title: "Redline Client",
     icon: getIcon(),
-    show: false,
     webPreferences: {
       preload: fromRoot("js-dist/preload.js"),
       nodeIntegration: false,
       webSecurity: true,
     },
-  });
-
-  mainWindow.once("ready-to-show", async (): Promise<void> => {
-    if (process.platform === "win32") {
-      // @ts-ignore
-      // Windows only
-      const { default: enject } = await import("node-enject");
-
-      const handleBuffer = mainWindow!.getNativeWindowHandle();
-      let hwnd: number;
-
-      if (process.arch === "x64" || process.arch === "arm64")
-        hwnd = Number(handleBuffer.readBigUInt64LE(0));
-      else hwnd = handleBuffer.readUInt32LE(0);
-
-      enject.startHook(hwnd);
-    }
-
-    mainWindow!.show();
   });
 
   mainWindow.maximize();
