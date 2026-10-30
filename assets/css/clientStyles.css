@@ -235,3 +235,8 @@ img.logo#logo {
     z-index: 1000000;
     font-family: "Roboto", sans-serif;
 }
+
+/* Repositon the hud overlay because the added hud values intersect the chat */
+#overlay {
+    top: 32%;
+}
