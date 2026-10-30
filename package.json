@@ -1,6 +1,6 @@
 {
   "name": "redline-client",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Redline Client",
   "author": "robertpakalns",
   "main": "js-dist/main.js",
@@ -11,14 +11,11 @@
   "license": "ISC",
   "devDependencies": {
     "@napi-rs/cli": "^3.10.9",
-    "electron": "^45.0.0",
+    "electron": "^45.1.0",
     "electron-builder": "^26.18.0",
     "vite": "^8.3.5"
   },
   "dependencies": {
     "electron-updater": "^6.8.11"
-  },
-  "optionalDependencies": {
-    "node-enject": "^1.1.0"
   }
 }

@@ -23,7 +23,6 @@ export default defineConfig({
         "path",
         "module",
         "url",
-        "node-enject",
       ],
       output: {
         manualChunks: undefined,
