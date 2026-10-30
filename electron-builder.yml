@@ -48,6 +48,7 @@ linux:
   icon: "assets/icons/icon.png"
 
 nsis:
+  buildUniversalInstaller: false
   oneClick: true
   deleteAppDataOnUninstall: true
   runAfterFinish: true
