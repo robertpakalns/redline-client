@@ -44,15 +44,14 @@ export const backToKirka = (): void => {
 };
 
 // In-game console versions
-let versionsCache: Record<string, string> | null = null;
+let versionsCache: Record<string, string>;
 
-export async function getVersions(): Promise<Record<string, string>> {
+export const getVersions = async (): Promise<Record<string, string>> => {
   if (!versionsCache) {
-    const raw = await ipcRenderer.invoke("get-hardware-data");
-    versionsCache = JSON.parse(raw);
+    versionsCache = await ipcRenderer.invoke("get-app-info");
   }
-  return versionsCache!;
-}
+  return versionsCache;
+};
 
 export const setVersions = async (cont: HTMLElement, toggle: boolean) => {
   if (!cont) return;

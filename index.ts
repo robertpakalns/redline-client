@@ -79,15 +79,13 @@ ipcMain.handle(
     return true;
   },
 );
-ipcMain.handle("get-hardware-data", (): string =>
-  JSON.stringify({
-    CHROMIUM: `v${process.versions.chrome}`,
-    ELECTRON: `v${process.versions.electron}`,
-    NODE: `v${process.versions.node}`,
-    REDLINE_CLIENT: `v${packageJson.version}`,
-    OS: `${type()} ${release()} (${arch()})`,
-  }),
-);
+ipcMain.handle("get-app-info", () => ({
+  CHROMIUM: `v${process.versions.chrome}`,
+  ELECTRON: `v${process.versions.electron}`,
+  NODE: `v${process.versions.node}`,
+  REDLINE_CLIENT: `v${packageJson.version}`,
+  OS: `${type()} ${release()} (${arch()})`,
+}));
 ipcMain.handle("get-analytics-data", (): string =>
   JSON.stringify(analytics.getAllData()),
 );
