@@ -1,19 +1,19 @@
 {
+  "type": "module",
   "name": "redline-client",
   "version": "1.3.1",
   "description": "Redline Client",
   "author": "robertpakalns",
   "main": "js-dist/main.js",
   "scripts": {
-    "dev": "vite build && electron .",
-    "build": "vite build && electron-builder"
+    "dev": "bun build.ts && electron .",
+    "build": "bun build.ts && electron-builder"
   },
   "license": "ISC",
   "devDependencies": {
     "@napi-rs/cli": "^3.10.9",
-    "electron": "^45.1.0",
-    "electron-builder": "^26.18.0",
-    "vite": "^8.3.5"
+    "electron": "^45.2.0",
+    "electron-builder": "^26.18.0"
   },
   "dependencies": {
     "electron-updater": "^6.8.11"

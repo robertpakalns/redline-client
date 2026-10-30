@@ -11,7 +11,7 @@ More information about dependencies:
 ## Build Technologies
 
 - **Electron's `nodeIntegration: false`** prevents Node.js API from being accessible directly in the renderer process.
-- **Vite** generates 2 separate scripts: one for the main process and one for the renderer process. This creates optimized bundles and a clear separation of main and renderer scripts.
+- **Bun** generates 2 separate scripts: one for the main process (ESM) and one for the renderer process (CommonJS). This creates optimized bundles and a clear separation of main and renderer scripts.
 - **TypeScript** ensures type safety and fewer runtime errors.
 - **napi-rs** compiles Node modules which are used in the client.
 

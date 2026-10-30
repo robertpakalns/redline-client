@@ -1,12 +1,11 @@
-import { nativeImage, NativeImage } from "electron";
-import { Config, ConfigType } from "./config.js";
-import { resolve, join } from "path";
+import { app, nativeImage, type NativeImage } from "electron";
+import { Config, type ConfigType } from "./config.js";
+import { join } from "path";
 
 const config = new Config();
 
 // Project root path
-const __root = resolve(__dirname, "../");
-export const fromRoot = (path: string): string => join(__root, path);
+export const fromRoot = (path: string): string => join(app.getAppPath(), path);
 
 // Kirka.io Domains
 export const domains = new Set<string>([
