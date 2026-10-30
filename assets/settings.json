@@ -17,7 +17,7 @@
   },
   {
     "name": "Unlimited FPS",
-    "description": "Uncaps FPS for better performance. Works only on Windows",
+    "description": "Uncaps FPS for better performance. This feature is unstable and might worsen the user experience.",
     "type": "checkbox",
     "config": "client.fpsUncap",
     "section": "settings",

@@ -136,7 +136,7 @@ const createWindow = (initialURL: string): void => {
 };
 
 // FPS uncap for Windows only
-if (config.get("client.fpsUncap") && process.platform === "win32") {
+if (config.get("client.fpsUncap")) {
   app.commandLine.appendSwitch("disable-frame-rate-limit");
   app.commandLine.appendSwitch("disable-gpu-vsync");
 }
