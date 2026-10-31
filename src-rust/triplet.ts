@@ -1,6 +1,6 @@
-import { fromRoot } from "../src/utils/functions.js";
 import { createRequire } from "module";
 import { arch, platform } from "os";
+import { join } from "path";
 
 type Platform = "win32" | "darwin" | "linux";
 type Arch = "x64" | "arm64";
@@ -22,7 +22,7 @@ export const triplet = (): string => {
   return result;
 };
 
-export const loadModule = <T = any>(name: string): T =>
-  createRequire(__filename)(
-    fromRoot(`./src-rust/${name}/${name}.${triplet()}.node`),
-  ) as T;
+export const loadModule = (name: string) =>
+  createRequire(import.meta.url)(
+    join(import.meta.dirname, `../src-rust/${name}/${name}.${triplet()}.node`),
+  );
