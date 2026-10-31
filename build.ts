@@ -25,8 +25,28 @@ await mkdir(outdir, { recursive: true });
 await Promise.all([
   rm(`${outdir}/main.js`, { force: true }),
   rm(`${outdir}/preload.js`, { force: true }),
+  rm(`${outdir}/clientStyles.css`, { force: true }),
+  rm(`${outdir}/modalStyles.css`, { force: true }),
 ]);
 
+// First minify CSS files
+const assetsBundle = await build({
+  entrypoints: [
+    "./assets/css/clientStyles.css",
+    "./assets/css/modalStyles.css",
+  ],
+  outdir,
+  target: "browser",
+  minify: true,
+  external: ["redline://*"],
+  naming: {
+    entry: "[name].[ext]",
+    chunk: "[name].[ext]",
+    asset: "[name].[ext]",
+  },
+});
+
+// Then bundle and minify JS files
 const common = {
   target: "node",
   external: ["electron", "electron-updater"],
@@ -50,7 +70,13 @@ const preloadBundle = await build({
   naming: "preload.js",
 });
 
-const bundles = [mainBundle, preloadBundle];
+// Delete minified css files because preload.js embeds them
+await Promise.all([
+  rm(`${outdir}/clientStyles.css`, { force: true }),
+  rm(`${outdir}/modalStyles.css`, { force: true }),
+]);
+
+const bundles = [mainBundle, preloadBundle, assetsBundle];
 const failed = bundles.some((result) => !result.success);
 
 if (failed) {

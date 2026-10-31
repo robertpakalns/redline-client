@@ -18,8 +18,8 @@ import { ipcRenderer, contextBridge, webFrame } from "electron";
 import { manageFriendsPage } from "./friends.js";
 import MenuModal from "../modals/menu/script.js";
 
-import modalStylesString from "../../assets/css/modalStyles.css?raw";
-import clientStylesString from "../../assets/css/clientStyles.css?raw";
+import modalStylesString from "../../js-dist/modalStyles.css?raw";
+import clientStylesString from "../../js-dist/clientStyles.css?raw";
 
 import rafYieldRaw from "./freezeBugFix.js?raw";
 

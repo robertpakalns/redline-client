@@ -12,6 +12,12 @@ files:
   - "js-dist/**/*"
   - "assets/**/*"
   - "src-rust/**/*.node"
+
+  # preload.js embeds these assets
+  - "!assets/css/**"
+  - "!assets/html/**"
+  - "!assets/**/*.json"
+
   - "!**/locales/*"
   - "!**/*.pak"
   - "!**/ffmpeg.dll"
