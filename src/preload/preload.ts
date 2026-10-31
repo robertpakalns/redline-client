@@ -21,7 +21,7 @@ import MenuModal from "../modals/menu/script.js";
 import modalStylesString from "../../js-dist/modalStyles.css?raw";
 import clientStylesString from "../../js-dist/clientStyles.css?raw";
 
-import rafYieldRaw from "./freezeBugFix.js?raw";
+import rafYieldRaw from "../../js-dist/freezeBugFix.js?raw";
 
 // With contextIsolation: true, window.appconsole is an alternative for window.console
 contextBridge.exposeInMainWorld("appconsole", window.console);

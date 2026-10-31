@@ -22,13 +22,6 @@ const rawPlugin: BunPlugin = {
 
 await mkdir(outdir, { recursive: true });
 
-await Promise.all([
-  rm(`${outdir}/main.js`, { force: true }),
-  rm(`${outdir}/preload.js`, { force: true }),
-  rm(`${outdir}/clientStyles.css`, { force: true }),
-  rm(`${outdir}/modalStyles.css`, { force: true }),
-]);
-
 // First minify CSS files
 const assetsBundle = await build({
   entrypoints: [
@@ -44,6 +37,14 @@ const assetsBundle = await build({
     chunk: "[name].[ext]",
     asset: "[name].[ext]",
   },
+});
+
+const freezeBugFixBundle = await build({
+  target: "browser",
+  minify: true,
+  outdir,
+  entrypoints: ["./src/preload/freezeBugFix.js"],
+  naming: "freezeBugFix.js",
 });
 
 // Then bundle and minify JS files
@@ -74,9 +75,10 @@ const preloadBundle = await build({
 await Promise.all([
   rm(`${outdir}/clientStyles.css`, { force: true }),
   rm(`${outdir}/modalStyles.css`, { force: true }),
+  rm(`${outdir}/freezeBugFix.js`, { force: true }),
 ]);
 
-const bundles = [mainBundle, preloadBundle, assetsBundle];
+const bundles = [mainBundle, preloadBundle, assetsBundle, freezeBugFixBundle];
 const failed = bundles.some((result) => !result.success);
 
 if (failed) {
