@@ -48,10 +48,10 @@ jobs:
             rustup target add "$target"
           done
 
-      - if: matrix.os == 'ubuntu-latest'
-        uses: taiki-e/install-action@v2
-        with:
-          tool: cross
+      # - if: matrix.os == 'ubuntu-latest'
+      #   uses: taiki-e/install-action@v2
+      #   with:
+      #     tool: cross
 
       - if: contains(matrix.targets, 'aarch64-unknown-linux-gnu') # Ubuntu ARM64 only
         uses: awalsh128/cache-apt-pkgs-action@latest
