@@ -15,16 +15,6 @@ const getHostRenderer = async (): Promise<string> => {
   return domains.has(host) ? host : "kirka.io";
 };
 
-// Go back to Kirka from Auth page
-const authDomains = new Set<string>([
-  "www.facebook.com",
-  "accounts.google.com",
-  "appleid.apple.com",
-  "www.twitch.tv",
-  "discord.com",
-  "id.vk.com",
-]);
-
 // Configs
 export const config = {
   get: (key: string) => ipcRenderer.invoke("config-get", key),
@@ -33,14 +23,14 @@ export const config = {
 };
 
 export const backToKirka = (): void => {
-  if (authDomains.has(window.location.host)) {
-    const _back = createEl("div", {}, "backToKirka", ["Back to Kirka"]);
-    _back.addEventListener(
-      "click",
-      async () => (window.location.href = `https://${await getHostRenderer()}`),
-    );
-    document.body.appendChild(_back);
-  }
+  if (domains.has(window.location.host)) return;
+
+  const _back = createEl("div", {}, "backToKirka", ["Back to Kirka"]);
+  _back.addEventListener(
+    "click",
+    async () => (window.location.href = `https://${await getHostRenderer()}`),
+  );
+  document.body.appendChild(_back);
 };
 
 // In-game console versions

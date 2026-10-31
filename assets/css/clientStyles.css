@@ -7,43 +7,25 @@
 /* Credits: PVT */
 img.logo#logo {
     content: url("redline://local?path=assets/logo.png");
+    filter: drop-shadow(0 0 10px black);
+    cursor: default;
+    pointer-events: none;
 }
 
 .backToKirka {
     position: absolute;
     bottom: 0;
     left: 0;
-    margin: 20px;
+    margin: 15px 20px;
     cursor: pointer;
     font-size: 2rem;
     transition: 0.3s ease;
-    animation: colored 3s infinite alternate;
+    mix-blend-mode: difference;
+    color: white;
     z-index: 100000;
 
     &:hover {
         transform: scale(1.1);
-    }
-}
-
-@keyframes colored {
-    0% {
-        color: red;
-    }
-
-    25% {
-        color: orange;
-    }
-
-    50% {
-        color: green;
-    }
-
-    75% {
-        color: blue;
-    }
-
-    100% {
-        color: purple;
     }
 }
 
@@ -69,6 +51,7 @@ img.logo#logo {
     img {
         height: 48px;
         width: 48px;
+        pointer-events: none;
     }
 }
 
