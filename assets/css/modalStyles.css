@@ -63,8 +63,8 @@
     font-family: "Roboto", sans-serif;
 
     h1 {
-        font-size: 0.8rem;
-        color: gray;
+        font-size: 1.2rem;
+        text-align: center;
     }
 
     .block {
@@ -119,10 +119,6 @@
 
         button {
             font-size: 1rem;
-
-            &:hover {
-                transform: scale(1.1);
-            }
         }
     }
 
@@ -132,8 +128,9 @@
 
     header {
         padding: 10px;
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         text-align: center;
+        font-weight: 900;
     }
 
     table {
@@ -143,7 +140,10 @@
     }
 
     tbody tr:nth-child(odd) {
-        background-color: #1a1a1a;
+        color: #aaa;
+        input {
+            color: #aaa;
+        }
     }
 
     td {
@@ -162,6 +162,11 @@
         cursor: pointer;
         text-decoration: none;
         color: #00a1e4;
+        transition: 0.3s ease;
+
+        &:hover {
+            color: #58bde7;
+        }
     }
 
     thead {
@@ -177,7 +182,7 @@
         margin: 5px 0;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
 
     input[type="text"],
@@ -204,7 +209,7 @@
         border: 1px solid rgb(50, 50, 50);
         outline: none;
         color: white;
-        border-radius: 20px;
+        border-radius: 8px;
         resize: vertical;
     }
 
@@ -234,13 +239,11 @@
 
         &:hover {
             color: gold;
-            transform: scale(1.1);
         }
     }
 
     /* Generate Configs */
     .configCont {
-        margin: 15px 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -287,6 +290,18 @@
             font-size: 1.25rem;
         }
     }
+
+    .block,
+    ul {
+        line-height: 20px;
+    }
+
+    .settingsCont {
+        margin: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 }
 
 @keyframes hop {
@@ -300,7 +315,6 @@
 }
 
 .disabled,
-input:disabled,
 input:disabled,
 label:disabled {
     opacity: 20%;
@@ -408,7 +422,14 @@ label:disabled {
 #userScriptsStyles {
     display: flex;
     gap: 20px;
-    margin: 10px 0;
+}
+
+#userscriptsCont {
+    margin: 10px;
+}
+
+#userstylesCont {
+    margin: 10px;
 }
 
 .warning {
@@ -481,13 +502,17 @@ label:disabled {
 }
 
 #clientUpdatesNavigator {
-    margin-top: 30px;
     display: flex;
     flex-direction: column;
     overflow: auto;
 
     & > button {
         padding: 10px;
+        transition: 0.3s ease;
+
+        &:hover {
+            color: gray;
+        }
     }
 }
 
@@ -496,7 +521,6 @@ label:disabled {
 }
 
 .updatesCont {
-    margin: 10px;
     padding: 10px;
 }
 
@@ -539,8 +563,20 @@ label:disabled {
 
 .main {
     display: flex;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 30px;
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+    }
+
+    span {
+        color: #888;
+    }
 }
 
 #updateAnalyticsData {

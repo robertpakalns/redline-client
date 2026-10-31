@@ -44,7 +44,7 @@
                 <div class="block">
                     <h1>Fast Join</h1>
                     <div class="content">
-                        <button id="joinLink">Join</button>
+                        <button class="btn" id="joinLink">Join</button>
                         <input type="url" id="joinLinkURL" />
                     </div>
                     <div class="content">
@@ -53,31 +53,23 @@
                 </div>
 
                 <div class="block">
-                    <h1>Configs</h1>
+                    <h1>Miscellaneous</h1>
                     <div class="content">
                         <a id="configFolder">Open Configs</a>
-                    </div>
-                </div>
 
-                <div class="block">
-                    <h1>Import/Export Settings</h1>
-                    <div class="content">
                         <button class="btn" id="importClientSettings">
-                            Import
+                            Import client settings
                         </button>
-                        |
+
                         <button class="btn" id="exportClientSettings">
-                            Export
+                            Export client settings
                         </button>
-                        <div>Client Settings</div>
+
+                        <button class="btn warning" id="relaunch">
+                            Relaunch Client
+                        </button>
                     </div>
                 </div>
-
-                <footer>
-                    <button id="relaunch" class="warning">
-                        Relaunch Client
-                    </button>
-                </footer>
             </div>
 
             <div class="mainContentBlock" name="customizationSection">
@@ -111,18 +103,18 @@
                     <ol>
                         <li>
                             Make sure you enabled it in the menu modal Settings
-                            section
+                            section.
                         </li>
                         <li>
                             Get the file URL you want to swap and extract only
-                            the file name and extension
+                            the file name and extension.
                         </li>
                         <li>
                             Open the
                             <a href="#" id="swapperFolder">swapper folder</a>
-                            and place the file there
+                            and place the file there.
                         </li>
-                        <li>Reload the client to apply changes</li>
+                        <li>Reload the client to apply changes.</li>
                         <li>
                             <a
                                 class="url"
@@ -147,7 +139,7 @@
                 <header>Redline Client</header>
                 <div class="block">
                     <p>Redline Client is an unofficial Kirka.io client.</p>
-                    <h4>Features</h4>
+                    <h1>Features</h1>
                     <ul>
                         <li>Analytics</li>
                         <li>Changelog</li>
@@ -182,7 +174,7 @@
                 </div>
 
                 <div class="block">
-                    <header>Client Safety</header>
+                    <h1>Client Safety</h1>
                     This project is open-source. All Redline Client source code
                     is publicly available in the
                     <a
@@ -201,7 +193,7 @@
                 </div>
 
                 <div class="block">
-                    <header>Credits</header>
+                    <h1>Credits</h1>
                     <ul>
                         <li>xip for Kirka.io</li>
                         <li>
@@ -217,7 +209,7 @@
                         In partnership with Kirka clan
                         <a class="url" href="https://discord.gg/BBchaJvZVU"
                             >ImOn_Smoko</a
-                        >
+                        >.
                     </p>
                 </div>
 
@@ -245,11 +237,8 @@
 
                 <div class="settingsCont"></div>
 
-                <header>Scripts</header>
+                <h1>Scripts</h1>
                 <div id="userscriptsCont"></div>
-
-                <header>Styles</header>
-                <div id="userstylesCont"></div>
 
                 <div class="block">
                     To use the userscripts:
@@ -258,15 +247,18 @@
                             Open the
                             <a href="#" id="userscriptsFolder"
                                 >userscripts folder</a
-                            >
+                            >.
                         </li>
                         <li>
                             Put there your scripts. Make sure the files are
-                            ending with the .js extension!
+                            ending with the .js extension.
                         </li>
-                        <li>Reload the client to apply changes</li>
+                        <li>Reload the client to apply changes.</li>
                     </ol>
                 </div>
+
+                <h1>Styles</h1>
+                <div id="userstylesCont"></div>
 
                 <div class="block">
                     To use the userstyles:
@@ -276,13 +268,13 @@
                             Open the
                             <a href="#" id="userstylesFolder"
                                 >userstyles folder</a
-                            >
+                            >.
                         </li>
                         <li>
                             Put there your styles. Make sure the files are
-                            ending with the .css extension!
+                            ending with the .css extension.
                         </li>
-                        <li>Reload the client to apply changes</li>
+                        <li>Reload the client to apply changes.</li>
                     </ol>
                 </div>
             </div>
@@ -292,15 +284,15 @@
 
                 <div class="main">
                     <div>
-                        <h1>Time Spent in Client</h1>
+                        <span>Time spent in client</span>
                         <div id="totalTimeSpentInClient"></div>
                     </div>
                     <div>
-                        <h1>Time Spent In-Game</h1>
+                        <span>Time spent in-game</span>
                         <div id="totalTimeSpentInGame"></div>
                     </div>
                     <div>
-                        <h1>Total Games Played</h1>
+                        <span>Total games played</span>
                         <div id="totalGamesPlayed"></div>
                     </div>
                 </div>
