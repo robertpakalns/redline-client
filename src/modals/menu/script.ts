@@ -10,6 +10,7 @@ import { generateConfigs } from "./generateConfigs.js";
 import createChangelogSection from "./changelog.js";
 import createAnalyticsSection from "./analytics.js";
 import createSettingsSection from "./settings.js";
+import { getVersions } from "../../preload/preloadUtils.js";
 
 class MenuModal extends Modal {
   modalHTMLString = menuModalHTML;
@@ -27,7 +28,7 @@ class MenuModal extends Modal {
     generateConfigs();
 
     const _version = this.modal?.querySelector("#clientVersion") as HTMLElement;
-    _version!.textContent = await ipcRenderer.invoke("get-app-version");
+    _version!.textContent = (await getVersions()).REDLINE_CLIENT;
 
     // Open by default
     this.modal!.querySelector(".mainContentBlock:first-child")!.classList.add(

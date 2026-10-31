@@ -12,9 +12,9 @@ import {
 } from "./src/utils/config.js";
 import { fromRoot, getIcon, getHost } from "./src/utils/functions.js";
 import { app, BrowserWindow, ipcMain, shell, protocol } from "electron";
+import { version as clientVersion } from "./package.json";
 import { writeFile, readFile } from "fs/promises";
 import electronUpdater from "electron-updater";
-import packageJson from "./package.json";
 import { type, release, arch } from "os";
 import { join } from "path";
 
@@ -83,7 +83,7 @@ ipcMain.handle("get-app-info", () => ({
   CHROMIUM: `v${process.versions.chrome}`,
   ELECTRON: `v${process.versions.electron}`,
   NODE: `v${process.versions.node}`,
-  REDLINE_CLIENT: `v${packageJson.version}`,
+  REDLINE_CLIENT: `v${clientVersion}`,
   OS: `${type()} ${release()} (${arch()})`,
 }));
 ipcMain.handle("get-analytics-data", (): string =>
@@ -94,7 +94,6 @@ ipcMain.handle("get-menu-modal-key", (): string =>
     ? (config.get("keybinding.content.MenuModal") as string)
     : defaultConfig.keybinding.content.MenuModal,
 );
-ipcMain.handle("get-app-version", (): string => `v${packageJson.version}`);
 
 const createWindow = (initialURL: string): void => {
   mainWindow = new BrowserWindow({
@@ -166,7 +165,7 @@ app.on("ready", () => {
   drpc.init(
     config.get("discord.joinButton") as boolean,
     deeplinkURL || `https://${getHost()}`,
-    packageJson.version,
+    clientVersion,
   );
 
   createWindow(deeplinkURL || `https://${getHost()}`);
