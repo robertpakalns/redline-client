@@ -69,7 +69,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (!domains.has(window.location.host)) return;
 
   const menuModal = new MenuModal();
-  menuModal.init();
   menuModal.work();
 
   const app: HTMLElement | null = document.getElementById("app");

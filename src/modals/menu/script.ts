@@ -13,46 +13,39 @@ import createSettingsSection from "./settings.js";
 import { getVersions } from "../../preload/preloadUtils.js";
 
 class MenuModal extends Modal {
-  modalHTMLString = menuModalHTML;
-
   constructor() {
-    super();
-  }
-
-  init() {
-    super.init();
-    this.modal!.id = "menuModal";
+    super(menuModalHTML, "menuModal");
   }
 
   async work() {
     generateConfigs();
 
-    const _version = this.modal?.querySelector("#clientVersion") as HTMLElement;
+    const _version = this.cont.querySelector("#clientVersion") as HTMLElement;
     _version!.textContent = (await getVersions()).REDLINE_CLIENT;
 
     // Open by default
-    this.modal!.querySelector(".mainContentBlock:first-child")!.classList.add(
-      "active",
-    );
-    this.modal!.querySelector(".sideBarItem:first-child")!.classList.add(
-      "active",
-    );
+    this.cont
+      .querySelector(".mainContentBlock:first-child")!
+      .classList.add("active");
+    this.cont
+      .querySelector(".sideBarItem:first-child")!
+      .classList.add("active");
 
-    const defaultSection = this.modal?.querySelector(
+    const defaultSection = this.cont.querySelector(
       "#menuMainContent > div[name='settingsSection']",
     );
     createSettingsSection(defaultSection as HTMLElement);
 
-    for (const item of Array.from(this.modal!.querySelectorAll(".sideBarItem")))
+    for (const item of Array.from(this.cont.querySelectorAll(".sideBarItem")))
       item.addEventListener("click", (e) => {
-        const activeDiv = this.modal?.querySelector(".mainContentBlock.active");
+        const activeDiv = this.cont.querySelector(".mainContentBlock.active");
         if (activeDiv) activeDiv.classList.remove("active");
 
-        const activeBar = this.modal?.querySelector(".sideBarItem.active");
+        const activeBar = this.cont.querySelector(".sideBarItem.active");
         if (activeBar) activeBar.classList.remove("active");
         item.classList.add("active");
 
-        const targetDiv = this.modal?.querySelector(
+        const targetDiv = this.cont.querySelector(
           `#menuMainContent > div[name="${(e.target as HTMLElement)?.id}"]`,
         ) as HTMLElement;
         if (targetDiv) targetDiv.classList.add("active");
@@ -78,14 +71,14 @@ class MenuModal extends Modal {
       });
 
     for (const el of Array.from(
-      this.modal!.querySelectorAll(".url"),
+      this.cont.querySelectorAll(".url"),
     ) as HTMLAnchorElement[])
       el.addEventListener("click", async (e) => {
         e.preventDefault();
         await ipcRenderer.invoke("shell-open-external", el.href);
       });
 
-    for (const el of Array.from(this.modal!.querySelectorAll(".copy")))
+    for (const el of Array.from(this.cont.querySelectorAll(".copy")))
       el.addEventListener("click", (e) => {
         navigator.clipboard.writeText((e.target as HTMLElement).innerText);
         popup("rgb(206, 185, 45)", "Copied!");
@@ -117,8 +110,8 @@ class MenuModal extends Modal {
       swapperFolder: "swapper",
     };
     for (const [key, value] of Object.entries(openFromShell))
-      this.modal
-        ?.querySelector(`#${key}`)
+      this.cont
+        .querySelector(`#${key}`)
         ?.addEventListener(
           "click",
           async () =>
