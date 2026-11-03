@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Roboto";
-    src: url(redline://local?path=assets/fonts/Roboto.ttf) format("truetype");
+    src: url(redline://local?path=assets/fonts/Roboto.woff2) format("woff2");
 }
 
 /* Change logo on the main menu */
@@ -216,7 +216,7 @@ img.logo#logo {
     font-size: 12px;
     white-space: nowrap;
     z-index: 1000000;
-    font-family: "Roboto", sans-serif;
+    font-family: "Noto Sans", sans-serif;
 }
 
 /* Repositon the hud overlay because the added hud values intersect the chat */
