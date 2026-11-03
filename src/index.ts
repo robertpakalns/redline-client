@@ -3,29 +3,29 @@ import {
   openDialogModal,
   saveDialogModal,
   errorModal,
-} from "./src/utils/dialogs.js";
+} from "./utils/dialogs.js";
 import {
   Config,
   configPath,
   configDir,
   defaultConfig,
-} from "./src/utils/config.js";
-import { fromRoot, getIcon, getHost } from "./src/utils/functions.js";
+} from "./utils/config.js";
+import { fromRoot, getIcon, getHost } from "./utils/functions.js";
 import { app, BrowserWindow, ipcMain, shell, protocol } from "electron";
-import { version as clientVersion } from "./package.json";
+import { version as clientVersion } from "../package.json";
 import { writeFile, readFile } from "fs/promises";
 import electronUpdater from "electron-updater";
 import { type, release, arch } from "os";
 import { join } from "path";
 
 // JavaScript modules
-import { userscripts } from "./src/utils/userscripts.js";
-import keybinding from "./src/utils/keybinding.js";
-import swapper from "./src/utils/swapper.js";
+import { userscripts } from "./utils/userscripts.js";
+import keybinding from "./utils/keybinding.js";
+import swapper from "./utils/swapper.js";
 
 // Rust modules
-import analytics from "./src-rust/analytics/index.js";
-import drpc from "./src-rust/drpc/index.js";
+import analytics from "../src-rust/analytics/index.js";
+import drpc from "../src-rust/drpc/index.js";
 
 protocol.registerSchemesAsPrivileged([
   {
