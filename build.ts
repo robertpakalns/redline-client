@@ -1,12 +1,22 @@
+import { rm, mkdir, writeFile } from "fs/promises";
 import { resolve as resolvePath } from "path";
 import { build, type BunPlugin } from "bun";
-import { rm, mkdir } from "fs/promises";
 
 const outdir = "./js-dist";
+await mkdir(outdir, { recursive: true });
 
+const minifyHTML = (source: string): string => {
+  return source
+    .replace(/<!--[\s\S]*?-->/g, "") // Remove comments
+    .replace(/\s*\n\s*/g, " ") // Convert newlines to spaces
+    .replace(/\s{2,}/g, " ") // Collapse multiple spaces
+    .replace(/>\s+</g, "><") // Remove spaces between tags
+    .replace(/\s+\/>/g, "/>"); // Remove space before self-closing
+};
+
+// Import *?raw as raw string
 const rawPlugin: BunPlugin = {
   name: "raw-imports",
-
   setup(builder) {
     builder.onResolve({ filter: /\?raw$/ }, (args) => ({
       path: resolvePath(args.resolveDir, args.path.replace(/\?raw$/, "")),
@@ -20,10 +30,11 @@ const rawPlugin: BunPlugin = {
   },
 };
 
-await mkdir(outdir, { recursive: true });
-
 // First minify CSS files
-const assetsBundle = await build({
+const menuHTML = await Bun.file("./assets/html/menu.html").text();
+await writeFile(`${outdir}/menu.html`, minifyHTML(menuHTML));
+
+const cssBundles = await build({
   entrypoints: [
     "./assets/css/clientStyles.css",
     "./assets/css/modalStyles.css",
@@ -50,15 +61,15 @@ const freezeBugFixBundle = await build({
 // Then bundle and minify JS files
 const common = {
   target: "node",
-  external: ["electron", "electron-updater"],
   minify: true,
+  outdir,
+  external: ["electron", "electron-updater"],
   plugins: [rawPlugin],
 };
 
 const mainBundle = await build({
   ...common,
   entrypoints: ["./index.ts"],
-  outdir,
   format: "esm",
   naming: "main.js",
 });
@@ -66,19 +77,20 @@ const mainBundle = await build({
 const preloadBundle = await build({
   ...common,
   entrypoints: ["./src/preload/preload.ts"],
-  outdir,
   format: "cjs",
   naming: "preload.js",
 });
 
-// Delete minified css files because preload.js embeds them
+// Delete these assets because preload.js embeds them
 await Promise.all([
+  rm(`${outdir}/menu.html`, { force: true }),
   rm(`${outdir}/clientStyles.css`, { force: true }),
   rm(`${outdir}/modalStyles.css`, { force: true }),
   rm(`${outdir}/freezeBugFix.js`, { force: true }),
 ]);
 
-const bundles = [mainBundle, preloadBundle, assetsBundle, freezeBugFixBundle];
+// Output errors when bundling
+const bundles = [mainBundle, preloadBundle, cssBundles, freezeBugFixBundle];
 const failed = bundles.some((result) => !result.success);
 
 if (failed) {

@@ -2,7 +2,7 @@ import { createEl, popup } from "../../preload/preloadFunctions.js";
 import { ipcRenderer } from "electron";
 import Modal from "../modal.js";
 
-import menuModalHTML from "../../../assets/html/menu.html?raw";
+import menuModalHTML from "../../../js-dist/menu.html?raw";
 
 import createCustomizationSection from "./customization.js";
 import createUserscriptsSection from "./userscripts.js";
