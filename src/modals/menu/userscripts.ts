@@ -34,13 +34,8 @@ const appendUserscriptConfig = (
     : null;
 
   const open = createEl("a", {}, "", ["Open"]);
-  open.addEventListener(
-    "click",
-    async () =>
-      await ipcRenderer.invoke(
-        "shell-open-path",
-        await ipcRenderer.invoke("from-config-dir", `${sh}/${meta.file}`),
-      ),
+  open.addEventListener("click", () =>
+    ipcRenderer.invoke("open-from-path", `${sh}/${meta.file}`),
   );
 
   const requires = createEl("div", {}, "refresh", ["Requires page refresh"]);
@@ -59,8 +54,8 @@ const createUserscriptsSection = async () => {
   if (loaded) return;
   loaded = true;
 
-  const writeConfig = async (): Promise<void> => {
-    await ipcRenderer.invoke("write-userscripts-config", userScriptsConfig);
+  const updateConfig = async (): Promise<void> => {
+    await ipcRenderer.invoke("update-userscripts-config", userScriptsConfig);
   };
 
   const userScriptsConfig = JSON.parse(
@@ -83,7 +78,7 @@ const createUserscriptsSection = async () => {
       });
       _checkbox.addEventListener("change", async (e) => {
         el.enabled = (e.target as HTMLInputElement).checked;
-        await writeConfig();
+        await updateConfig();
         sendNotification("refresh");
       });
 
@@ -117,7 +112,7 @@ const createUserscriptsSection = async () => {
       });
       checkbox.addEventListener("change", async (e) => {
         obj[key] = (e.target as HTMLInputElement).checked;
-        await writeConfig();
+        await updateConfig();
         sendNotification("refresh");
       });
 
@@ -139,7 +134,7 @@ const createUserscriptsSection = async () => {
   userscriptsEnabled!.addEventListener("change", async (e) => {
     toggleUserScripts();
     userScriptsConfig.enable = (e.target as HTMLInputElement).checked;
-    await writeConfig();
+    await updateConfig();
     sendNotification("refresh");
   });
 

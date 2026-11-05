@@ -47,33 +47,27 @@ const handleURL = (url: string): void => {
   analytics.setEntry(lastURL);
 };
 
-ipcMain.handle("shell-open-path", (_, path: string) => shell.openPath(path));
+ipcMain.handle("open-from-path", (_, path: string) =>
+  shell.openPath(join(configDir, path)),
+);
 ipcMain.handle("shell-open-external", (_, url: string) =>
   shell.openExternal(url),
 );
 ipcMain.handle("config-get", (_, key: string) => config.get(key));
 ipcMain.handle("config-set", (_, key: string, value: boolean) => {
   config.set(key, value);
-  return true;
 });
-ipcMain.handle("from-config-dir", (_, name: string): string =>
-  join(configDir, name),
-);
 ipcMain.handle(
   "read-userscripts-config",
   async (): Promise<string> =>
     await readFile(join(configDir, "userscripts.json"), "utf8"),
 );
-ipcMain.handle(
-  "write-userscripts-config",
-  async (_, content: string): Promise<boolean> => {
-    await writeFile(
-      join(configDir, "userscripts.json"),
-      JSON.stringify(content, null, 2),
-    );
-    return true;
-  },
-);
+ipcMain.handle("update-userscripts-config", (_, content: string) => {
+  writeFile(
+    join(configDir, "userscripts.json"),
+    JSON.stringify(content, null, 2),
+  );
+});
 ipcMain.handle("get-app-info", () => ({
   CHROMIUM: `v${process.versions.chrome}`,
   ELECTRON: `v${process.versions.electron}`,

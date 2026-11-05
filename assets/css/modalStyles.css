@@ -434,11 +434,11 @@ label:disabled {
 }
 
 #userscriptsCont {
-    margin: 10px;
+    margin: 10px 0;
 }
 
 #userstylesCont {
-    margin: 10px;
+    margin: 10px 0;
 }
 
 .warning {

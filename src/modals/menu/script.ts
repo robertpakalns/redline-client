@@ -112,13 +112,8 @@ class MenuModal extends Modal {
     for (const [key, value] of Object.entries(openFromShell))
       this.cont
         .querySelector(`#${key}`)
-        ?.addEventListener(
-          "click",
-          async () =>
-            await ipcRenderer.invoke(
-              "shell-open-path",
-              await ipcRenderer.invoke("from-config-dir", value),
-            ),
+        ?.addEventListener("click", () =>
+          ipcRenderer.invoke("open-from-path", value),
         );
   }
 }
