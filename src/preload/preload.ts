@@ -200,10 +200,6 @@ ipcRenderer.on("toggle-window", (_, modal) => {
     return;
   }
 
-  if (modal === "null")
-    document.querySelector(".enmYtp")
-      ? document.querySelector("canvas")?.requestPointerLock()
-      : document.exitPointerLock();
   if (openedModal) {
     openedModal.classList.toggle("open");
     if (modal === "null" || openedModal.id === modal)
