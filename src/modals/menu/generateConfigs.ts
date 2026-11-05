@@ -2,6 +2,7 @@ import { createEl, popup } from "../../preload/preloadFunctions";
 import settingsJson from "../../../assets/settings.json";
 import { config } from "../../preload/preloadUtils";
 import { ipcRenderer } from "electron";
+import { toggleMenuModal } from "../../preload/preload";
 
 type RequiresType = "restart" | "refresh" | null;
 
@@ -96,13 +97,13 @@ export const generateConfigs = async (): Promise<void> => {
   }
 
   // Toggle
-  const toggleObject = {
-    modalHint: "toggle-menu-modal",
-    drpcJoinButton: "toggle-drpc-join-button",
-  };
-  for (const [id, event] of Object.entries(toggleObject)) {
-    document.querySelector(`#${id}`)?.addEventListener("change", (e) => {
-      ipcRenderer.send(event, (e.target as HTMLInputElement).checked);
-    });
-  }
+  document.getElementById("drpcJoinButton")?.addEventListener("change", (e) => {
+    ipcRenderer.send(
+      "toggle-drpc-join-button",
+      (e.target as HTMLInputElement).checked,
+    );
+  });
+  document.getElementById("modalHint")?.addEventListener("change", (e) => {
+    toggleMenuModal((e.target as HTMLInputElement).checked);
+  });
 };

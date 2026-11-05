@@ -1,4 +1,5 @@
 import { createEl } from "../../preload/preloadFunctions";
+import { updateFastCSS } from "../../preload/preload";
 import { config } from "../../preload/preloadUtils";
 import { ipcRenderer } from "electron";
 
@@ -33,8 +34,7 @@ const createCustomizationSection = async (cont: HTMLElement): Promise<void> => {
   for (const id of ["enableFastCSS", "fastCSSURL", "fastCSSValue"]) {
     const eventType = id === "enableFastCSS" ? "change" : "input";
     cont.querySelector(`#${id}`)?.addEventListener(eventType, () => {
-      ipcRenderer.send(
-        "change-fast-css",
+      updateFastCSS(
         enableFastCSS.checked,
         fastCSSURL.value,
         fastCSSValue.value,

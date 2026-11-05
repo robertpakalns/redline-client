@@ -91,11 +91,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   )
     app.querySelector("#left-icons")?.appendChild(_hint);
 
-  ipcRenderer.on(
-    "toggle-menu-modal",
-    (_, toggle) => (_hint.style.display = toggle ? "block" : "none"),
-  );
-
   // Observers
   const appObserver = new MutationObserver(async () => {
     appObserver.disconnect();
@@ -150,40 +145,48 @@ window.addEventListener("DOMContentLoaded", async () => {
     setVersions(overlay, isNonEmpty);
   });
   consoleObserver.observe(overlay!, { childList: true, subtree: true });
+});
 
-  // Fast CSS
-  const fastCSSStyles = document.getElementById("fastCSSStyles") as HTMLElement;
+export const toggleMenuModal = (toggle: boolean): void => {
+  const hintCont = document.getElementById("clientModalHint");
+  if (hintCont) hintCont.style.display = toggle ? "block" : "none";
+};
+
+export const updateFastCSS = (
+  enable: boolean,
+  url: string,
+  value: string,
+): void => {
+  const fastCSSStyles = document.getElementById("fastCSSStyles");
   let fastCSSLink = document.getElementById(
     "fastCSSLink",
   ) as HTMLLinkElement | null;
 
-  ipcRenderer.on("change-fast-css", (_, enable, url, value) => {
-    if (!enable) {
-      fastCSSStyles.innerHTML = "";
-      if (fastCSSLink) {
-        fastCSSLink.remove();
-        fastCSSLink = null;
-      }
-      return;
-    }
-
-    fastCSSStyles.innerHTML = value;
-
-    if (url) {
-      if (!fastCSSLink) {
-        fastCSSLink = createEl("link", {
-          id: "fastCSSLink",
-          rel: "stylesheet",
-        }) as HTMLLinkElement;
-        document.head.appendChild(fastCSSLink!);
-      }
-      if (fastCSSLink) fastCSSLink.href = url;
-    } else if (fastCSSLink) {
+  if (!enable) {
+    fastCSSStyles!.innerHTML = "";
+    if (fastCSSLink) {
       fastCSSLink.remove();
       fastCSSLink = null;
     }
-  });
-});
+    return;
+  }
+
+  fastCSSStyles!.innerHTML = value;
+
+  if (url) {
+    if (!fastCSSLink) {
+      fastCSSLink = createEl("link", {
+        id: "fastCSSLink",
+        rel: "stylesheet",
+      }) as HTMLLinkElement;
+      document.head.appendChild(fastCSSLink!);
+    }
+    if (fastCSSLink) fastCSSLink.href = url;
+  } else if (fastCSSLink) {
+    fastCSSLink.remove();
+    fastCSSLink = null;
+  }
+};
 
 ipcRenderer.on("toggle-window", (_, modal) => {
   // Toggles modals on keybinds
