@@ -1,6 +1,6 @@
-import { createEl, popup } from "../../preload/preloadFunctions.js";
+import { createEl, popup } from "../../preload/preloadFunctions";
 import settingsJson from "../../../assets/settings.json";
-import { config } from "../../preload/preloadUtils.js";
+import { config } from "../../preload/preloadUtils";
 import { ipcRenderer } from "electron";
 
 type RequiresType = "restart" | "refresh" | null;

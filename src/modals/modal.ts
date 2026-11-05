@@ -1,4 +1,4 @@
-import { createEl } from "../preload/preloadFunctions.js";
+import { createEl } from "../preload/preloadFunctions";
 
 class Modal {
   cont: HTMLElement;

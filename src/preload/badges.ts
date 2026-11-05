@@ -1,4 +1,4 @@
-import { createEl } from "../preload/preloadFunctions.js";
+import { createEl } from "../preload/preloadFunctions";
 
 const linkedBadge = (linkedTime: string): HTMLElement => {
   const img = createEl("img", {

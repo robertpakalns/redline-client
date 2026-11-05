@@ -3,14 +3,9 @@ import {
   openDialogModal,
   saveDialogModal,
   errorModal,
-} from "./utils/dialogs.js";
-import {
-  Config,
-  configPath,
-  configDir,
-  defaultConfig,
-} from "./utils/config.js";
-import { fromRoot, getIcon, getHost } from "./utils/functions.js";
+} from "./utils/dialogs";
+import { Config, configPath, configDir, defaultConfig } from "./utils/config";
+import { fromRoot, getIcon, getHost } from "./utils/functions";
 import { app, BrowserWindow, ipcMain, shell, protocol } from "electron";
 import { version as clientVersion } from "../package.json";
 import { writeFile, readFile } from "fs/promises";
@@ -19,13 +14,13 @@ import { type, release, arch } from "os";
 import { join } from "path";
 
 // JavaScript modules
-import { userscripts } from "./utils/userscripts.js";
-import keybinding from "./utils/keybinding.js";
-import swapper from "./utils/swapper.js";
+import { userscripts } from "./utils/userscripts";
+import keybinding from "./utils/keybinding";
+import swapper from "./utils/swapper";
 
 // Rust modules
-import analytics from "../src-rust/analytics/index.js";
-import drpc from "../src-rust/drpc/index.js";
+import analytics from "../src-rust/analytics/index";
+import drpc from "../src-rust/drpc/index";
 
 protocol.registerSchemesAsPrivileged([
   {

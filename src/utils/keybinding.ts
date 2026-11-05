@@ -1,5 +1,5 @@
-import { Config, defaultConfig } from "./config.js";
 import { app, BrowserWindow, ipcMain } from "electron";
+import { Config, defaultConfig } from "./config";
 
 const config = new Config();
 

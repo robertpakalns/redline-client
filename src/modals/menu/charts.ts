@@ -2,7 +2,7 @@ import {
   createEl,
   formatDuration,
   output,
-} from "../../preload/preloadFunctions.js";
+} from "../../preload/preloadFunctions";
 
 const pieBlocks = new Map<string, HTMLElement>();
 

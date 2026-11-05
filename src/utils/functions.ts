@@ -1,5 +1,5 @@
 import { app, nativeImage, type NativeImage } from "electron";
-import { Config, type ConfigType } from "./config.js";
+import { Config, type ConfigType } from "./config";
 import { join } from "path";
 
 const config = new Config();

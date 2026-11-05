@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile, readdir, access } from "fs/promises";
-import { configDir } from "./config.js";
 import { WebContents } from "electron";
+import { configDir } from "./config";
 import { join } from "path";
 
 export interface ScriptMeta {

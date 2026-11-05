@@ -1,3 +1,3 @@
-import { loadModule } from "../triplet.js";
+import { loadModule } from "../triplet";
 
 export default loadModule("drpc");

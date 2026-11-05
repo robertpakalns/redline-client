@@ -2,7 +2,7 @@ import {
   createEl,
   sessionFetch,
   getAsset,
-} from "../../preload/preloadFunctions.js";
+} from "../../preload/preloadFunctions";
 
 interface UpdateEntry {
   version: string;

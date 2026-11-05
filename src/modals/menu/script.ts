@@ -1,16 +1,16 @@
-import { createEl, popup } from "../../preload/preloadFunctions.js";
+import { createEl, popup } from "../../preload/preloadFunctions";
 import { ipcRenderer } from "electron";
-import Modal from "../modal.js";
+import Modal from "../modal";
 
 import menuModalHTML from "../../../js-dist/menu.html?raw";
 
-import createCustomizationSection from "./customization.js";
-import createUserscriptsSection from "./userscripts.js";
-import { generateConfigs } from "./generateConfigs.js";
-import createChangelogSection from "./changelog.js";
-import createAnalyticsSection from "./analytics.js";
-import createSettingsSection from "./settings.js";
-import { getVersions } from "../../preload/preloadUtils.js";
+import createCustomizationSection from "./customization";
+import createUserscriptsSection from "./userscripts";
+import { generateConfigs } from "./generateConfigs";
+import createChangelogSection from "./changelog";
+import createAnalyticsSection from "./analytics";
+import createSettingsSection from "./settings";
+import { getVersions } from "../../preload/preloadUtils";
 
 class MenuModal extends Modal {
   constructor() {

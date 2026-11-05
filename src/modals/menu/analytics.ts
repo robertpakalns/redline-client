@@ -1,5 +1,5 @@
-import { createPieChart, hideTooltip, lastWeekChart } from "./charts.js";
-import { formatDuration } from "../../preload/preloadFunctions.js";
+import { createPieChart, hideTooltip, lastWeekChart } from "./charts";
+import { formatDuration } from "../../preload/preloadFunctions";
 import { ipcRenderer } from "electron";
 
 const setValues = (

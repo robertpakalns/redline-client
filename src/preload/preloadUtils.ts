@@ -1,4 +1,4 @@
-import { createEl, isNum } from "../preload/preloadFunctions.js";
+import { createEl, isNum } from "../preload/preloadFunctions";
 import { ipcRenderer } from "electron";
 
 // Kirka.io Domains

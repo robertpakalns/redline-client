@@ -5,18 +5,18 @@ import {
   gameTDMBadges,
   gameDMBadges,
   escGameBadges,
-} from "./badges.js";
+} from "./badges";
 import {
   backToKirka,
   setVersions,
   setTrickoLink,
   changeSocLinks,
-} from "./preloadUtils.js";
-import { domains, config } from "../preload/preloadUtils.js";
-import { createEl } from "../preload/preloadFunctions.js";
+} from "./preloadUtils";
+import { domains, config } from "../preload/preloadUtils";
+import { createEl } from "../preload/preloadFunctions";
 import { ipcRenderer, contextBridge, webFrame } from "electron";
-import { manageFriendsPage } from "./friends.js";
-import MenuModal from "../modals/menu/script.js";
+import { manageFriendsPage } from "./friends";
+import MenuModal from "../modals/menu/script";
 
 import modalStylesString from "../../js-dist/modalStyles.css?raw";
 import clientStylesString from "../../js-dist/clientStyles.css?raw";

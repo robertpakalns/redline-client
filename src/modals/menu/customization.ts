@@ -1,5 +1,5 @@
-import { createEl } from "../../preload/preloadFunctions.js";
-import { config } from "../../preload/preloadUtils.js";
+import { createEl } from "../../preload/preloadFunctions";
+import { config } from "../../preload/preloadUtils";
 import { ipcRenderer } from "electron";
 
 let loaded = false;

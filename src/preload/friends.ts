@@ -1,5 +1,5 @@
-import { createEl } from "../preload/preloadFunctions.js";
-import { setFriendBadges } from "./badges.js";
+import { createEl } from "../preload/preloadFunctions";
+import { setFriendBadges } from "./badges";
 
 const filterFriends = (cont: HTMLElement, search: string): void => {
   const query = search.toLowerCase().trim();

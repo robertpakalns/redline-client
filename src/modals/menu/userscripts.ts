@@ -1,7 +1,7 @@
-import { appendConfig, Setting, sendNotification } from "./generateConfigs.js";
+import { appendConfig, Setting, sendNotification } from "./generateConfigs";
 import settingsJson from "../../../assets/userscriptsSettings.json";
 import { createEl } from "../../preload/preloadFunctions";
-import { ScriptMeta } from "../../utils/userscripts.js";
+import { ScriptMeta } from "../../utils/userscripts";
 import { ipcRenderer } from "electron";
 
 const data = settingsJson as Setting[];

@@ -1,7 +1,7 @@
 import { protocol, net, WebContents } from "electron";
 import { mkdir, readdir, access } from "fs/promises";
-import { domains, fromRoot } from "./functions.js";
-import { Config, configDir } from "./config.js";
+import { domains, fromRoot } from "./functions";
+import { Config, configDir } from "./config";
 import { pathToFileURL } from "url";
 import { join } from "path";
 
