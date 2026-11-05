@@ -1,4 +1,11 @@
 {
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["DOM", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+  },
   "include": ["src", "bun-env.d.ts"],
   "exclude": ["node_modules", "src-rust/target"],
 }
