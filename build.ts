@@ -69,7 +69,7 @@ const common = {
 
 const mainBundle = await build({
   ...common,
-  entrypoints: ["./src/index.ts"],
+  entrypoints: ["./src/main.ts"],
   format: "esm",
   naming: "main.js",
 });
