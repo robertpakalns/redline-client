@@ -11,8 +11,9 @@ import {
   setVersions,
   setTrickoLink,
   changeSocLinks,
+  domains,
 } from "./preloadUtils";
-import { domains, config } from "../preload/preloadUtils";
+import { config } from "../preload/config";
 import { createEl } from "../preload/preloadFunctions";
 import { ipcRenderer, contextBridge, webFrame } from "electron";
 import { manageFriendsPage } from "./friends";
@@ -35,7 +36,7 @@ const appendStyles = async (): Promise<void> => {
   const clientStyles = createEl("style");
   clientStyles.innerHTML =
     clientStylesString +
-    `.clientModalHint { display: ${(await config.get("interface.modalHint")) ? "block" : "none"} }`;
+    `.clientModalHint { display: ${config.get("interface.modalHint") ? "block" : "none"} }`;
 
   const fastCSSStyles = createEl("style", { id: "fastCSSStyles" });
   const fastCSSLink = createEl("link", {
@@ -43,7 +44,7 @@ const appendStyles = async (): Promise<void> => {
     rel: "stylesheet",
   }) as HTMLAnchorElement;
 
-  const { enable, url, value } = (await config.get("fastCSS")) as {
+  const { enable, url, value } = config.get("fastCSS") as {
     enable: boolean;
     url: string;
     value: string;

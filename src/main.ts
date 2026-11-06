@@ -53,7 +53,9 @@ ipcMain.handle("open-from-path", (_, path: string) =>
 ipcMain.handle("shell-open-external", (_, url: string) =>
   shell.openExternal(url),
 );
-ipcMain.handle("config-get", (_, key: string) => config.get(key));
+ipcMain.handle("config-get-all", () => {
+  return config.getAll();
+});
 ipcMain.handle("config-set", (_, key: string, value: boolean) => {
   config.set(key, value);
 });

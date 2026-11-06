@@ -1,6 +1,6 @@
 import { createEl } from "../../preload/preloadFunctions";
 import { updateFastCSS } from "../../preload/preload";
-import { config } from "../../preload/preloadUtils";
+import { config } from "../../preload/config";
 import { ipcRenderer } from "electron";
 
 let loaded = false;
@@ -10,22 +10,20 @@ const createCustomizationSection = async (cont: HTMLElement): Promise<void> => {
 
   // Fast CSS
   const fastCSSURL = cont.querySelector("#fastCSSURL") as HTMLInputElement;
-  fastCSSURL?.addEventListener(
-    "change",
-    async (e) =>
-      await config.set("fastCSS.url", (e.target as HTMLInputElement).value),
+  fastCSSURL.addEventListener("change", (e) =>
+    config.set("fastCSS.url", (e.target as HTMLInputElement).value),
   );
-  fastCSSURL!.value = (await config.get("fastCSS.url")) as string;
+  fastCSSURL.value = config.get("fastCSS.url") as string;
 
   const fastCSSValue = cont.querySelector(
     "#fastCSSValue",
   ) as HTMLTextAreaElement;
-  fastCSSValue?.addEventListener(
+  fastCSSValue.addEventListener(
     "input",
     async (e) =>
       await config.set("fastCSS.value", (e.target as HTMLInputElement).value),
   );
-  fastCSSValue!.value = (await config.get("fastCSS.value")) as string;
+  fastCSSValue.value = config.get("fastCSS.value") as string;
 
   const enableFastCSS = cont.querySelector(
     "#enableFastCSS",
@@ -74,7 +72,7 @@ const createCustomizationSection = async (cont: HTMLElement): Promise<void> => {
     keybindingCont.appendChild(tr);
   };
 
-  const { content: c2 } = (await config.get("keybinding")) as {
+  const { content: c2 } = config.get("keybinding") as {
     content: Record<string, string>;
   };
   if (keybindingCont.children.length === 0)

@@ -1,8 +1,8 @@
 import { createEl, popup } from "../../preload/preloadFunctions";
 import settingsJson from "../../../assets/settings.json";
-import { config } from "../../preload/preloadUtils";
-import { ipcRenderer } from "electron";
 import { toggleMenuModal } from "../../preload/preload";
+import { config } from "../../preload/config";
+import { ipcRenderer } from "electron";
 
 type RequiresType = "restart" | "refresh" | null;
 
@@ -69,7 +69,7 @@ export const generateConfigs = async (): Promise<void> => {
         "",
         [],
       ) as HTMLInputElement;
-      configCont.checked = (await config.get(el.config)) as boolean;
+      configCont.checked = config.get(el.config) as boolean;
       configCont.addEventListener("change", async (e) => {
         await config.set(el.config, (e.target as HTMLInputElement).checked);
         sendNotification(el.requires as RequiresType);
@@ -87,7 +87,7 @@ export const generateConfigs = async (): Promise<void> => {
           configCont.appendChild(option);
         }
 
-        configCont!.value = (await config.get(el.config)) as string;
+        configCont.value = config.get(el.config) as string;
       }
     } else {
       configCont = createEl("div", {}, "", []);

@@ -120,6 +120,10 @@ export class Config {
     return result as ConfigType;
   }
 
+  getAll(): IConfig {
+    return structuredClone(this.config);
+  }
+
   set(key: string, value: string | boolean): void {
     const keys = key.split(".");
     const lastKey = keys.pop();

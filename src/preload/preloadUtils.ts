@@ -1,5 +1,6 @@
-import { createEl, isNum } from "../preload/preloadFunctions";
+import { createEl } from "../preload/preloadFunctions";
 import { ipcRenderer } from "electron";
+import { config } from "./config";
 
 // Kirka.io Domains
 export const domains = new Set<string>([
@@ -11,15 +12,8 @@ export const domains = new Set<string>([
 ]);
 
 const getHostRenderer = async (): Promise<string> => {
-  const host = (await config.get("client.domain")) as string;
+  const host = config.get("client.domain") as string;
   return domains.has(host) ? host : "kirka.io";
-};
-
-// Configs
-export const config = {
-  get: (key: string) => ipcRenderer.invoke("config-get", key),
-  set: (key: string, value: string | boolean) =>
-    ipcRenderer.invoke("config-set", key, value),
 };
 
 export const backToKirka = (): void => {
