@@ -1,21 +1,15 @@
 import { protocol, net, WebContents } from "electron";
 import { mkdir, readdir, access } from "fs/promises";
+import { BLOCKED_DOMAINS } from "../constants/main";
+import { DOMAINS } from "../constants/shared";
 import { Config, configDir } from "./config";
 import { fromRoot } from "./functions";
-import { DOMAINS } from "../constants";
 import { pathToFileURL } from "url";
 import { join } from "path";
 
 const config = new Config();
 
 const swapper = async (webContents: WebContents): Promise<void> => {
-  const reject = new Set<string>([
-    "api.adinplay.com",
-    "www.google-analytics.com",
-    "www.googletagmanager.com",
-    "static.cloudflareinsights.com",
-  ]);
-
   const { adblocker, swapper } = config.get("client") as {
     adblocker: boolean;
     swapper: boolean;
@@ -46,10 +40,10 @@ const swapper = async (webContents: WebContents): Promise<void> => {
     }
   });
 
-  const swapFile = async (name: string | undefined): Promise<string | null> => {
+  const swapFile = async (name: string): Promise<string | null> => {
     // Resource detection based on the file name and extension
-    if (!swapperFiles.has(name as string)) return null;
-    const localFilePath = join(swapperFolder, name as string);
+    if (!swapperFiles.has(name)) return null;
+    const localFilePath = join(swapperFolder, name);
 
     try {
       await access(localFilePath);
@@ -66,15 +60,16 @@ const swapper = async (webContents: WebContents): Promise<void> => {
       if (protocol === "file:") return callback({});
 
       // Block ads and other scripts which are not Kirka related
-      if (adblocker && reject.has(host)) return callback({ cancel: true });
+      if (adblocker && BLOCKED_DOMAINS.has(host))
+        return callback({ cancel: true });
 
       if (DOMAINS.has(host)) {
         // Swapper
         if (swapper) {
           const fileName = pathname.split("/").pop();
-          if (await swapFile(fileName))
+          if (fileName && (await swapFile(fileName)))
             return callback({
-              redirectURL: `redline://local?asset=${encodeURIComponent(fileName as string)}`,
+              redirectURL: `redline://local?asset=${encodeURIComponent(fileName)}`,
             });
         }
       }

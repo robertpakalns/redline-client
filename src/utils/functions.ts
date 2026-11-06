@@ -1,5 +1,5 @@
 import { app, nativeImage, type NativeImage } from "electron";
-import { DOMAINS, MAIN_DOMAIN } from "../constants";
+import { DOMAINS, MAIN_DOMAIN } from "../constants/shared";
 import { Config } from "./config";
 import { join } from "path";
 

@@ -9,3 +9,6 @@ export const DOMAINS = new Set<string>([
 
 // Fallback domain
 export const MAIN_DOMAIN = "kirka.io";
+
+export const DISCORD_LINK = "https://discord.gg/cTE6CVuGen";
+export const REDLINE_TRICKO_PAGE = "https://tricko.pro/redline";

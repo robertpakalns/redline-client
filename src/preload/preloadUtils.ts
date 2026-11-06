@@ -1,5 +1,10 @@
+import {
+  DISCORD_LINK,
+  DOMAINS,
+  MAIN_DOMAIN,
+  REDLINE_TRICKO_PAGE,
+} from "../constants/shared";
 import { createEl } from "../preload/preloadFunctions";
-import { DOMAINS, MAIN_DOMAIN } from "../constants";
 import { ipcRenderer } from "electron";
 import { config } from "./config";
 
@@ -94,7 +99,7 @@ export const changeSocLinks = (cont: HTMLElement): void => {
   });
   discordButton.querySelector("svg")!.replaceWith(discordButtonImg);
   discordButton.onclick = () =>
-    ipcRenderer.invoke("shell-open-external", "https://discord.gg/cTE6CVuGen");
+    ipcRenderer.invoke("shell-open-external", DISCORD_LINK);
 
   btns[0].replaceWith(discordButton);
 
@@ -106,7 +111,7 @@ export const changeSocLinks = (cont: HTMLElement): void => {
   });
   trickoButton.querySelector("svg")!.replaceWith(trickoButtonImg);
   trickoButton.onclick = () =>
-    ipcRenderer.invoke("shell-open-external", "https://tricko.pro/redline");
+    ipcRenderer.invoke("shell-open-external", REDLINE_TRICKO_PAGE);
 
   const texts = Array.from(
     trickoButton.querySelector(".text-soc")!.children,

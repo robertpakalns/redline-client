@@ -17,7 +17,7 @@ import { createEl } from "../preload/preloadFunctions";
 import { ipcRenderer, contextBridge, webFrame } from "electron";
 import { manageFriendsPage } from "./friends";
 import MenuModal from "../modals/menu/script";
-import { DOMAINS } from "../constants";
+import { DOMAINS } from "../constants/shared";
 
 import modalStylesString from "../../js-dist/modalStyles.css?raw";
 import clientStylesString from "../../js-dist/clientStyles.css?raw";

@@ -1,5 +1,5 @@
 import { writeFile, mkdir, access } from "fs/promises";
-import { MAIN_DOMAIN } from "../constants";
+import { MAIN_DOMAIN } from "../constants/shared";
 import { readFileSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
