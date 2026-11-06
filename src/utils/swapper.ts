@@ -1,7 +1,8 @@
 import { protocol, net, WebContents } from "electron";
 import { mkdir, readdir, access } from "fs/promises";
-import { domains, fromRoot } from "./functions";
 import { Config, configDir } from "./config";
+import { fromRoot } from "./functions";
+import { DOMAINS } from "../constants";
 import { pathToFileURL } from "url";
 import { join } from "path";
 
@@ -67,7 +68,7 @@ const swapper = async (webContents: WebContents): Promise<void> => {
       // Block ads and other scripts which are not Kirka related
       if (adblocker && reject.has(host)) return callback({ cancel: true });
 
-      if (domains.has(host)) {
+      if (DOMAINS.has(host)) {
         // Swapper
         if (swapper) {
           const fileName = pathname.split("/").pop();

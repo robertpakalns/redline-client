@@ -11,13 +11,13 @@ import {
   setVersions,
   setTrickoLink,
   changeSocLinks,
-  domains,
 } from "./preloadUtils";
 import { config } from "../preload/config";
 import { createEl } from "../preload/preloadFunctions";
 import { ipcRenderer, contextBridge, webFrame } from "electron";
 import { manageFriendsPage } from "./friends";
 import MenuModal from "../modals/menu/script";
+import { DOMAINS } from "../constants";
 
 import modalStylesString from "../../js-dist/modalStyles.css?raw";
 import clientStylesString from "../../js-dist/clientStyles.css?raw";
@@ -67,7 +67,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   backToKirka();
   appendStyles();
 
-  if (!domains.has(window.location.host)) return;
+  if (!DOMAINS.has(window.location.host)) return;
 
   const menuModal = new MenuModal();
   menuModal.work();

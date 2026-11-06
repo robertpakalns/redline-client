@@ -1,4 +1,5 @@
 import { writeFile, mkdir, access } from "fs/promises";
+import { MAIN_DOMAIN } from "../constants";
 import { readFileSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
@@ -44,7 +45,7 @@ export const defaultConfig: IConfig = {
     fpsUncap: false,
     fullscreen: false,
     swapper: false,
-    domain: "kirka.io",
+    domain: MAIN_DOMAIN,
   },
   interface: {
     modalHint: true,

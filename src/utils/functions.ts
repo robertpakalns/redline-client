@@ -1,5 +1,6 @@
 import { app, nativeImage, type NativeImage } from "electron";
-import { Config, type ConfigType } from "./config";
+import { DOMAINS, MAIN_DOMAIN } from "../constants";
+import { Config } from "./config";
 import { join } from "path";
 
 const config = new Config();
@@ -7,18 +8,8 @@ const config = new Config();
 // Project root path
 export const fromRoot = (path: string): string => join(app.getAppPath(), path);
 
-// Kirka.io Domains
-export const domains = new Set<string>([
-  "kirka.io",
-  "snipers.io",
-  "ask101math.com",
-  "fpsiogame.com",
-  "cloudconverts.com",
-]);
-
-const host: ConfigType = config.get("client.domain");
-export const getHost = (): string =>
-  domains.has(host as string) ? (host as string) : "kirka.io";
+const host = config.get("client.domain") as string;
+export const getHost = (): string => (DOMAINS.has(host) ? host : MAIN_DOMAIN);
 
 // Redline Client icon
 const extObj: Record<string, string> = {

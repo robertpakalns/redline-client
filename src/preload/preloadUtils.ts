@@ -1,23 +1,15 @@
 import { createEl } from "../preload/preloadFunctions";
+import { DOMAINS, MAIN_DOMAIN } from "../constants";
 import { ipcRenderer } from "electron";
 import { config } from "./config";
 
-// Kirka.io Domains
-export const domains = new Set<string>([
-  "kirka.io",
-  "snipers.io",
-  "ask101math.com",
-  "fpsiogame.com",
-  "cloudconverts.com",
-]);
-
 const getHostRenderer = async (): Promise<string> => {
   const host = config.get("client.domain") as string;
-  return domains.has(host) ? host : "kirka.io";
+  return DOMAINS.has(host) ? host : MAIN_DOMAIN;
 };
 
 export const backToKirka = (): void => {
-  if (domains.has(window.location.host)) return;
+  if (DOMAINS.has(window.location.host)) return;
 
   const _back = createEl("div", {}, "backToKirka", ["Back to Kirka"]);
   _back.addEventListener(
