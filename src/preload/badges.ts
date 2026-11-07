@@ -64,8 +64,8 @@ export const mainMenuBadge = (cont: HTMLElement): void => {
 };
 
 export const gameTDMBadges = (cont: HTMLElement): void => {
-  const leftCont = cont.querySelector(".player-left-cont");
-  const rightCont = cont.querySelector(".player-right-cont");
+  const leftCont = cont.querySelector(".player-list.side-red");
+  const rightCont = cont.querySelector(".player-list.side-blue");
   if (!leftCont || !rightCont) return;
 
   const allContainers = [leftCont, rightCont];

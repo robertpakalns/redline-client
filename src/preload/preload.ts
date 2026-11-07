@@ -108,7 +108,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     const friendsCont = app.querySelector(".container .friends") as HTMLElement;
     if (friendsCont) manageFriendsPage(friendsCont);
 
-    const tdmCont = app.querySelector(".tab-team-info") as HTMLElement;
+    const tdmCont = app.querySelector(".players-cont") as HTMLElement;
     if (tdmCont) gameTDMBadges(tdmCont);
     const dmCont = app.querySelector(".tab-info") as HTMLElement;
     if (dmCont) gameDMBadges(dmCont);
