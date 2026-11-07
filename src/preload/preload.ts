@@ -110,7 +110,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     const tdmCont = app.querySelector(".players-cont") as HTMLElement;
     if (tdmCont) gameTDMBadges(tdmCont);
-    const dmCont = app.querySelector(".tab-info") as HTMLElement;
+    const dmCont = app.querySelector(".players-cont") as HTMLElement;
     if (dmCont) gameDMBadges(dmCont);
     const parkourCont = app.querySelector(".tab-parkour-info") as HTMLElement;
     if (parkourCont) gameDMBadges(parkourCont);
